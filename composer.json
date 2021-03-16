@@ -1,7 +1,7 @@
 {
     "name": "nickyeoman/phpframework",
     "description": "Quick, easy to use framework.",
-    "homepage": "https://www.nickyeoman.com"
+    "homepage": "https://www.nickyeoman.com",
     "type": "library",
     "license": "CC0-1.0",
     "authors": [
