@@ -1,0 +1,22 @@
+{
+    "name": "nickyeoman/phpframework",
+    "description": "Quick, easy to use framework.",
+    "homepage": "https://www.nickyeoman.com"
+    "type": "library",
+    "license": "CC0-1.0",
+    "authors": [
+        {
+            "name": "Nick Yeoman",
+            "email": "c@nickyeoman.com",
+            "homepage": "https://www.nickyeoman.com",
+            "role": "Developer"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+      "php": ">=7.4 <8.1"
+    },
+    "autoload": {
+        "psr-4": { "Nickyeoman\\framework\\": "src/" }
+    }
+}
