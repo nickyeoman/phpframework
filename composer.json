@@ -17,6 +17,6 @@
       "php": ">=7.4 <8.1"
     },
     "autoload": {
-        "psr-4": { "Nickyeoman\\framework\\": "src/" }
+        "psr-4": { "Nickyeoman\\Framework\\": "src/" }
     }
 }
