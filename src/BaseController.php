@@ -3,11 +3,9 @@ namespace Nickyeoman\Framework;
 
 class BaseController {
 
-  public $test = 'hello world';
-
   public function __construct() {
 
-    echo "started base controller";
+    //code here
 
   }
 

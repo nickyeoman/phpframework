@@ -1,14 +1,35 @@
 # phpframework
 
 Just a lightweight framework for routing and calling controllers.
-Just working on a proof of concept at this point.
 
 
 # Use
 
-require_once '../vendor/autoload.php';
-USE Nickyeoman\Framework;
-$router = new Nickyeoman\Framework\Router();
-$classname=$router->controller . 'Controller';
-require_once '../Controllers/index.php'; //TODO: need autoloader
-call_user_func_array( array(new $classname(), $router->action), $router->params );
+composer require nickyeoman/phpframework
+
+mkdir -p Controllers tmp public
+
+cp vendor/nickyeoman/phpframework/test/index.php public/.
+
+cp env.sample .env  (then edit)
+
+vi Controllers/index.php
+
+```
+<?php
+class indexController extends Nickyeoman\Framework\BaseController {
+
+	function index() {
+
+    $data = array( ['templatevar1' => 'title page' ] );
+    $this->twig('viewName', $data);
+
+  }
+}
+
+```
+
+# Composer Dependencies
+
+* ENV Variables: https://github.com/vlucas/phpdotenv
+* Autoloader for app: Nette\Loaders\RobotLoader
