@@ -11,12 +11,10 @@ class BaseController {
 
   public function twig($viewname = 'index', $vars = array() ) {
 
-    //TODO: ensure correct file/directory path
-      $path = realpath(__DIR__ . DIRECTORY_SEPARATOR . '..');
       //TWIG
-      $loader = new \Twig\Loader\FilesystemLoader($path . '/Views');
+      $loader = new \Twig\Loader\FilesystemLoader($_ENV['VIEWS']);
       $this->twig = new \Twig\Environment($loader, [
-          //'cache' => $path . '/cache',
+          'cache' => $_ENV['TWIGCACHE'],
       ]);
 
       echo $this->twig->render("$viewname.html.twig", $vars);

@@ -2,6 +2,10 @@
 //Require composer
 require_once '../vendor/autoload.php';
 
+// Tracy Debugger https://tracy.nette.org/
+use Tracy\Debugger;
+Debugger::enable();
+
 //Grab EnvVariables, then prepare them
 $realpath = realpath(__DIR__ . DIRECTORY_SEPARATOR . '..');
 $dotenv = Dotenv\Dotenv::createImmutable($realpath);

@@ -13,21 +13,7 @@ cp vendor/nickyeoman/phpframework/test/index.php public/.
 
 cp env.sample .env  (then edit)
 
-vi Controllers/index.php
-
-```
-<?php
-class indexController extends Nickyeoman\Framework\BaseController {
-
-	function index() {
-
-    $data = array( ['templatevar1' => 'title page' ] );
-    $this->twig('viewName', $data);
-
-  }
-}
-
-```
+cp test/childController.php Controllers/index.php
 
 # Composer Dependencies
 
