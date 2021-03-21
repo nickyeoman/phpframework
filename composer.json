@@ -16,10 +16,10 @@
     "prefer-stable" : true,
     "require": {
         "php": ">=7.4 <8.1",
-        "nette/robot-loader": "^v3.4",
-        "vlucas/phpdotenv": "^5.3",
-        "tracy/tracy": "^3.0",
-        "twig/twig": "^3.0"
+        "nette/robot-loader": "v3.*",
+        "vlucas/phpdotenv": "5.*",
+        "tracy/tracy": "3.*",
+        "twig/twig": "3.*"
     },
     "autoload": {
         "psr-4": { "Nickyeoman\\Framework\\": "src/" }
