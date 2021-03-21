@@ -13,12 +13,13 @@
         }
     ],
     "minimum-stability": "dev",
+    "prefer-stable" : true,
     "require": {
         "php": ">=7.4 <8.1",
-        "nette/robot-loader": "v3.4.x-dev",
-        "vlucas/phpdotenv": "5.3.x-dev",
-        "tracy/tracy": "v3.0.x-dev",
-        "twig/twig": "3.x-dev"
+        "nette/robot-loader": "v3.4.x",
+        "vlucas/phpdotenv": "5.3.x",
+        "tracy/tracy": "v3.0.x",
+        "twig/twig": "3.x"
     },
     "autoload": {
         "psr-4": { "Nickyeoman\\Framework\\": "src/" }
