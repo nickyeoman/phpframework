@@ -25,9 +25,20 @@ class Router {
 
     $this->makeUri();
     if ( ! $this->makeController() ) {
+
+      // TODO: check this works on docker
+      if ($_SERVER['REMOTE_ADDR'] == '127.0.0.1' || $_SERVER['REMOTE_ADDR'] == 'localhost' ) {
+
+        $tmpl = new frameworkTemplates;
+        echo $tmpl->echoControllerTemplate($this->controller, $this->action);
+        echo $tmpl->echoViewTemplate();
+        die("<h2>If not localhost, this would be a  404 error.</h2>");
+      }
+
       //TODO: this is sloppy, should just be a make here, 404 page should probably be i constructor
       header('HTTP/1.1 404 Not Found');
       echo 'This is 404 page. <a href="/">home</a>';
+      exit();  // must stop here or controller will still be called.
 
     }
 
@@ -87,13 +98,14 @@ class Router {
 
     }
 
+    //set parms even with error
+    $this->controller = $controller;
+    $this->action = $action;
+    $this->params = $uri;
+
     //Check controller exists
     //TODO: need filepath to parameters, see: composer require vlucas/phpdotenv
     if ( file_exists('../Controllers/' . $controller . '.php') ) {
-
-      $this->controller = $controller;
-      $this->action = $action;
-      $this->params = $uri;
 
       return true;
 

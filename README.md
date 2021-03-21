@@ -7,11 +7,11 @@ Just a lightweight framework for routing and calling controllers.
 
 composer require nickyeoman/phpframework
 
-mkdir -p Controllers tmp public
+mkdir -p Controllers tmp Public Views
 
 cp vendor/nickyeoman/phpframework/test/index.php public/.
 
-cp env.sample .env  (then edit)
+cp vendor/nickyeoman/phpframework/env.sample .env  (then edit)
 
 cp test/childController.php Controllers/index.php
 
