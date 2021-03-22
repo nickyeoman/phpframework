@@ -8,6 +8,7 @@ Debugger::enable();
 
 //Grab EnvVariables, then prepare them
 $realpath = realpath(__DIR__ . DIRECTORY_SEPARATOR . '..');
+$_ENV['realpath'] = $realpath;
 $dotenv = Dotenv\Dotenv::createImmutable($realpath);
 $dotenv->load();
 $controllerDirectory = $realpath . "/" . $_ENV['CONTROLLERPATH'];
