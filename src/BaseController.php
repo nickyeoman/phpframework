@@ -6,14 +6,13 @@ class BaseController {
 
   public $session = array();
   public $destroy = false;
+  public $loggedin = 0;
 
   /*
   * Manage the session
   */
   public function __construct() {
 
-    //debug
-    dump($_SESSION);
     // sessions
     if ( empty($_SESSION['sessionid']) ) {
 
@@ -25,8 +24,17 @@ class BaseController {
     } else {
 
       $this->session = $_SESSION;
+      if ( !empty( $this->session['loggedin'] ) ) {
+        if ( $this->session['loggedin'] == 1 ) {
+          $this->loggedin = 1;
+        }
+      }
 
     }
+
+    bdump($this->session);
+    bdump("loggedin: " . $this->loggedin);
+
 
   }
 
@@ -58,7 +66,7 @@ class BaseController {
   /*
   * This would be logout
   */
-  public function destroy() {
+  public function destroySession() {
 
     session_destroy();
     $this->destroy = true;
@@ -70,7 +78,7 @@ class BaseController {
   */
   function redirect($controller = 'index', $action = 'index') {
     header("Location: /$controller/$action");
-    exit;
+    exit();
   }
 
   /*
