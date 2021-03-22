@@ -2,6 +2,10 @@
 
 Just a lightweight framework for routing and calling controllers.
 
+# Links
+
+* https://github.com/nickyeoman/phpframework
+* https://packagist.org/packages/nickyeoman/phpframework
 
 # Use
 
