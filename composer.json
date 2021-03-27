@@ -20,7 +20,7 @@
         "vlucas/phpdotenv": "v5.3.0",
         "tracy/tracy": "v2.8.3",
         "twig/twig": "3.3.0",
-        "gabordemooij/redbean": "^5.6",
+        "gabordemooij/redbean": "^5.6"
     },
     "autoload": {
         "psr-4": { "Nickyeoman\\Framework\\": "src/" }
