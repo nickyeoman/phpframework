@@ -32,10 +32,6 @@ class BaseController {
 
     }
 
-    bdump($this->session);
-    bdump("loggedin: " . $this->loggedin);
-
-
   }
 
   /*

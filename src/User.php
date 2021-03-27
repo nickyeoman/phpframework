@@ -28,6 +28,7 @@ class User {
     $this->checkSession();
     $this->valid = new \Nickyeoman\Validation\Validate();
     R::setup( 'mysql:host=' . $_ENV['DBHOST'] . ';dbname=' . $_ENV['DB'] , $_ENV['DBUSER'], $_ENV['DBPASSWORD'] );
+    bdump($this->userTraits, "User Traits.");
 
   }
   // End Construct
@@ -54,11 +55,15 @@ class User {
   * Check if login is set
   **/
   public function loggedin() {
+
     if ( $this->userTraits['loggedin'] ) {
+
       return true;
+
     }
 
     return false;
+
   }
   //End loggedin
 
@@ -282,18 +287,32 @@ class User {
     if ( $this->valid->isEmail( $_POST[$formName] ) ) {
 
       //validate with email
-      $user = R::findone( 'users', ' email LIKE ? ', [ $_POST[$formName] ] );
+      $userdb = R::findone( 'users', ' email LIKE ? ', [ $_POST[$formName] ] );
 
     } else {
 
       //validate with username
-      $user = R::findone( 'users', ' username LIKE ? ', [ $_POST[$formName] ] );
+      $userdb = R::findone( 'users', ' username LIKE ? ', [ $_POST[$formName] ] );
 
     }
 
-    if ( empty($user) ) {
+    if ( empty($userdb) ) {
 
       $this->errors['login'] = 'Invalid login';
+      return false;
+
+    }
+
+    if ( ! empty( $userdb['validate'] ) ) {
+
+      $this->errors['login'] = 'Please validate your email address';
+      return false;
+
+    }
+
+    if ( $userdb['blocked'] == 1 ) {
+
+      $this->errors['login'] = 'Your account has been blocked';
       return false;
 
     }
@@ -305,7 +324,7 @@ class User {
 
     }
 
-    if ( ! password_verify( $_POST['password'] , $user['password'])  ) {
+    if ( ! password_verify( $_POST['password'] , $userdb['password'])  ) {
 
       $this->errors['login'] = 'Invalid login';
       return false;
@@ -316,11 +335,11 @@ class User {
 
     //set session
     $_SESSION['NY_FRAMEWORK_USER'] = [
-      'id' => $user[id],
-      'username' => $user[username],
-      'email' => $user[email],
-      'first_name' => $user[first_name],
-      'last_name' => $user[last_name],
+      'id' => $userdb['id'],
+      'username' => $userdb['username'],
+      'email' => $userdb['email'],
+      'first_name' => $userdb['first_name'],
+      'last_name' => $userdb['last_name'],
       'loggedin' => true,
       ];
 
