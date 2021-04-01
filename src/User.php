@@ -110,15 +110,16 @@ class User {
 
   /**
   * Checks if email is valid and not already in system
+  * unless exists param is passed then checks if in database
   **/
-  public function checkEmail(){
+  public function checkEmail($exists = false){
 
     //Email
     $email = $this->valid->clean( 'email' );
 
     //check email address is valid (if not do things)
     if ( ! $this->valid->isEmail( $email ) ) {
-      $this->error['email'] = "Not a valid E-mail address: $email";
+      $this->errors['email'] = "Not a valid E-mail address: $email";
       $this->userTraits['email'] = '';
       return false;
     }
@@ -126,10 +127,24 @@ class User {
     //Check database
 
     $existingEmail = R::findone( 'users', ' email LIKE ? ', [ $email ] );
-    if ( ! empty( $existingEmail ) ) {
-      $this->errors['email'] = "Email is already registered.";
-      $this->userTraits['email'] = '';
-      return false;
+
+    if ($exists) {
+
+      if ( ! empty( $existingEmail ) ) {
+
+        $this->userTraits['email'] = $email;
+        return true;
+
+      }
+
+    } else {
+
+      if ( ! empty( $existingEmail ) ) {
+        $this->errors['email'] = "Email is already registered.";
+        $this->userTraits['email'] = '';
+        return false;
+      }
+
     }
 
     // Checks all seem good
@@ -232,6 +247,40 @@ class User {
 
   }
   //end Send Registration Email
+
+  //TODO: send to a text file or output if debugging
+  public function passwordReset() {
+
+    $resetkey = md5( $username . $_ENV['SALT'] );
+    //Passed Checks, Remove Key from database
+    $user = R::findone( 'users', ' email LIKE ? ', [ $this->userTraits['email'] ] );
+    $userdb = R::dispense("users");
+		$userdb->reset = $resetkey;
+		$userdb->updated = R::isoDateTime();
+		$userdb->id = $user['id'];
+		R::store( $userdb );
+
+    // https://packagist.org/packages/nette/mail
+    $mail = new \Nette\Mail\Message;
+
+    $mail->setFrom($_ENV['MAIL_FROM_NAME'] . ' <' . $_ENV['MAIL_FROM_ADDRESS'] .'>')
+      ->addTo( $this->userTraits['email'] )
+      ->setSubject('Reset your password at GOPOLI')
+      ->setBody('Hello, please go to this link to change your password ' . $_ENV['BASEURL'] . 'user/reset/?valid=' . $resetkey . '&email=' . $this->userTraits['email'])
+    ;
+
+    $mailer = new \Nette\Mail\SmtpMailer([
+       'host'     => $_ENV['MAIL_HOST'],
+       'username' => $_ENV['MAIL_USERNAME'],
+       'password' => $_ENV['MAIL_PASSWORD'],
+       'secure'   => $_ENV['MAIL_ENCRYPTION'],
+       'port'     => $_ENV['MAIL_PORT'],
+     ]);
+
+    $mailer->send($mail);
+
+  }
+  //end Send Reset Email
 
   /**
   * Is the Validation key correct?
