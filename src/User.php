@@ -6,12 +6,14 @@ USE \Nickyeoman\Validation;
 class User {
 
   public $userTraits = array(
+    "uid" => '',
     "username" => '',
     "password" => '',
     "email" => '',
     "first_name" => '',
     "last_name" => '',
     "validate" => '',
+    "reset" => '',
     "created" => '',
     "updated" => '',
     "blocked" => '',
@@ -110,15 +112,16 @@ class User {
 
   /**
   * Checks if email is valid and not already in system
+  * unless exists param is passed then checks if in database
   **/
-  public function checkEmail(){
+  public function checkEmail($exists = false){
 
     //Email
     $email = $this->valid->clean( 'email' );
 
     //check email address is valid (if not do things)
     if ( ! $this->valid->isEmail( $email ) ) {
-      $this->error['email'] = "Not a valid E-mail address: $email";
+      $this->errors['email'] = "Not a valid E-mail address: $email";
       $this->userTraits['email'] = '';
       return false;
     }
@@ -126,10 +129,18 @@ class User {
     //Check database
 
     $existingEmail = R::findone( 'users', ' email LIKE ? ', [ $email ] );
-    if ( ! empty( $existingEmail ) ) {
-      $this->errors['email'] = "Email is already registered.";
-      $this->userTraits['email'] = '';
-      return false;
+
+    if ( ! empty($existingEmail) ) {
+
+        $this->userTraits['email'] = $email;
+        return true;
+
+    } else {
+
+        $this->errors['email'] = "Email is not registered.";
+        $this->userTraits['email'] = '';
+        return false;
+
     }
 
     // Checks all seem good
@@ -233,6 +244,57 @@ class User {
   }
   //end Send Registration Email
 
+  //TODO: send to a text file or output if debugging
+    /**
+     * Creates a password reset key, stores it in db and emails to  user
+     */
+  public function passwordReset() {
+
+    $resetkey = md5( $this->userTraits['email'] . $_ENV['SALT'] );
+    
+    //Passed Checks, Remove Key from database
+    $user = R::findone( 'users', ' email LIKE ? ', [ $this->userTraits['email'] ] );
+
+    $userdb = R::dispense("users");
+		$userdb->reset = $resetkey;
+		$userdb->updated = R::isoDateTime();
+		$userdb->id = $user['id'];
+		R::store( $userdb );
+
+    // https://packagist.org/packages/nette/mail
+    $mail = new \Nette\Mail\Message;
+
+    $mail->setFrom($_ENV['MAIL_FROM_NAME'] . ' <' . $_ENV['MAIL_FROM_ADDRESS'] .'>')
+      ->addTo( $this->userTraits['email'] )
+      ->setSubject('Reset your password at GOPOLI')
+      ->setBody('Hello, please go to this link to change your password ' . $_ENV['BASEURL'] . 'user/reset/?valid=' . $resetkey . '&email=' . $this->userTraits['email'])
+    ;
+
+    $mailer = new \Nette\Mail\SmtpMailer([
+       'host'     => $_ENV['MAIL_HOST'],
+       'username' => $_ENV['MAIL_USERNAME'],
+       'password' => $_ENV['MAIL_PASSWORD'],
+       'secure'   => $_ENV['MAIL_ENCRYPTION'],
+       'port'     => $_ENV['MAIL_PORT'],
+     ]);
+
+    $mailer->send($mail);
+
+  }
+  //end Send Reset Email
+
+    public function resetUserPassword() {
+
+        //Passed Checks, Remove Key from database
+        $userdb = R::dispense("users");
+        $userdb->reset = '';
+        $userdb->password = $this->userTraits['password'];
+        $userdb->updated = R::isoDateTime();
+        $userdb->id = $this->userTraits['uid'];
+        R::store( $userdb );
+
+    }
+
   /**
   * Is the Validation key correct?
   * take a key and and email, check the database
@@ -280,6 +342,65 @@ class User {
 
   }
   //end Check validationkey
+
+    /**
+     * Is the password reset key correct?
+     * take a key and email, check the database
+     * */
+    public function checkResetKey($key2check) {
+
+        $cleanKey = $this->valid->clean( $key2check );
+
+        // Check for empty key
+        if ( empty( $cleanKey ) ) {
+            $this->errors['valid'] = 'Key is Empty';
+            return false;
+        }
+        // cleankey is not empty
+
+        // probably alrady checked email by now, but just in case
+        // TODO: add session
+        if ( ! empty( $_POST['email'] ) )
+            $email = $this->valid->clean( $_POST['email'] );
+        else if ( ! empty( $_GET['email'] ) )
+            $email = $this->valid->clean( $_GET['email'] );
+        else {
+            $this->errors['valid'] = 'Email is Empty';
+            return false;
+        }
+
+        // Check if email exists
+        if ( $this->valid->isEmail( $email ) ) {
+
+            $user = R::findone( 'users', ' email LIKE ? ', [ $email ] );
+
+        } else {
+
+            $this->errors['valid'] = 'Key or Email not valid';
+            return false;
+
+        }
+        // the email address exists
+
+        // Check database returned something
+        if ( isset( $user ) )
+            $this->userTraits['uid'] = $user['id'];
+        else {
+            $this->errors['valid'] = 'Email not valid';
+            return false;
+        }
+
+        if ( $cleanKey != $user['reset']) {
+
+            $this->errors['valid'] = 'Key or Email not valid';
+            return false;
+
+        }
+
+        return true;
+
+    }
+    //end Check validationkey
 
   public function login($formName = 'login') {
 

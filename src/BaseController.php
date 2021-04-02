@@ -32,6 +32,8 @@ class BaseController {
 
     }
 
+    bdump($this->session, 'Session Data');
+
   }
 
   /*
