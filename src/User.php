@@ -127,19 +127,26 @@ class User {
     }
 
     //Check database
-
     $existingEmail = R::findone( 'users', ' email LIKE ? ', [ $email ] );
 
     if ( ! empty($existingEmail) ) {
 
         $this->userTraits['email'] = $email;
-        return true;
+        if ( $exists )
+          return true;
+        else
+          return false;
 
     } else {
 
+      if ( ! $exists ) {
+        $this->userTraits['email'] = $email;
+        return true;
+      } else {
         $this->errors['email'] = "Email is not registered.";
         $this->userTraits['email'] = '';
         return false;
+      }
 
     }
 
@@ -161,13 +168,13 @@ class User {
 
     //validate minimum length
     if ( ! $this->valid->minLength( $password, $minlength ) ) {
-      $this->error['password'] = "Password must be at least $minlength characters long.";
+      $this->errors['password'] = "Password must be at least $minlength characters long.";
       return false;
     }
 
     //validate max length
     if ( ! $this->valid->maxLength( $password, $maxlength ) ) {
-      $this->error['password'] = "Password must be shorter than $maxlength characters.";
+      $this->errors['password'] = "Password must be shorter than $maxlength characters.";
       return false;
     }
 
@@ -178,7 +185,7 @@ class User {
 
         if ( $password != $_POST[$confirm] ) {
 
-          $this->error['password'] = 'Passwords do not match';
+          $this->errors['password'] = 'Passwords do not match';
           return false;
 
         }
@@ -213,7 +220,7 @@ class User {
       return true;
     }
 
-    $this->error['database'] = "User not created in database";
+    $this->errors['database'] = "User not created in database";
     return false;
 
   }
@@ -251,7 +258,7 @@ class User {
   public function passwordReset() {
 
     $resetkey = md5( $this->userTraits['email'] . $_ENV['SALT'] );
-    
+
     //Passed Checks, Remove Key from database
     $user = R::findone( 'users', ' email LIKE ? ', [ $this->userTraits['email'] ] );
 

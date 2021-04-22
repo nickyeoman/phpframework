@@ -14,25 +14,24 @@ class BaseController {
   public function __construct() {
 
     // sessions
-    if ( empty($_SESSION['sessionid']) ) {
+    if ( empty( $_SESSION['sessionid'] ) ) {
 
       $this->session['sessionid'] = session_id();
-      //$this->setVar( 'sessionid', session_id() );
-      $this->session['formkey'] = md5( session_id(). date("ymdhis") );
-      //$this->setVar( 'formkey', md5( session_id(). date("ymdhis") ) );
+      $this->session['formkey']   = md5( session_id(). date("ymdhis") );
 
     } else {
 
       $this->session = $_SESSION;
+      
       if ( !empty( $this->session['loggedin'] ) ) {
-        if ( $this->session['loggedin'] == 1 ) {
+      
+        if ( $this->session['loggedin'] == 1 )
           $this->loggedin = 1;
-        }
+        
       }
 
-    }
 
-    bdump($this->session, 'Session Data');
+    }
 
   }
 
@@ -41,23 +40,31 @@ class BaseController {
   */
   public function writeSession() {
 
-    if (!$this->destroy) {
+    if ( ! $this->destroy )
       $_SESSION = $this->session;
-    }
 
   }
 
   public function setFlash($name, $value){
+  
     $this->session['flash']["$name"] = $value;
+    
   }
 
   public function readFlash($name) {
+  
     if ( isset( $this->session['flash']["$name"] ) ) {
+    
       $value = $this->session['flash']["$name"];
+      
       unset($this->session['flash']["$name"]);
+      
       return $value;
+      
     } else {
+    
       return false;
+      
     }
   }
 
@@ -75,8 +82,10 @@ class BaseController {
   * Redirect the page
   */
   function redirect($controller = 'index', $action = 'index') {
+  
     header("Location: /$controller/$action");
     exit();
+    
   }
 
   /*
@@ -85,7 +94,7 @@ class BaseController {
   public function twig($viewname = 'index', $vars = array() ) {
 
       //TWIG
-      $loader = new \Twig\Loader\FilesystemLoader($_ENV['realpath'] . '/' . $_ENV['VIEWPATH']);
+      $loader     = new \Twig\Loader\FilesystemLoader($_ENV['realpath'] . '/' . $_ENV['VIEWPATH']);
       $this->twig = new \Twig\Environment($loader, [
           'cache' => $_ENV['realpath'] . '/' .$_ENV['TWIGCACHE'],
       ]);
