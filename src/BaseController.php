@@ -22,14 +22,13 @@ class BaseController {
     } else {
 
       $this->session = $_SESSION;
-      
+
       if ( !empty( $this->session['loggedin'] ) ) {
-      
+
         if ( $this->session['loggedin'] == 1 )
           $this->loggedin = 1;
-        
-      }
 
+      }
 
     }
 
@@ -46,25 +45,25 @@ class BaseController {
   }
 
   public function setFlash($name, $value){
-  
+
     $this->session['flash']["$name"] = $value;
-    
+
   }
 
   public function readFlash($name) {
-  
+
     if ( isset( $this->session['flash']["$name"] ) ) {
-    
+
       $value = $this->session['flash']["$name"];
-      
+
       unset($this->session['flash']["$name"]);
-      
+
       return $value;
-      
+
     } else {
-    
+
       return false;
-      
+
     }
   }
 
@@ -82,10 +81,10 @@ class BaseController {
   * Redirect the page
   */
   function redirect($controller = 'index', $action = 'index') {
-  
+
     header("Location: /$controller/$action");
     exit();
-    
+
   }
 
   /*
@@ -97,7 +96,9 @@ class BaseController {
       $loader     = new \Twig\Loader\FilesystemLoader($_ENV['realpath'] . '/' . $_ENV['VIEWPATH']);
       $this->twig = new \Twig\Environment($loader, [
           'cache' => $_ENV['realpath'] . '/' .$_ENV['TWIGCACHE'],
+          'debug' => true,
       ]);
+      $this->twig->addExtension(new \Twig\Extension\DebugExtension());
 
       echo $this->twig->render("$viewname.html.twig", $vars);
 

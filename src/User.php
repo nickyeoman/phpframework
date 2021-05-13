@@ -17,6 +17,7 @@ class User {
     "created" => '',
     "updated" => '',
     "blocked" => '',
+    "admin" => '',
     "loggedin" => false,
   );
   public $errors = array();
@@ -65,6 +66,39 @@ class User {
     }
 
     return false;
+
+  }
+  //End loggedin
+
+  /**
+  * Check if admin is set
+  **/
+  public function isAdmin() {
+
+    if ( $this->userTraits['admin'] ) {
+
+      return true;
+
+    } else {
+
+      //double check with a database call
+      $existingUser = R::findone( 'users', ' username LIKE ? ', [ $this->userTraits['username'] ] );
+      if ( ! empty( $existingUser ) ) {
+
+        if ( $existingUser['admin'] ) {
+          $this->userTraits['admin'] = $existingUser['admin']; //1
+          return true;
+        } else {
+          $this->errors['admin'] = "You are not an admin";
+          return false;
+        }
+
+      }
+      $this->errors['admin'] = "You are not an admin";
+      return false;
+    }
+
+
 
   }
   //End loggedin
@@ -468,6 +502,7 @@ class User {
       'email' => $userdb['email'],
       'first_name' => $userdb['first_name'],
       'last_name' => $userdb['last_name'],
+      'admin' => $userdb['admin'],
       'loggedin' => true,
       ];
 
