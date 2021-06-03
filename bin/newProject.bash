@@ -1,9 +1,5 @@
 #!/bin/bash
 
-PWD=`pwd`;
-projectNamae=$1;
-echo "Creating ${projectNamae} project in ${PWD}";
-
 # Create directories needed
 mkdir -p controllers tmp public views
 

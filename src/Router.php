@@ -3,12 +3,9 @@ namespace Nickyeoman\Framework;
 
 /**
 * Router Class
-* v0.3
-* Last Updated: Mar 17, 2021
+* v1.0
+* Last Updated: Jun 02, 2021
 * URL: TBA
-*
-* Changelog:
-* v0 working on 1.0 release
 **/
 
 class Router {
@@ -17,6 +14,7 @@ class Router {
   public $controller = '';
   public $action = '';
   public $params = array();
+  public $env = null;
 
   /**
   * Find the Controller Paths
@@ -25,15 +23,6 @@ class Router {
 
     $this->makeUri();
     if ( ! $this->makeController() ) {
-
-      // TODO: check this works on docker
-      if ($_SERVER['REMOTE_ADDR'] == '127.0.0.1' || $_SERVER['REMOTE_ADDR'] == 'localhost' ) {
-
-        $tmpl = new frameworkTemplates;
-        echo $tmpl->echoControllerTemplate($this->controller, $this->action);
-        echo $tmpl->echoViewTemplate();
-        die("<h2>If not localhost, this would be a  404 error.</h2>");
-      }
 
       //TODO: this is sloppy, should just be a make here, 404 page should probably be i constructor
       header('HTTP/1.1 404 Not Found');
@@ -104,8 +93,7 @@ class Router {
     $this->params = $uri;
 
     //Check controller exists
-    //TODO: need filepath to parameters, see: composer require vlucas/phpdotenv
-    if ( file_exists('../Controllers/' . $controller . '.php') ) {
+    if ( file_exists( $_ENV['realpath'] . "/" . $_ENV['CONTROLLERPATH'] . $controller . '.php') ) {
 
       return true;
 
