@@ -11,12 +11,13 @@ If this was your framework you would probably like it more.
 # Install using Composer
 
 You need a basic understanding of bash, replace the <YOUR_PROJECT_PATH/YOUR_PROJECT_NAME>.
+Always run your scripts from the root directory.
 
 ```bash
 mkdir <YOUR_PROJECT_PATH/YOUR_PROJECT_NAME>
 cd <YOUR_PROJECT_PATH/YOUR_PROJECT_NAME>
 composer require nickyeoman/phpframework
-bash vendor/nickyeoman/phpframeworks/bin/newProject.bash
+bash vendor/nickyeoman/phpframework/bin/newProject.bash
 ```
 
 After you edit the env file you will want to add a controller

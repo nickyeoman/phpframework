@@ -1,0 +1,17 @@
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>{% include 'modules/header.html.twig' %}</head>
+
+<body>
+  <div id="page">
+    {% if notice is not empty %}
+      <div id="notice">{{  notice }}</div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </div>
+
+</body>
+
+</html>

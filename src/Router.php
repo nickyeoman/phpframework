@@ -40,8 +40,10 @@ class Router {
 
     //remove get (will grab parameters using GET)
     $builduri = strtok($_SERVER['REQUEST_URI'], '?');
+
     //put into array
     $uriarr = explode("/", $builduri);
+
     //drop the first empty
     array_shift($uriarr);
 
@@ -93,7 +95,7 @@ class Router {
     $this->params = $uri;
 
     //Check controller exists
-    if ( file_exists( $_ENV['realpath'] . "/" . $_ENV['CONTROLLERPATH'] . $controller . '.php') ) {
+    if ( file_exists( $_ENV['realpath'] . "/" . $_ENV['CONTROLLERPATH'] . '/' . $controller . '.php' ) ) {
 
       return true;
 
