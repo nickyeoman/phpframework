@@ -77,7 +77,6 @@ class Router {
     }
 
     //get action
-    //TODO: check if action function exists
     if ( empty( $uri[0] ) ) {
 
       $action = 'index';
@@ -105,6 +104,8 @@ class Router {
       return false;
 
     }
+
+    //TODO: what if action doesn't exist?
 
     return true;
 
