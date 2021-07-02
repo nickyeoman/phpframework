@@ -29,9 +29,10 @@ bash vendor/nickyeoman/phpframework/bin/newController.bash index
 
 ## Start server
 
+Make sure your dotenv Docker section is complete, or change USERDOCKER="php".
+
 sudo bash vendor/nickyeoman/phpframework/bin/startServer.bash
 
-Make sure your dotenv is complete
 
 # Framework Components
 
@@ -45,7 +46,7 @@ ENV Variables: https://github.com/vlucas/phpdotenv
 
 ## Tracy Debugger
 
-I "must have" debugging tool: https://tracy.nette.org/
+A "must have" debugging tool: https://tracy.nette.org/
 
 To enable Tracy Debug bar, change .env variable "DEBUG" to "display".
 Any other value will disable tracy.
