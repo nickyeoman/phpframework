@@ -27,6 +27,12 @@ Then you will want to add a controller:
 bash vendor/nickyeoman/phpframework/bin/newController.bash index
 ```
 
+## Start server
+
+sudo bash vendor/nickyeoman/phpframework/bin/startServer.bash
+
+Make sure your dotenv is complete
+
 # Framework Components
 
 ## Composer
@@ -49,10 +55,10 @@ Any other value will disable tracy.
 Auto loads Controllers
 https://doc.nette.org/en/3.1/robotloader
 
+## Uses Twig templates
 
-* Autoloader for app: Nette\Loaders\RobotLoader
-* "php": ">=7.4 <8.1",
-* "nette/robot-loader": "v3.4.0",
-* "vlucas/phpdotenv": "v5.3.0",
-* "twig/twig": "3.3.0",
-* "gabordemooij/redbean": "^5.6"
+The view function calls on twig templates for displaying the views.
+
+## Database redbean
+
+Readbean does so much work for you.
