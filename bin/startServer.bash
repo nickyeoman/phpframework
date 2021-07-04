@@ -41,6 +41,33 @@ if [ "$DOCKERVOL" == "local" ]; then
 
   docker run -d -p ${DOCKERPORT}:80 --name ${DOCKERNAME} --net ${DOCKERNET} -v ${PWD}:/website ${DOCKERIMAGE}:${DOCKERVER}
   #echo "for debug local: docker run -d -p ${DOCKERPORT}:80 --name ${DOCKERNAME} --net ${DOCKERNET} -v ${PWD}:/website ${DOCKERIMAGE}:${DOCKERVER}"
+
+  # Create a container for a database?
+  if [ "$DOCKERDB" == "mariadb" ] || [ "$DOCKERDB" == "mysql" ]; then
+
+    docker run -d -p ${DBPORT}:3306 --name ${DOCKERNAME}-db --net ${DOCKERNET} -v ${DOCKERNAME}-db:/var/lib/mysql \
+    -e MYSQL_ROOT_PASSWORD=${DBPASSWORD} \
+    -e MYSQL_PASSWORD=${DBPASSWORD} \
+    -e MYSQL_USER=${DBUSER} \
+    -e MYSQL_DATABASE=${DB} \
+    mariadb:latest;
+
+    echo "Started docker container ${DOCKERNAME}-db on port ${DBPORT}"
+
+  fi
+
+  # Do you want phpmyadmin?
+  if [[ $DOCKERPHPMYADMIN =~ '^[0-9]+$' ]] ; then
+
+    docker run -d -p ${DOCKERPHPMYADMIN}:80 --name ${DOCKERNAME}-phpmyadmin --net ${DOCKERNET} \
+    -e PMA_ARBITRARY="1" \
+    -e UPLOAD_LIMIT="200M" \
+    phpmyadmin/phpmyadmin:latest
+
+    echo "Started docker container ${DOCKERNAME}-phpmyadmin on port ${DOCKERPHPMYADMIN}"
+
+  fi
+
   echo "Started docker container ${DOCKERNAME}"
   echo "When done: docker stop ${DOCKERNAME}; docker rm ${DOCKERNAME}"
 

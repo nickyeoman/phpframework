@@ -1,5 +1,6 @@
 <?php
 namespace Nickyeoman\Framework;
+USE \RedBeanPHP\R;
 session_start();
 
 class BaseController {
@@ -31,6 +32,10 @@ class BaseController {
       }
 
     }
+
+    //database
+    if ( ! empty( $_ENV['DBUSER'] )
+      R::setup( 'mysql:host=' . $_ENV['DBHOST'] . ';dbname=' . $_ENV['DB'] , $_ENV['DBUSER'], $_ENV['DBPASSWORD'] );
 
   }
 

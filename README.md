@@ -63,3 +63,12 @@ The view function calls on twig templates for displaying the views.
 ## Database redbean
 
 Readbean does so much work for you.
+
+# My Philosophies
+
+1. A url should be clean, no GET statements (question marks).
+1. You should not have to define controllers, routes should be based on the url and the system should be able to figure them out. (CodeIgniter style)
+1. Apache is okay
+1. Framework should play nice with hugo (Apache settings)
+1. Docker is king
+1. Build websites fast

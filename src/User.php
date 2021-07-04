@@ -1,6 +1,6 @@
 <?php
 namespace Nickyeoman\Framework;
-USE \RedBeanPHP\R;
+//USE \RedBeanPHP\R;
 USE \Nickyeoman\Validation;
 
 class User {
@@ -30,7 +30,7 @@ class User {
 
     $this->checkSession();
     $this->valid = new \Nickyeoman\Validation\Validate();
-    R::setup( 'mysql:host=' . $_ENV['DBHOST'] . ';dbname=' . $_ENV['DB'] , $_ENV['DBUSER'], $_ENV['DBPASSWORD'] );
+    //R::setup( 'mysql:host=' . $_ENV['DBHOST'] . ';dbname=' . $_ENV['DB'] , $_ENV['DBUSER'], $_ENV['DBPASSWORD'] );
     bdump($this->userTraits, "User Traits.");
 
   }
