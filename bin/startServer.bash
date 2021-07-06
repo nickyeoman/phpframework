@@ -57,8 +57,9 @@ if [ "$DOCKERVOL" == "local" ]; then
   fi
 
   # Do you want phpmyadmin?
-  if [[ $DOCKERPHPMYADMIN =~ '^[0-9]+$' ]] ; then
+  if [[ $DOCKERPHPMYADMIN =~ ^[0-9]+$ ]] ; then
 
+    # TODO: Can we just put in the info an auto connect?
     docker run -d -p ${DOCKERPHPMYADMIN}:80 --name ${DOCKERNAME}-phpmyadmin --net ${DOCKERNET} \
     -e PMA_ARBITRARY="1" \
     -e UPLOAD_LIMIT="200M" \

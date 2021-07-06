@@ -19,12 +19,13 @@ bash vendor/nickyeoman/phpframework/bin/startServer.bash
 
 ### Using Phinx
 
-First you need to initialize phinx: php vendor/bin/phinx init
+First you need to initialize phinx:
+php vendor/bin/phinx init
 in order to create a phinx.php config file. [Phinx Installation](https://book.cakephp.org/phinx/0/en/install.html)
 
 Next supply phinx.php with your database information.
 Note this is left separate as when working in development mode you are connecting from host to container,
-where in the application (dotenv)  you are connecting container to container.
+where in the application (dotenv) you are connecting container to container.
 
 **TODO: get phix to read from .env file.**
 
@@ -44,6 +45,11 @@ Further documentation:
 
 * [RedBeanPHP CRUD documentation](https://redbeanphp.com/index.php?p=/crud)
 * [RedBeanPHP Querying documentation](https://redbeanphp.com/index.php?p=/querying)
+
+You must always include the line: use \RedBeanPHP\R as R;
+at the top of your controller to access the R::functions
+
+### Create Row
 
 Below is an example of how to use RedBeanPHP to create a row:
 
@@ -66,4 +72,20 @@ if ( ! empty( $id ) ) {
   $this->errors['database'] = "User not created in database";
   return false;
 }
+```
+
+### Get rows
+
+```php
+$data['users'] = R::getAll( 'select * from users' );
+```
+
+Then in twig:
+
+```php
+{% for user in users %}
+  id: {{ user.id }} <br />
+  name: {{ user.name }} <br />
+  email: {{ user.email }}
+{% endfor %}
 ```

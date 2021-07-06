@@ -72,3 +72,4 @@ Readbean does so much work for you.
 1. Framework should play nice with hugo (Apache settings)
 1. Docker is king
 1. Build websites fast
+1. I went with bash for the automation process for two reasons, one I'm more familiar with it and two it seemed more appropriate when working with containers.
