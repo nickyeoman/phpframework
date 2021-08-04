@@ -70,6 +70,15 @@ if [ "$DOCKERVOL" == "local" ]; then
     echo "Started docker container ${DOCKERNAME}-phpmyadmin on port ${DOCKERPHPMYADMIN}"
 
   fi
+  
+  docker run -it \
+  -e DATABASE_NAME=${DOCKERNAME}-strapi \
+  -e DATABASE_HOST=${DOCKERNAME}-db \
+  -e DATABASE_PORT=${DBPORT} \
+  -e DATABASE_USERNAME=${DBUSER} \
+  -e DATABASE_PASSWORD=${DBPASSWORD} \
+  -p 1337:1337 \
+  strapi/strapi
 
   echo "Started docker container ${DOCKERNAME}"
   echo "When done: docker stop ${DOCKERNAME}; docker rm ${DOCKERNAME}"
