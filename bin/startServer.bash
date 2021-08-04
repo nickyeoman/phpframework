@@ -59,10 +59,12 @@ if [ "$DOCKERVOL" == "local" ]; then
   # Do you want phpmyadmin?
   if [[ $DOCKERPHPMYADMIN =~ ^[0-9]+$ ]] ; then
 
-    # TODO: Can we just put in the info an auto connect?
+    # Documentation: https://hub.docker.com/r/phpmyadmin/phpmyadmin/
     docker run -d -p ${DOCKERPHPMYADMIN}:80 --name ${DOCKERNAME}-phpmyadmin --net ${DOCKERNET} \
-    -e PMA_ARBITRARY="1" \
     -e UPLOAD_LIMIT="200M" \
+    -e PMA_USER=${DBUSER} \
+    -e PMA_PASSWORD=${DBPASSWORD} \
+    -e PMA_HOST=${DOCKERNAME}-db \
     phpmyadmin/phpmyadmin:latest
 
     echo "Started docker container ${DOCKERNAME}-phpmyadmin on port ${DOCKERPHPMYADMIN}"
@@ -75,6 +77,5 @@ if [ "$DOCKERVOL" == "local" ]; then
 else
 
   docker run -d -p ${DOCKERPORT}:80 --name ${DOCKERNAME} -v ${DOCKERNAME}:/website --net ${DOCKERNET} ${DOCKERIMAGE}:${DOCKERVER}
-  #echo "for debug nonlocal: docker run -d -p ${DOCKERPORT}:80 --name ${DOCKERNAME} -v ${DOCKERNAME}:/website --net ${DOCKERNET} ${DOCKERIMAGE}:${DOCKERVER}"
 
 fi

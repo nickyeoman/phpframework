@@ -1,6 +1,5 @@
 <?php
 namespace Nickyeoman\Framework;
-//USE \RedBeanPHP\R;
 USE \Nickyeoman\Validation;
 
 class User {
@@ -21,7 +20,8 @@ class User {
     "loggedin" => false,
   );
   public $errors = array();
-  public $valid;
+  public $valid; //Validation Class
+  public $db;
 
   /*
   * Make sure there is not a session
@@ -30,8 +30,11 @@ class User {
 
     $this->checkSession();
     $this->valid = new \Nickyeoman\Validation\Validate();
-    //R::setup( 'mysql:host=' . $_ENV['DBHOST'] . ';dbname=' . $_ENV['DB'] , $_ENV['DBUSER'], $_ENV['DBPASSWORD'] );
     bdump($this->userTraits, "User Traits.");
+
+    //database
+    if ( ! empty( $_ENV['DBUSER'] ) )
+      $this->db = new \Nickyeoman\Dbhelper\Dbhelp($_ENV['DBHOST'], $_ENV['DBUSER'], $_ENV['DBPASSWORD'], $_ENV['DB'], $_ENV['DBPORT'] );
 
   }
   // End Construct
@@ -124,7 +127,7 @@ class User {
     }
 
     //Check database
-    $existingUser = R::findone( 'users', ' username LIKE ? ', [ $username ] );
+    $existingUser = $this->db->findone('users', 'username', $username);
 
     if ( ! empty( $existingUser ) ) {
 
@@ -161,7 +164,7 @@ class User {
     }
 
     //Check database
-    $existingEmail = R::findone( 'users', ' email LIKE ? ', [ $email ] );
+    $existingEmail = $this->db->findone('users', 'email', $email);
 
     if ( ! empty($existingEmail) ) {
 
@@ -241,14 +244,17 @@ class User {
   */
   public function newuser() {
 
-    $user = R::dispense("users");
-    $user->email    = $this->userTraits['email'];
-    $user->username = $this->userTraits['username'];
-    $user->password = $this->userTraits['password'];
-    $user->created  = R::isoDateTime();
-    $user->updated  = R::isoDateTime();
-    $user->validate = $this->userTraits['validate'];
-    $id = R::store( $user );
+    $user = array(
+      'email'    => $this->userTraits['email'],
+      'username' => $this->userTraits['username'],
+      'password' => $this->userTraits['password'],
+      'validate' => $this->userTraits['validate'],
+      'created'  => date("Y-m-d H:i:s"),
+      'updated'  => date("Y-m-d H:i:s")
+    );
+
+
+    $id = $this->db->create("users", $user );
 
     if ( ! empty( $id ) ) {
       return true;
@@ -324,7 +330,7 @@ class User {
   }
   //end Send Reset Email
 
-    public function resetUserPassword() {
+  public function resetUserPassword() {
 
         //Passed Checks, Remove Key from database
         $userdb = R::dispense("users");
@@ -355,7 +361,7 @@ class User {
     // Check if email exists
     if ( $this->valid->isEmail( $email ) ) {
 
-      $user = R::findone( 'users', ' email LIKE ? ', [ $email ] );
+      $user = $this->db->findone('users', 'email', $email);
 
     } else {
 
@@ -367,22 +373,27 @@ class User {
 
     if ( $cleanKey != $user['validate']) {
 
-      $this->errors['valid'] = 'Key or Email not valid';
+      $this->errors['valid'] = 'cleankey: Key not valid';
       return false;
 
     }
 
     //Passed Checks, Remove Key from database
-    $userdb = R::dispense("users");
-		$userdb->validate = '';
-		$userdb->updated = R::isoDateTime();
-		$userdb->id = $user['id'];
-		R::store( $userdb );
+    $user = array(
+      'id'        => $user['id'],
+      'validate'    => '',
+      'updated'  => date("Y-m-d H:i:s")
+    );
 
-    return true;
+    $id = $this->db->update("users", $user, 'id' );
 
-  }
-  //end Check validationkey
+    if ( ! empty( $id ) ) {
+      return true;
+    }
+
+    return false;
+
+  } //end Check validationkey
 
     /**
      * Is the password reset key correct?
@@ -413,11 +424,11 @@ class User {
         // Check if email exists
         if ( $this->valid->isEmail( $email ) ) {
 
-            $user = R::findone( 'users', ' email LIKE ? ', [ $email ] );
+            $user = $this->db->findone('users', 'email', $email);
 
         } else {
 
-            $this->errors['valid'] = 'Key or Email not valid';
+            $this->errors['valid'] = 'Email address is not valid';
             return false;
 
         }
@@ -449,12 +460,12 @@ class User {
     if ( $this->valid->isEmail( $_POST[$formName] ) ) {
 
       //validate with email
-      $userdb = R::findone( 'users', ' email LIKE ? ', [ $_POST[$formName] ] );
+      $userdb = $this->db->findone('users', 'email', $_POST[$formName]);
 
     } else {
 
       //validate with username
-      $userdb = R::findone( 'users', ' username LIKE ? ', [ $_POST[$formName] ] );
+      $userdb = $this->db->findone('users', 'username', $_POST[$formName]);
 
     }
 
@@ -509,6 +520,5 @@ class User {
     $this->userTraits['loggedin'] = true;
     return true;
   }
-
 
 }
