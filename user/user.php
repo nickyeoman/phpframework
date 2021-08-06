@@ -12,17 +12,21 @@ class userController extends Nickyeoman\Framework\BaseController {
 		'post'				=> array(),
 	];
 
+	/**
+	* /user/registration
+	**/
 	public function registration(){
 
+		// Create new user class
     $user = new Nickyeoman\Framework\User();
 
     // If the user is logged in we don't need to proceed
-    if ( $user->loggedin() ) {
+    if ( $user->loggedin() )
       $this->redirect('dashboard', 'index');
-    }
 
+		// Session data
     $this->data['error']    = $this->readFlash('error'); // Flash Data for view
-    $this->data['formkey']  = $this->session['formkey'];     // Form cross site protection
+    $this->data['formkey']  = $this->session['formkey']; // Form cross site protection
 
     //check Form Was submitted is enabled
     if ( ! empty( $_POST['formkey'] ) ){
@@ -33,9 +37,8 @@ class userController extends Nickyeoman\Framework\BaseController {
 				//clean the data (true = good, false = bad)
 				if ( ! $user->checkUsername() ) {
 
-					bdump($_POST['username'], "Checking Username");
-
 					$this->error = true;
+
 					//For the view
 					$this->data['badUsername'] = $user->errors['username'];
 

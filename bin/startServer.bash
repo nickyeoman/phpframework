@@ -45,7 +45,11 @@ if [ "$DOCKERVOL" == "local" ]; then
   # Create a container for a database?
   if [ "$DOCKERDB" == "mariadb" ] || [ "$DOCKERDB" == "mysql" ]; then
 
-    docker run -d -p ${DBPORT}:3306 --name ${DOCKERNAME}-db --net ${DOCKERNET} -v ${DOCKERNAME}-db:/var/lib/mysql \
+    docker run -d \
+    -p 8001:3306 \
+    --name ${DOCKERNAME}-db \
+    --net ${DOCKERNET} \
+    -v ${DOCKERNAME}-db:/var/lib/mysql \
     -e MYSQL_ROOT_PASSWORD=${DBPASSWORD} \
     -e MYSQL_PASSWORD=${DBPASSWORD} \
     -e MYSQL_USER=${DBUSER} \
@@ -60,7 +64,10 @@ if [ "$DOCKERVOL" == "local" ]; then
   if [[ $DOCKERPHPMYADMIN =~ ^[0-9]+$ ]] ; then
 
     # Documentation: https://hub.docker.com/r/phpmyadmin/phpmyadmin/
-    docker run -d -p ${DOCKERPHPMYADMIN}:80 --name ${DOCKERNAME}-phpmyadmin --net ${DOCKERNET} \
+    docker run -d \
+    --name ${DOCKERNAME}-phpmyadmin \
+    --net ${DOCKERNET} \
+    -p ${DOCKERPHPMYADMIN}:80 \
     -e UPLOAD_LIMIT="200M" \
     -e PMA_USER=${DBUSER} \
     -e PMA_PASSWORD=${DBPASSWORD} \
@@ -70,14 +77,19 @@ if [ "$DOCKERVOL" == "local" ]; then
     echo "Started docker container ${DOCKERNAME}-phpmyadmin on port ${DOCKERPHPMYADMIN}"
 
   fi
-  
-  docker run -it \
-  -e DATABASE_NAME=${DOCKERNAME}-strapi \
+
+  sleep 10;
+  docker run -d \
+  --name ${DOCKERNAME}-strapi \
+  --net ${DOCKERNET} \
+  -p 1337:1337 \
+  -e DATABASE_CLIENT='mysql' \
+  -e DATABASE_SSL='false' \
+  -e DATABASE_NAME=${DB} \
   -e DATABASE_HOST=${DOCKERNAME}-db \
   -e DATABASE_PORT=${DBPORT} \
   -e DATABASE_USERNAME=${DBUSER} \
   -e DATABASE_PASSWORD=${DBPASSWORD} \
-  -p 1337:1337 \
   strapi/strapi
 
   echo "Started docker container ${DOCKERNAME}"
