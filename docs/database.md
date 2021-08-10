@@ -20,7 +20,11 @@ bash vendor/nickyeoman/phpframework/bin/startServer.bash
 ### Using Phinx
 
 First you need to initialize phinx:
+
+```bash
 php vendor/bin/phinx init
+```
+
 in order to create a phinx.php config file. [Phinx Installation](https://book.cakephp.org/phinx/0/en/install.html)
 
 Next supply phinx.php with your database information.
