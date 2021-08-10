@@ -12,6 +12,7 @@ If this was your framework you would probably like it more.
 
 You need a basic understanding of bash, replace the <YOUR_PROJECT_PATH/YOUR_PROJECT_NAME>.
 Always run your scripts from the project root directory.
+[Install Composer](https://www.nickyeoman.com/blog/php/install-composer-on-ubuntu/) if you have not done so already.
 
 ```bash
 mkdir <YOUR_PROJECT_PATH/YOUR_PROJECT_NAME>
@@ -20,7 +21,6 @@ composer require nickyeoman/phpframework
 bash vendor/nickyeoman/phpframework/bin/newProject.bash
 ```
 
-After you edit the env file.
 Then you will want to add a controller:
 
 ```bash
@@ -60,16 +60,12 @@ https://doc.nette.org/en/3.1/robotloader
 
 The view function calls on twig templates for displaying the views.
 
-## Database redbean
+# Framework Philosophies
 
-Readbean does so much work for you.
-
-# My Philosophies
-
-1. A url should be clean, no GET statements (question marks).
-1. You should not have to define controllers, routes should be based on the url and the system should be able to figure them out. (CodeIgniter style)
-1. Apache is okay
-1. Framework should play nice with hugo (Apache settings)
-1. Docker is king
 1. Build websites fast
+1. A url should be modern, no GET statements (question marks).
+1. You should not have to define controllers, routes should be based on the url and the system should be able to figure them out. (CodeIgniter style)
+1. Docker is king
+1. Framework should play nice with hugo (Apache settings)
+1. Apache is okay
 1. I went with bash for the automation process for two reasons, one I'm more familiar with it and two it seemed more appropriate when working with containers.

@@ -1,7 +1,6 @@
 # How to connect to a database
 
-The framework uses RedBeanPHP to connect to a database.
-Optionally you can use phinx to control your database migrations.
+You can use phinx to control your database migrations.
 
 ## Database Migrations with Phinx
 
@@ -19,6 +18,7 @@ bash vendor/nickyeoman/phpframework/bin/startServer.bash
 
 ### Using Phinx
 
+<<<<<<< HEAD
 First you need to initialize phinx:
 
 ```bash
@@ -26,12 +26,16 @@ php vendor/bin/phinx init
 ```
 
 in order to create a phinx.php config file. [Phinx Installation](https://book.cakephp.org/phinx/0/en/install.html)
+=======
+First you need to edit your phinx.php file to your needs.
 
-Next supply phinx.php with your database information.
-Note this is left separate as when working in development mode you are connecting from host to container,
-where in the application (dotenv) you are connecting container to container.
+Alternatively, if you prefer to use the original phix file, remove phinx.php the newProject.bash created and run:
 
-**TODO: get phix to read from .env file.**
+php vendor/bin/phinx init
+>>>>>>> e6a0d93e30401e4418dda8270fe1577002a9ebb9
+
+in order to create a phinx.php config file. [Phinx Installation](https://book.cakephp.org/phinx/0/en/install.html)
+
 
 ### Create a new migration
 
@@ -43,45 +47,29 @@ php vendor/bin/phinx create FirstMigrationCamelCase
 
 php vendor/bin/phinx migrate
 
-## Database Queries with RedBeanPHP
+## Database Queries
 
 Further documentation:
 
-* [RedBeanPHP CRUD documentation](https://redbeanphp.com/index.php?p=/crud)
-* [RedBeanPHP Querying documentation](https://redbeanphp.com/index.php?p=/querying)
-
-You must always include the line: use \RedBeanPHP\R as R;
-at the top of your controller to access the R::functions
+* [mysqli-database-class](https://packagist.org/packages/thingengineer/mysqli-database-class)
 
 ### Create Row
 
-Below is an example of how to use RedBeanPHP to create a row:
-
 ```php
-//We will place row in "users" table
-$user = R::dispense("users");
-
-//Set fields for the row
-$user->email    = "sample@email.com";
-$user->password = "REALLY_SECURE_PASSWORD";
-
-//Store to database, return a transaction id
-$id = R::store( $user );
-
-//error checking
-if ( ! empty( $id ) ) {
-  return true;
-} else {
-  //framework's built in error control
-  $this->errors['database'] = "User not created in database";
-  return false;
-}
+$data = Array ("login" => "admin",
+               "firstName" => "John",
+               "lastName" => 'Doe'
+);
+$id = $db->insert ('users', $data);
+if($id)
+    echo 'user was created. Id=' . $id;
 ```
 
 ### Get rows
 
 ```php
-$data['users'] = R::getAll( 'select * from users' );
+$users = $db->get('users'); //contains an Array of all users
+$users = $db->get('users', 10); //contains an Array 10 users
 ```
 
 Then in twig:

@@ -1,27 +1,25 @@
 <?php
 namespace Nickyeoman\Framework;
-//USE \RedBeanPHP\R;
 USE \Nickyeoman\Validation;
 
 class User {
 
   public $userTraits = array(
-    "uid" => '',
-    "username" => '',
-    "password" => '',
-    "email" => '',
-    "first_name" => '',
-    "last_name" => '',
-    "validate" => '',
-    "reset" => '',
-    "created" => '',
-    "updated" => '',
-    "blocked" => '',
-    "admin" => '',
-    "loggedin" => false,
+    "uid"               => '',
+    "username"          => '',
+    "password"          => '',
+    "email"             => '',
+    "confirmationToken" => '',
+    "reset"             => '',
+    "created"           => '',
+    "updated"           => '',
+    "blocked"           => '',
+    "admin"             => '',
+    "loggedin"          => false,
   );
   public $errors = array();
-  public $valid;
+  public $valid; // Validation Class
+  public $db; // Database class
 
   /*
   * Make sure there is not a session
@@ -30,8 +28,13 @@ class User {
 
     $this->checkSession();
     $this->valid = new \Nickyeoman\Validation\Validate();
-    //R::setup( 'mysql:host=' . $_ENV['DBHOST'] . ';dbname=' . $_ENV['DB'] , $_ENV['DBUSER'], $_ENV['DBPASSWORD'] );
+
+    // debugging
     bdump($this->userTraits, "User Traits.");
+
+    //database
+    if ( ! empty( $_ENV['DBUSER'] ) )
+      $this->db = new \Nickyeoman\Dbhelper\Dbhelp($_ENV['DBHOST'], $_ENV['DBUSER'], $_ENV['DBPASSWORD'], $_ENV['DB'], $_ENV['DBPORT'] );
 
   }
   // End Construct
@@ -71,39 +74,6 @@ class User {
   //End loggedin
 
   /**
-  * Check if admin is set
-  **/
-  public function isAdmin() {
-
-    if ( $this->userTraits['admin'] ) {
-
-      return true;
-
-    } else {
-
-      //double check with a database call
-      $existingUser = R::findone( 'users', ' username LIKE ? ', [ $this->userTraits['username'] ] );
-      if ( ! empty( $existingUser ) ) {
-
-        if ( $existingUser['admin'] ) {
-          $this->userTraits['admin'] = $existingUser['admin']; //1
-          return true;
-        } else {
-          $this->errors['admin'] = "You are not an admin";
-          return false;
-        }
-
-      }
-      $this->errors['admin'] = "You are not an admin";
-      return false;
-    }
-
-
-
-  }
-  //End loggedin
-
-  /**
   * Checks if username is valid based on length
   * Checks username doesn't exist in database
   * Return true username is valid and unused
@@ -124,7 +94,7 @@ class User {
     }
 
     //Check database
-    $existingUser = R::findone( 'users', ' username LIKE ? ', [ $username ] );
+    $existingUser = $this->db->findone('users-permissions_user', 'username', $username);
 
     if ( ! empty( $existingUser ) ) {
 
@@ -137,7 +107,7 @@ class User {
     // Checks all seem good
 
     $this->userTraits['username'] = $username;
-    $this->userTraits['validate'] = md5( $username . $_ENV['SALT'] );
+    $this->userTraits['confirmationToken'] = md5( $username . $_ENV['SALT'] );
 
     return true;
 
@@ -161,7 +131,7 @@ class User {
     }
 
     //Check database
-    $existingEmail = R::findone( 'users', ' email LIKE ? ', [ $email ] );
+    $existingEmail = $this->db->findone('users-permissions_user', 'email', $email);
 
     if ( ! empty($existingEmail) ) {
 
@@ -229,7 +199,7 @@ class User {
     } // end confirm
 
     // encrypt password
-    $this->userTraits['password'] = password_hash($password, PASSWORD_DEFAULT);
+    $this->userTraits['password'] = password_hash($password, PASSWORD_BCRYPT);
     return true;
 
   }
@@ -241,14 +211,21 @@ class User {
   */
   public function newuser() {
 
-    $user = R::dispense("users");
-    $user->email    = $this->userTraits['email'];
-    $user->username = $this->userTraits['username'];
-    $user->password = $this->userTraits['password'];
-    $user->created  = R::isoDateTime();
-    $user->updated  = R::isoDateTime();
-    $user->validate = $this->userTraits['validate'];
-    $id = R::store( $user );
+    $user = array(
+      'username'          => $this->userTraits['username'],
+      'email'             => $this->userTraits['email'],
+      'provider'          => 'local',
+      'password'          => $this->userTraits['password'],
+      'confirmationToken' => $this->userTraits['confirmationToken'],
+      'confirmed'         => '0',
+      'blocked'           => '0',
+      'role'              => '1',
+      'created_by'        => '1',
+      'created_at'        => date("Y-m-d H:i:s"),
+      'updated_at'        => date("Y-m-d H:i:s")
+    );
+
+    $id = $this->db->create("users-permissions_user", $user );
 
     if ( ! empty( $id ) ) {
       return true;
@@ -269,7 +246,7 @@ class User {
     $mail->setFrom($_ENV['MAIL_FROM_NAME'] . ' <' . $_ENV['MAIL_FROM_ADDRESS'] .'>')
       ->addTo( $this->userTraits['email'] )
       ->setSubject('Validate your email address at GOPOLI')
-      ->setBody('Hello, please go to this link to veirfy your email address ' . $_ENV['BASEURL'] . 'user/validate/?valid=' . $this->userTraits['validate'] . '&email=' . $this->userTraits['email'])
+      ->setBody('Hello, please go to this link to veirfy your email address ' . $_ENV['BASEURL'] . 'user/validate/?valid=' . $this->userTraits['confirmationToken'] . '&email=' . $this->userTraits['email'])
     ;
 
     $mailer = new \Nette\Mail\SmtpMailer([
@@ -285,22 +262,26 @@ class User {
   }
   //end Send Registration Email
 
-  //TODO: send to a text file or output if debugging
-    /**
-     * Creates a password reset key, stores it in db and emails to  user
-     */
+
+  /**
+  * Creates a password reset key, stores it in db and emails to  user
+  */
   public function passwordReset() {
 
     $resetkey = md5( $this->userTraits['email'] . $_ENV['SALT'] );
 
     //Passed Checks, Remove Key from database
-    $user = R::findone( 'users', ' email LIKE ? ', [ $this->userTraits['email'] ] );
+    $user = $this->db->findone('users-permissions_user', 'email', $this->userTraits['email']);
 
-    $userdb = R::dispense("users");
-		$userdb->reset = $resetkey;
-		$userdb->updated = R::isoDateTime();
-		$userdb->id = $user['id'];
-		R::store( $userdb );
+    // Create array for db
+    $userdb = array(
+      'id'                 => $user['id'],
+      'resetPasswordToken' => $resetkey,
+      'updated_at'         => date("Y-m-d H:i:s")
+    );
+
+    // Update db
+    $id = $this->db->update("users-permissions_user", $userdb, 'id' );
 
     // https://packagist.org/packages/nette/mail
     $mail = new \Nette\Mail\Message;
@@ -324,17 +305,23 @@ class User {
   }
   //end Send Reset Email
 
-    public function resetUserPassword() {
+  /*
+  * Checks complete, update db
+  */
+  public function resetUserPassword() {
 
-        //Passed Checks, Remove Key from database
-        $userdb = R::dispense("users");
-        $userdb->reset = '';
-        $userdb->password = $this->userTraits['password'];
-        $userdb->updated = R::isoDateTime();
-        $userdb->id = $this->userTraits['uid'];
-        R::store( $userdb );
+        // Create array for db
+        $userdb = array(
+          'id'                 => $this->userTraits['uid'],
+          'resetPasswordToken' => '',
+          'password'           => $this->userTraits['password'],
+          'updated_at'         => date("Y-m-d H:i:s")
+        );
 
-    }
+        // Update db
+        $id = $this->db->update("users-permissions_user", $userdb, 'id' );
+  }
+  // End resetUserPassword
 
   /**
   * Is the Validation key correct?
@@ -343,7 +330,7 @@ class User {
   public function checkValidationKey($key2check) {
 
     $cleanKey = $this->valid->clean( $key2check );
-    $email = $this->valid->clean( $_GET['email'] );
+    $email    = $this->valid->clean( $_GET['email'] );
 
     // Check for empty key
     if ( empty( $cleanKey ) ) {
@@ -355,7 +342,7 @@ class User {
     // Check if email exists
     if ( $this->valid->isEmail( $email ) ) {
 
-      $user = R::findone( 'users', ' email LIKE ? ', [ $email ] );
+      $user = $this->db->findone('users-permissions_user', 'email', $email);
 
     } else {
 
@@ -365,24 +352,30 @@ class User {
     }
     // the email address exists
 
-    if ( $cleanKey != $user['validate']) {
+    if ( $cleanKey != $user['confirmationToken']) {
 
-      $this->errors['valid'] = 'Key or Email not valid';
+      $this->errors['valid'] = 'cleankey: Key not valid';
       return false;
 
     }
 
     //Passed Checks, Remove Key from database
-    $userdb = R::dispense("users");
-		$userdb->validate = '';
-		$userdb->updated = R::isoDateTime();
-		$userdb->id = $user['id'];
-		R::store( $userdb );
+    $user = array(
+      'id'                => $user['id'],
+      'confirmationToken' => 'NULL',
+      'confirmed'         => '1',
+      'updated_at'        => date("Y-m-d H:i:s")
+    );
 
-    return true;
+    $id = $this->db->update("users-permissions_user", $user, 'id' );
 
-  }
-  //end Check validationkey
+    if ( ! empty( $id ) ) {
+      return true;
+    }
+
+    return false;
+
+  } //end Check validationkey
 
     /**
      * Is the password reset key correct?
@@ -413,11 +406,11 @@ class User {
         // Check if email exists
         if ( $this->valid->isEmail( $email ) ) {
 
-            $user = R::findone( 'users', ' email LIKE ? ', [ $email ] );
+            $user = $this->db->findone('users-permissions_user', 'email', $email);
 
         } else {
 
-            $this->errors['valid'] = 'Key or Email not valid';
+            $this->errors['valid'] = 'Email address is not valid';
             return false;
 
         }
@@ -431,7 +424,7 @@ class User {
             return false;
         }
 
-        if ( $cleanKey != $user['reset']) {
+        if ( $cleanKey != $user['resetPasswordToken']) {
 
             $this->errors['valid'] = 'Key or Email not valid';
             return false;
@@ -449,12 +442,12 @@ class User {
     if ( $this->valid->isEmail( $_POST[$formName] ) ) {
 
       //validate with email
-      $userdb = R::findone( 'users', ' email LIKE ? ', [ $_POST[$formName] ] );
+      $userdb = $this->db->findone('users-permissions_user', 'email', $_POST[$formName]);
 
     } else {
 
       //validate with username
-      $userdb = R::findone( 'users', ' username LIKE ? ', [ $_POST[$formName] ] );
+      $userdb = $this->db->findone('users-permissions_user', 'username', $_POST[$formName]);
 
     }
 
@@ -465,7 +458,7 @@ class User {
 
     }
 
-    if ( ! empty( $userdb['validate'] ) ) {
+    if ( ! empty( $userdb['confirmationToken'] ) ) {
 
       $this->errors['login'] = 'Please validate your email address';
       return false;
@@ -509,6 +502,5 @@ class User {
     $this->userTraits['loggedin'] = true;
     return true;
   }
-
 
 }

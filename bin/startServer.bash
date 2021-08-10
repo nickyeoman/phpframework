@@ -45,7 +45,11 @@ if [ "$DOCKERVOL" == "local" ]; then
   # Create a container for a database?
   if [ "$DOCKERDB" == "mariadb" ] || [ "$DOCKERDB" == "mysql" ]; then
 
-    docker run -d -p ${DBPORT}:3306 --name ${DOCKERNAME}-db --net ${DOCKERNET} -v ${DOCKERNAME}-db:/var/lib/mysql \
+    docker run -d \
+    -p 8001:3306 \
+    --name ${DOCKERNAME}-db \
+    --net ${DOCKERNET} \
+    -v ${DOCKERNAME}-db:/var/lib/mysql \
     -e MYSQL_ROOT_PASSWORD=${DBPASSWORD} \
     -e MYSQL_PASSWORD=${DBPASSWORD} \
     -e MYSQL_USER=${DBUSER} \
@@ -59,15 +63,34 @@ if [ "$DOCKERVOL" == "local" ]; then
   # Do you want phpmyadmin?
   if [[ $DOCKERPHPMYADMIN =~ ^[0-9]+$ ]] ; then
 
-    # TODO: Can we just put in the info an auto connect?
-    docker run -d -p ${DOCKERPHPMYADMIN}:80 --name ${DOCKERNAME}-phpmyadmin --net ${DOCKERNET} \
-    -e PMA_ARBITRARY="1" \
+    # Documentation: https://hub.docker.com/r/phpmyadmin/phpmyadmin/
+    docker run -d \
+    --name ${DOCKERNAME}-phpmyadmin \
+    --net ${DOCKERNET} \
+    -p ${DOCKERPHPMYADMIN}:80 \
     -e UPLOAD_LIMIT="200M" \
+    -e PMA_USER=${DBUSER} \
+    -e PMA_PASSWORD=${DBPASSWORD} \
+    -e PMA_HOST=${DOCKERNAME}-db \
     phpmyadmin/phpmyadmin:latest
 
     echo "Started docker container ${DOCKERNAME}-phpmyadmin on port ${DOCKERPHPMYADMIN}"
 
   fi
+
+  sleep 10;
+  docker run -d \
+  --name ${DOCKERNAME}-strapi \
+  --net ${DOCKERNET} \
+  -p 1337:1337 \
+  -e DATABASE_CLIENT='mysql' \
+  -e DATABASE_SSL='false' \
+  -e DATABASE_NAME=${DB} \
+  -e DATABASE_HOST=${DOCKERNAME}-db \
+  -e DATABASE_PORT=${DBPORT} \
+  -e DATABASE_USERNAME=${DBUSER} \
+  -e DATABASE_PASSWORD=${DBPASSWORD} \
+  strapi/strapi
 
   echo "Started docker container ${DOCKERNAME}"
   echo "When done: docker stop ${DOCKERNAME}; docker rm ${DOCKERNAME}"
@@ -75,6 +98,5 @@ if [ "$DOCKERVOL" == "local" ]; then
 else
 
   docker run -d -p ${DOCKERPORT}:80 --name ${DOCKERNAME} -v ${DOCKERNAME}:/website --net ${DOCKERNET} ${DOCKERIMAGE}:${DOCKERVER}
-  #echo "for debug nonlocal: docker run -d -p ${DOCKERPORT}:80 --name ${DOCKERNAME} -v ${DOCKERNAME}:/website --net ${DOCKERNET} ${DOCKERIMAGE}:${DOCKERVER}"
 
 fi

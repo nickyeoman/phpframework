@@ -1,6 +1,6 @@
 <?php
 namespace Nickyeoman\Framework;
-USE \RedBeanPHP\R as R;
+USE \Nickyeoman\Dbhelper;
 session_start();
 
 class BaseController {
@@ -8,6 +8,7 @@ class BaseController {
   public $session = array();
   public $destroy = false;
   public $loggedin = 0;
+  public $db = null;
 
   /*
   * Manage the session
@@ -35,7 +36,7 @@ class BaseController {
 
     //database
     if ( ! empty( $_ENV['DBUSER'] ) )
-      R::setup( 'mysql:host=' . $_ENV['DBHOST'] . ';dbname=' . $_ENV['DB'] , $_ENV['DBUSER'], $_ENV['DBPASSWORD'] );
+      $this->db = new \Nickyeoman\Dbhelper\Dbhelp($_ENV['DBHOST'], $_ENV['DBUSER'], $_ENV['DBPASSWORD'], $_ENV['DB'], $_ENV['DBPORT'] );
 
   }
 

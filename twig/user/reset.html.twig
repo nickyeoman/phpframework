@@ -1,0 +1,44 @@
+{% set title = 'GOPO' %}
+{% extends "layout/master.html.twig" %}
+
+{% block content %}
+<div class="btn-group">
+  <a href="/">Home</a>
+  <a href="/user/login">Login</a>
+</div>
+<hr />
+{% if badValid is not empty %}
+  <div class="error">{{ badValid }}</div>
+{% endif %}
+{% if goodValid is not empty %}
+  <div class="message">{{ goodValid }}</div>
+  <div class="formContainer">
+
+    <form action="/user/reset" method="post">
+
+      <input type="hidden" name="formkey"   value="{{ formkey }}"  />
+      <input type="hidden" name="resetkey"  value="{{ resetkey }}" />
+      <input type="hidden" name="email"     value="{{ email }}"    />
+
+      <div class="formGroup">
+        <label for="password"><b>Password</b></label>
+        {% if badPassword is not empty %}
+          <div class="error">{{ badPassword }}</div>
+        {% endif %}
+        <input type="password" placeholder="Enter Password" name="password" required />
+
+        <label for="password-confirm"><b>Password Confirm</b></label>
+        <input type="password" placeholder="Confirm Password" name="password-confirm" required />
+      </div>
+
+      <div class="formGroup">
+        <button type="submit">Reset My Password.</button>
+      </div>
+    </form>
+{% endif %}
+
+{% if goodValid is empty %}
+Please check your email for password reset link.
+{% endif %}
+
+{% endblock %}

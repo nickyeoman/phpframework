@@ -1,0 +1,21 @@
+{% set title = 'GOPO' %}
+{% extends "layout/master.html.twig" %}
+
+{% block content %}
+<div class="btn-group">
+  <a href="/">Home</a>
+  <a href="/user/login">Login</a>
+</div>
+<hr />
+{% if badValid is not empty %}
+  <div class="error">{{ badValid }}</div>
+{% endif %}
+{% if goodValid is not empty %}
+  <div class="message">{{ goodValid }}</div>
+{% endif %}
+
+{% if goodValid is empty %}
+Check your email for a valid link.
+{% endif %}
+
+{% endblock %}

@@ -1,4 +1,4 @@
-FROM php:8.0.3-apache-buster
+FROM php:8.0.9-apache-buster
 LABEL maintainer="Nick Yeoman <c@nickyeoman.com>"
 
 WORKDIR /website
