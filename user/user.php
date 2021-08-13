@@ -5,24 +5,43 @@ class userController extends Nickyeoman\Framework\BaseController {
 	public array $data = [
 		'error'				=> '',
 		'formkey'			=> '',
-		'badEmail'		=> '',
 		'email' 			=> '',
-		'badUsername'	=> '',
 		'username' 		=> '',
 		'post'				=> array(),
 	];
+
+
+	public function index(){
+
+		$user = new Nickyeoman\Framework\User();
+
+		if ( ! $user->loggedin() ) {
+
+			$this->setFlash('notice', "You need to login.");
+			$this->writeSession();
+			$this->redirect('user', 'login');
+
+		}
+
+		$this->data['notice'] = $this->readFlash('notice'); // Flash Data for view
+		$this->twig('user/index', $this->data);
+		// If the user is logged in we don't need to proceed
+
+	} // end function index
 
 	/**
 	* /user/registration
 	**/
 	public function registration(){
 
+		$this->data['notice'] = $this->readFlash('notice'); // Flash Data for view
+
 		// Create new user class
     $user = new Nickyeoman\Framework\User();
 
     // If the user is logged in we don't need to proceed
     if ( $user->loggedin() )
-      $this->redirect('dashboard', 'index');
+      $this->redirect('user', 'index');
 
 		// Session data
     $this->data['error']    = $this->readFlash('error'); // Flash Data for view
@@ -40,7 +59,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 					$this->error = true;
 
 					//For the view
-					$this->data['badUsername'] = $user->errors['username'];
+					$this->data['error'] .= $user->errors['username'];
 
 				}
 
@@ -49,7 +68,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 
 					$this->error = true;
 					//For the view
-					$this->data['badEmail'] = $user->errors['email'];
+					$this->data['error'] .= $user->errors['email'];
 
 				}
 
@@ -58,7 +77,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 
 					$this->error = true;
 					//For the view
-					$this->data['badPassword'] = $user->errors['password'];
+					$this->data['error'] .= $user->errors['password'];
 
 				}
 
@@ -96,17 +115,21 @@ class userController extends Nickyeoman\Framework\BaseController {
 
 	public function validate(){
 
+		$this->data['notice'] = $this->readFlash('notice'); // Flash Data for view
+
 		if ( isset( $_GET['valid'] ) ) {
 
 			//A validation key exists, we better check it
 			$user = new Nickyeoman\Framework\User();
+
+			// TODO: Check user isn't already valid.
 
 			// Check if the key is valid
 			if ( ! $user->checkValidationKey($_GET['valid']) ) {
 
 				$this->error = true;
 				//For the view
-				$this->data['badValid'] = $user->errors['valid'];
+				$this->data['error'] = $user->errors['valid'];
 
 			} else {
 
@@ -138,6 +161,8 @@ class userController extends Nickyeoman\Framework\BaseController {
 
 		// Flash Data for view
 		$this->data['error'] = $this->readFlash('error');
+		$this->data['notice'] = $this->readFlash('notice'); // Flash Data for view
+
     // Form cross site protection
     $this->data['formkey'] = $this->session['formkey'];
 
@@ -145,7 +170,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 
 		// If the user is logged in we don't need to proceed
 		if ( $user->loggedin() ) {
-			$this->redirect('dashboard', 'index');
+			$this->redirect('user', 'index');
 		}
 
 		if ( ! empty( $_POST['formkey'] ) ){
@@ -154,7 +179,7 @@ class userController extends Nickyeoman\Framework\BaseController {
       if ( $_POST['formkey'] == $this->session['formkey'] ) {
 				if ( $user->login() ) {
 
-					$this->redirect('dashboard', 'index');
+					$this->redirect('user', 'index');
 
 				} else {
 
@@ -187,7 +212,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 
 		// If the user is logged in we don't need to proceed
 		if ( $user->loggedin() )
-		    $this->redirect('dashboard', 'index');
+		    $this->redirect('user', 'index');
 
 		$this->data['error'] = $this->readFlash('error');   // Flash Data for view
 		$this->data['formkey'] = $this->session['formkey'];       // Form cross site protection

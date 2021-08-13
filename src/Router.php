@@ -4,7 +4,6 @@ namespace Nickyeoman\Framework;
 /**
 * Router Class
 * v1.0
-* Last Updated: Jun 02, 2021
 * URL: TBA
 **/
 

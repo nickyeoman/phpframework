@@ -2,11 +2,6 @@
 {% extends "layout/master.html.twig" %}
 
 {% block content %}
-<div class="btn-group">
-  <a href="/">Home</a>
-  <a href="/user/register">Create An Account</a>
-</div>
-<hr />
 <h1>Login</h1>
 <p>Login to your account.</p>
 
@@ -17,24 +12,20 @@
     <div class="formGroup">
 
       <label for="login"><b>Your Username or Email</b></label>
-      {% if badLogin is not empty %}
-        <div class="error">{{ badLogin }}</div>
-      {% endif %}
       <input type="text" placeholder="Enter Username" name="login" value="{{ login }}" required>
 
     </div>
     <div class="formGroup">
       <label for="password"><b>Password</b></label>
-      {% if badPassword is not empty %}
-        <div class="error">{{ badPassword }}</div>
-      {% endif %}
-      <br />
       <input type="password" placeholder="Enter Password" name="password" required>
     </div>
     <div class="formGroup">
       <button type="submit">Login</button>
     </div>
   </form>
-  <a href="/user/forgot">Did you forget your password?</a>
+  <div class="user-links">
+    <div><a href="/user/forgot">Did you forget your password?</a></div>
+    <div><a href="/user/registration">Create An Account</a></div>
+  </div>
 </div>
 {% endblock %}

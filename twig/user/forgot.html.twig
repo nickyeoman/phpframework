@@ -2,12 +2,6 @@
 {% extends "layout/master.html.twig" %}
 
 {% block content %}
-<div class="btn-group">
-  <a href="/">Home</a>
-  <a href="/user/register">Create An Account</a>
-  <a href="/user/login">Login</a>
-</div>
-<hr />
 <h1>Forgot Password</h1>
 
 <div class="formContainer">
@@ -17,9 +11,6 @@
     <div class="formGroup">
 
       <label for="login"><b>Enter Your Email</b></label>
-      {% if badLogin is not empty %}
-        <div class="error">{{ badLogin }}</div>
-      {% endif %}
       <input type="text" placeholder="Enter Email Address" name="email" value="{{ post.email }}" required>
 
     </div>

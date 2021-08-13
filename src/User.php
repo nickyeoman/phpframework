@@ -87,7 +87,7 @@ class User {
     //validate minimum length
     if ( ! $this->valid->minLength( $username, $minlength ) ) {
 
-      $this->errors['username'] = "Username must be at least $minlength characters";
+      $this->errors['username'] = "<div id=\"error-username\">Username must be at least $minlength characters</div>";
       $this->userTraits['username'] = '';
       return false;
 
@@ -98,7 +98,7 @@ class User {
 
     if ( ! empty( $existingUser ) ) {
 
-      $this->errors['username'] = "Username is taken.";
+      $this->errors['username'] = '<div id="error-username">Username is taken.</div>';
       $this->userTraits['username'] = '';
       return false;
 
@@ -125,7 +125,7 @@ class User {
 
     //check email address is valid (if not do things)
     if ( ! $this->valid->isEmail( $email ) ) {
-      $this->errors['email'] = "Not a valid E-mail address: $email";
+      $this->errors['email'] = "<div id=\"error-email\">Not a valid E-mail address: $email</div>";
       $this->userTraits['email'] = '';
       return false;
     }
@@ -147,7 +147,7 @@ class User {
         $this->userTraits['email'] = $email;
         return true;
       } else {
-        $this->errors['email'] = "Email is not registered.";
+        $this->errors['email'] = '<div id="error-email">Email is not registered.</div>';
         $this->userTraits['email'] = '';
         return false;
       }
@@ -172,13 +172,13 @@ class User {
 
     //validate minimum length
     if ( ! $this->valid->minLength( $password, $minlength ) ) {
-      $this->errors['password'] = "Password must be at least $minlength characters long.";
+      $this->errors['password'] = "<div id=\"error-password\">Password must be at least $minlength characters long.</div>";
       return false;
     }
 
     //validate max length
     if ( ! $this->valid->maxLength( $password, $maxlength ) ) {
-      $this->errors['password'] = "Password must be shorter than $maxlength characters.";
+      $this->errors['password'] = "<div id=\"error-password\">Password must be shorter than $maxlength characters.</div>";
       return false;
     }
 
@@ -189,7 +189,7 @@ class User {
 
         if ( $password != $_POST[$confirm] ) {
 
-          $this->errors['password'] = 'Passwords do not match';
+          $this->errors['password'] = '<div id="error-password">Passwords do not match</div>';
           return false;
 
         }
@@ -231,7 +231,7 @@ class User {
       return true;
     }
 
-    $this->errors['database'] = "User not created in database";
+    $this->errors['database'] = "<div id=\"error-user\">User not created in database</div>";
     return false;
 
   }
@@ -334,7 +334,7 @@ class User {
 
     // Check for empty key
     if ( empty( $cleanKey ) ) {
-      $this->errors['valid'] = 'Key is Empty';
+      $this->errors['valid'] = '<div id="error-key">Key is Empty</div>';
       return false;
     }
     // cleankey is not empty
@@ -346,7 +346,7 @@ class User {
 
     } else {
 
-      $this->errors['valid'] = 'Key or Email not valid';
+      $this->errors['valid'] = '<div id="error-email">Key or Email not valid</div>';
       return false;
 
     }
@@ -354,7 +354,7 @@ class User {
 
     if ( $cleanKey != $user['confirmationToken']) {
 
-      $this->errors['valid'] = 'cleankey: Key not valid';
+      $this->errors['valid'] = '<div id="error-token">cleankey: Key not valid</div>';
       return false;
 
     }
@@ -387,7 +387,7 @@ class User {
 
         // Check for empty key
         if ( empty( $cleanKey ) ) {
-            $this->errors['valid'] = 'Key is Empty';
+            $this->errors['valid'] = '<div id="error-key">Key is Empty</div>';
             return false;
         }
         // cleankey is not empty
@@ -399,7 +399,7 @@ class User {
         else if ( ! empty( $_GET['email'] ) )
             $email = $this->valid->clean( $_GET['email'] );
         else {
-            $this->errors['valid'] = 'Email is Empty';
+            $this->errors['valid'] = '<div id="error-email">Email is Empty</div>';
             return false;
         }
 
@@ -410,7 +410,7 @@ class User {
 
         } else {
 
-            $this->errors['valid'] = 'Email address is not valid';
+            $this->errors['valid'] = '<div id="error-email">Email address is not valid</div>';
             return false;
 
         }
@@ -420,13 +420,13 @@ class User {
         if ( isset( $user ) )
             $this->userTraits['uid'] = $user['id'];
         else {
-            $this->errors['valid'] = 'Email not valid';
+            $this->errors['valid'] = '<div id="error-email">Email not valid</div>';
             return false;
         }
 
         if ( $cleanKey != $user['resetPasswordToken']) {
 
-            $this->errors['valid'] = 'Key or Email not valid';
+            $this->errors['valid'] = '<div id="error-token">Key or Email not valid</div>';
             return false;
 
         }
@@ -458,23 +458,23 @@ class User {
 
     }
 
-    if ( ! empty( $userdb['confirmationToken'] ) ) {
+    if ( ! empty( $userdb['confirmationToken'] ) && $userdb['confirmationToken'] != "NULL" ) {
 
-      $this->errors['login'] = 'Please validate your email address';
+      $this->errors['login'] = '<div id="error-email">Please validate your email address</div>';
       return false;
 
     }
 
     if ( $userdb['blocked'] == 1 ) {
 
-      $this->errors['login'] = 'Your account has been blocked';
+      $this->errors['login'] = '<div id="error-login">Your account has been blocked</div>';
       return false;
 
     }
 
     if (  empty( $_POST['password'] ) ) {
 
-      $this->errors['login'] = 'blank password';
+      $this->errors['login'] = '<div id="error-blank-password">blank password</div>';
       return false;
 
     }
