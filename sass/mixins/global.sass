@@ -1,0 +1,107 @@
+// These are HTML based mixins
+// Joomla Mixins are in the Joomla file
+
+// Used for development
+=db($color: red)
+    border: 1px solid $color
+
+@import mixins/_navigation.sass
+@import mixins/_latestNewsMod.sass
+@import mixins/_frostylinksMod.sass
+@import mixins/_3col.sass
+@import mixins/_legacy.sass
+
+
+=container
+    display: block
+    margin: 0 auto
+    max-width: $max-width
+
+=clearfix
+    &:after
+        content: ""
+        display: table
+        clear: both
+
+/* Background Gradient */
+/* http://www.w3schools.com/css/css3_gradients.asp */
+=bg-grad-horz($left-color: #00c6ff,$right-color: #0072ff)
+    background: $left-color /* fallback for old browsers */
+    /*background: -webkit-linear-gradient(to left, $left-color , $right-color) /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to left, $left-color , $right-color) /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+=bg-grad-vert($top-color: #00c6ff,$bottom-color: #0072ff)
+    background: $top-color
+    background: -webkit-linear-gradient(top, $top-color, $bottom-color)
+    background: -o-linear-gradient(bottom, $top-color, $bottom-color)
+    background: -moz-linear-gradient(bottom, $top-color, $bottom-color)
+    background: linear-gradient(to bottom, $top-color, $bottom-color)
+
+
+/* Border Radius */
+=border-radius($size: 8px)
+    -webkit-border-radius: $size
+    -moz-border-radius: $size
+    border-radius: $size
+
+/* Box Shadow */
+=boxshadow($color: #ccc)
+    -webkit-box-shadow: 2px 2px 8px 1px $color
+    -moz-box-shadow: 2px 2px 8px 1px $color
+    box-shadow: 2px 2px 8px 1px $color
+
+// =============================================================================
+// Responsive
+// =============================================================================
+
+//Version 3 added more generic functions
+//less than = lt
+=lt ($max-width: $tablet-width)
+    @media (max-width: $max-width)
+        @content
+
+//greaterthan
+=gt ($min-width: $phone-width)
+    @media (min-width: $min-width)
+        @content
+
+//between
+=bt ($min-width: $phone-width, $max-width: $tablet-width)
+    @media (min-width: $min-width ) and (max-width: $max-width)
+        @content
+
+// =============================================================================
+// Font Awesome
+// =============================================================================
+
+
+// Add icon before or after, just give content
+=addAwesome($content: "\f003\0020")
+    content: $content
+    font-family: FontAwesome
+
+=replaceAwesome($content: "\f003\0020")
+    visibility: hidden
+
+    &:before
+        visibility: visible
+        +addAwesome($content)
+
+// =============================================================================
+// Buttons
+// =============================================================================
+
+=btn($btn-bg: transparent, $btn-color: #fff, $hover: #ccc)
+    background: $btn-bg
+    border: 2px solid #fff
+    text-transform: uppercase
+    font-style: normal
+    text-decoration: none
+    padding: 6px 12px
+    display: block
+    width: 100%
+    color: $btn-color
+    text-align: center
+    &:hover
+        border: 2px solid $hover
+        color: $hover

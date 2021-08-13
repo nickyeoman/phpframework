@@ -5,7 +5,9 @@
 ################################################################################
 
 echo "Creating directories: controllers tmp public views scripts"
-mkdir -p controllers tmp migrations public scripts views/modules views/layout views/user
+mkdir -p controllers tmp migrations sass scripts
+mkdir -p public/css public/js public/images
+mkdir -p views/modules views/layout views/user
 
 ################################################################################
 # Public Folder
@@ -26,6 +28,15 @@ cp vendor/nickyeoman/phpframework/twig/header.html.twig views/modules/header.htm
 cp vendor/nickyeoman/phpframework/twig/master.html.twig views/layout/master.html.twig
 cp vendor/nickyeoman/phpframework/twig/footer.html.twig views/modules/footer.html.twig
 cp vendor/nickyeoman/phpframework/twig/user/* views/user/.
+
+################################################################################
+# SASS
+################################################################################
+
+echo "Creating SASS directory for css"
+cp vendor/nickyeoman/phpframework/sass/master.sass sass/.
+cp vendor/nickyeoman/phpframework/sass/variable.sass sass/.
+cp vendor/nickyeoman/phpframework/sass/project.sass sass/.
 
 ################################################################################
 # Controller
