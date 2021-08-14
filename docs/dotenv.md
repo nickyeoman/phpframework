@@ -33,11 +33,16 @@ The path twig uses to cache.
 From the root project directory.
 do not add pre or post slashes.
 
+## SALT
+I generate my SALT with pwgen -cnsB1v 32
+
+## BASEURL
+Requires last slash.
+If left blank? (how do we allow for anything?)
 ---
 
 LOADERTMPDIR="tmp"
-SALT="MakeASalt32charactersWouldBeNice"
-BASEURL="http://localhost:8000/"
+
 
 # Docker
 USEDOCKER="docker"

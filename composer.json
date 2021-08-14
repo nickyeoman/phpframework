@@ -22,7 +22,7 @@
         "tracy/tracy": "v2.8.3",
         "twig/twig": "3.3.0",
         "robmorgan/phinx": "0.12.7",
-        "nickyeoman/php-mysql-helper": "^1.0.2",
+        "nickyeoman/php-mysql-helper": "^2.0.1",
         "nickyeoman/php-validation-class": "^5.0"
     },
     "autoload": {
