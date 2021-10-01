@@ -13,7 +13,7 @@ echo "*** Starting New Project Script ***"
 # Create directories
 ################################################################################
 
-echo "\xE2\x9C\x94 Creating directories: controllers tmp public views scripts"
+echo "Creating directories: controllers tmp public views scripts"
 mkdir -p controllers tmp migrations sass scripts
 mkdir -p public/css public/js public/images
 mkdir -p views/modules views/layout views/user
@@ -22,17 +22,17 @@ mkdir -p views/modules views/layout views/user
 # Public Folder
 ################################################################################
 
-echo "\xE2\x9C\x94 Creating index.php page in public directory"
+echo "Creating index.php page in public directory"
 cp vendor/nickyeoman/phpframework/public/index.php public/.
 
-echo "\xE2\x9C\x94 Adding Apache htacess"
+echo "Adding Apache htaccess"
 cp vendor/nickyeoman/phpframework/public/htaccess public/.htaccess
 
 ################################################################################
 # Twig
 ################################################################################
 
-echo "\xE2\x9C\x94 Creating scaffolding Twig templates in views directory"
+echo "Creating scaffolding Twig templates in views directory"
 cp vendor/nickyeoman/phpframework/twig/header.html.twig views/modules/header.html.twig
 cp vendor/nickyeoman/phpframework/twig/master.html.twig views/layout/master.html.twig
 cp vendor/nickyeoman/phpframework/twig/footer.html.twig views/modules/footer.html.twig
@@ -42,7 +42,7 @@ cp vendor/nickyeoman/phpframework/twig/user/* views/user/.
 # SASS
 ################################################################################
 
-echo "\xE2\x9C\x94 Creating SASS directory for css"
+echo "Creating SASS directory for css"
 cp vendor/nickyeoman/phpframework/sass/master.sass sass/.
 cp vendor/nickyeoman/phpframework/sass/variables.sass sass/.
 cp vendor/nickyeoman/phpframework/sass/project.sass sass/.
@@ -57,24 +57,24 @@ cp vendor/nickyeoman/phpframework/user/user.php controllers/user.php
 # Configuration
 ################################################################################
 
-echo "\xE2\x9C\x94 Setting up sample .env in root directory. Please edit .env file for your needs."
+echo "Setting up sample .env in root directory. Please edit .env file for your needs."
 cp vendor/nickyeoman/phpframework/env.sample .env
 
-echo "\xE2\x9C\x94 Setting up sample phinx config file in root directory. Please edit phinx.php for your needs."
+echo "Setting up sample phinx config file in root directory. Please edit phinx.php for your needs."
 cp vendor/nickyeoman/phpframework/phinx.php.sample phinx.php
 
 ################################################################################
 # database
 ################################################################################
 
-echo "\xE2\x9C\x94 Move user migrations to migrations folder"
+echo "Move user migrations to migrations folder"
 cp vendor/nickyeoman/phpframework/user/20210721230307_users_database_creation.php migrations/20210721230307_users_database_creation.php
 
 ################################################################################
 # Docker
 ################################################################################
 
-echo "\xE2\x9C\x94 Creating a sample Dockerfile incase you would like to use docker with this project"
+echo "Creating a sample Dockerfile incase you would like to use docker with this project"
 cp vendor/nickyeoman/phpframework/docker/Dockerfile Dockerfile
 
 ################################################################################
