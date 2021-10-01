@@ -43,8 +43,6 @@ cp vendor/nickyeoman/phpframework/twig/user/* views/user/.
 ################################################################################
 
 echo "Creating SASS directory for css"
-cp vendor/nickyeoman/phpframework/sass/master.sass sass/.
-cp vendor/nickyeoman/phpframework/sass/variables.sass sass/.
 cp vendor/nickyeoman/phpframework/sass/project.sass sass/.
 
 ################################################################################
