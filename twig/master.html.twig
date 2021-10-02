@@ -4,19 +4,26 @@
 <head>{% include 'modules/header.html.twig' %}</head>
 
 <body>
+  <div id="container">
+    <header>Logo Goes Here</header>
+    <nav>
+      <ul>
+        <li>Navigation Goes Here</li>
+      </ul>
+    </nav>
 
-  <div id="page">
-    {% if error is not empty %}
-      <div class="error">{{ error }}</div>
-    {% endif %}
-    {% if notice is not empty %}
-      <div id="notice">{{  notice }}</div>
-    {% endif %}
+    <div id="page">
+      {% if error is not empty %}
+        <div class="error">{{ error }}</div>
+      {% endif %}
+      {% if notice is not empty %}
+        <div id="notice">{{  notice }}</div>
+      {% endif %}
 
-    {% block content %}{% endblock %}
+      <article>{% block content %}{% endblock %}</article>
+    </div>
+
   </div>
-
 <footer>{% include 'modules/footer.html.twig' %}</footer>
-</body>
 
-</html>
+</body></html>
