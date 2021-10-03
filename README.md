@@ -1,66 +1,35 @@
 # Nick Yeoman's phpframework
 
-This is Nix framework, it is my favourite framework because it is my framework.
-If this was your framework you would probably like it more.
-
-# Links
+## Links
 
 * [View on GitHub](https://github.com/nickyeoman/phpframework)
 * [View on Composer's Packagist](https://packagist.org/packages/nickyeoman/phpframework)
 
-# Install using Composer
+## Things you need to know
 
-You need a basic understanding of bash, replace the <YOUR_PROJECT_PATH/YOUR_PROJECT_NAME>.
-Always run your scripts from the project root directory.
-[Install Composer](https://www.nickyeoman.com/blog/php/install-composer-on-ubuntu/) if you have not done so already.
+1. Always run bin scripts from the project root directory.
 
-```bash
-mkdir <YOUR_PROJECT_PATH/YOUR_PROJECT_NAME>
-cd <YOUR_PROJECT_PATH/YOUR_PROJECT_NAME>
-composer require nickyeoman/phpframework
-bash vendor/nickyeoman/phpframework/bin/newProject.bash
-```
+## Two line Install
 
-Then you will want to add a controller:
+Just change "YOUR_PROJECT_NAME" to whatever you want.
 
 ```bash
-bash vendor/nickyeoman/phpframework/bin/newController.bash index
+wget https://raw.githubusercontent.com/nickyeoman/phpframework/main/bin/newProject.bash
+bash newProject.bash YOUR_PROJECT_NAME
 ```
 
-## Start server
+## Framework Documentation
 
-Make sure your dotenv Docker section is complete, or change USERDOCKER="php".
+* [startServer](https://github.com/nickyeoman/phpframework/tree/main/docs)
+* [dotenv](https://github.com/nickyeoman/phpframework/tree/main/docs)
+* [tracy](/home/nick/github/phpframework/README.md)
+* [database](https://github.com/nickyeoman/phpframework/tree/main/docs)
+* [sass](https://github.com/nickyeoman/phpframework/tree/main/docs)
+* [robotloader](https://github.com/nickyeoman/phpframework/tree/main/docs)
+* [twig](https://github.com/nickyeoman/phpframework/tree/main/docs)
+* [users](https://github.com/nickyeoman/phpframework/tree/main/docs)
 
-sudo bash vendor/nickyeoman/phpframework/bin/startServer.bash
-
-
-# Framework Components
-
-## Composer
-
-The whole idea is to play nice with composer, to save time.
-
-## ENV Variables
-
-ENV Variables: https://github.com/vlucas/phpdotenv
-
-## Tracy Debugger
-
-A "must have" debugging tool: https://tracy.nette.org/
-
-To enable Tracy Debug bar, change .env variable "DEBUG" to "display".
-Any other value will disable tracy.
-
-## Nette RobotLoader
-
-Auto loads Controllers
-https://doc.nette.org/en/3.1/robotloader
-
-## Uses Twig templates
-
-The view function calls on twig templates for displaying the views.
-
-# Framework Philosophies
+## Framework Philosophies
 
 1. Build websites fast
 1. A url should be modern, no GET statements (question marks).

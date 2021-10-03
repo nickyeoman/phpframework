@@ -70,3 +70,8 @@ MAIL_PASSWORD=""
 MAIL_ENCRYPTION="tls"
 MAIL_FROM_ADDRESS=""
 MAIL_FROM_NAME=""
+
+
+### ENV Variables
+
+ENV Variables: https://github.com/vlucas/phpdotenv

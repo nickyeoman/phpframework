@@ -1,13 +1,24 @@
 #!/bin/bash
 
-# More colours: https://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-NC='\033[0m' # No Color
-
 echo "*** Starting New Project Script ***"
 
 # TODO: check if script has already been run
+# TODO: check that $1 exits
+# TODO: check folder doesn't exist
+
+composer -v > /dev/null 2>&1
+COMPOSER=$?
+if [[ $COMPOSER -ne 0 ]]; then
+    echo 'Composer is not installed'
+    echo 'Checkout how to Install Composer here: https://www.nickyeoman.com/blog/php/install-composer-on-ubuntu/'
+    echo 'Once installed, try running this script again'
+    exit 1
+else
+  mkdir $1
+  cd $1
+  composer require nickyeoman/phpframework
+  echo "Composer has installed nickyeoman/phpframework to $1"
+fi
 
 ################################################################################
 # Create directories
@@ -76,13 +87,16 @@ echo "Creating a sample Dockerfile incase you would like to use docker with this
 cp vendor/nickyeoman/phpframework/docker/Dockerfile Dockerfile
 
 ################################################################################
+# Creating the first controller
+################################################################################
+bash vendor/nickyeoman/phpframework/bin/newController.bash index
+
+################################################################################
 # Instructions
 ################################################################################
 
 echo "*** End New Project Script ***"
 
 echo "FURTHER INSTRUCTIONS: "
-echo "Next, to create a controller run: ${GREEN}bash vendor/nickyeoman/phpframework/bin/newController.bash index${NC}"
-echo ""
-echo "To start a local server, after editintg the .env file, run:"
-echo "${GREEN}bash vendor/nickyeoman/phpframework/bin/startServer.bash${NC}"
+echo "To start a local server, edit .env file then run:"
+echo "bash vendor/nickyeoman/phpframework/bin/startServer.bash"
