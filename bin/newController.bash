@@ -11,7 +11,7 @@ cat << EOF > controllers/${ControllerName}.php
 
        \$data = array();
        \$data['notice'] = \$this->readFlash('notice'); // Flash Data for view
-       \$this->twig('index', \$data);
+       \$this->twig('${ControllerName}', \$data);
 
      }
    }
@@ -19,10 +19,11 @@ EOF
 
 # Create view
 cat << EOF > views/${ControllerName}.html.twig
-  {% set title = 'Title of Page' %}
+  {% set title = '${ControllerName} Page' %}
   {% extends "layout/master.html.twig" %}
 
   {% block content %}
-  <p>Sample Page Content.</p>
+  <p>Sample ${ControllerName} Page Content.</p>
   {% endblock %}
 EOF
+
