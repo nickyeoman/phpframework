@@ -9,21 +9,23 @@ class BaseController {
   public $destroy = false;
   public $loggedin = 0;
   public $db = null;
+  public $post = array(['submitted'] = false;);
 
   /*
-  * Manage the session
+  * Sessions are managed with the Base Controller
   */
   public function __construct() {
 
     // sessions
     if ( empty( $_SESSION['sessionid'] ) ) {
 
+      // Empty session, create a new one
       $this->session['sessionid'] = session_id();
-      $this->session['formkey']   = md5( session_id(). date("ymdhis") );
+      $this->session['formkey']   = md5( session_id() . date("ymdhis") );
 
     } else {
 
-      $this->session = $_SESSION;
+      $this->session = $_SESSION; // Store the session to this object in an array
 
       if ( !empty( $this->session['loggedin'] ) ) {
 
@@ -34,28 +36,48 @@ class BaseController {
 
     }
 
-    //database
+    // Store the database object to a variable in this object
     if ( ! empty( $_ENV['DBUSER'] ) )
       $this->db = new \Nickyeoman\Dbhelper\Dbhelp($_ENV['DBHOST'], $_ENV['DBUSER'], $_ENV['DBPASSWORD'], $_ENV['DB'], $_ENV['DBPORT'] );
 
+    // POST
+    if ( ! empty( $_POST['formkey'] ) ){
+      //check session matches
+      if ( $_POST['formkey'] == $this->session['formkey'] ) {
+
+        $this->post['submitted'] = true;
+        foreach( $_POST as $key => $value){
+          $this->post[$key] = trim(strip_tags($value));
+        }
+
+      } else {
+
+        //error no form key.
+        $this->post['error'] = "There was a problem with the session, try again";
+
+      }
+    }
+
   }
 
-  /*
-  * place what you have in the session var into session
-  */
+  // Write the current session to PHP session
   public function writeSession() {
 
     if ( ! $this->destroy )
       $_SESSION = $this->session;
+    else
+      session_destroy();
 
   }
 
+  // Set a flash varaiable (only good until next page load)
   public function setFlash($name, $value){
 
     $this->session['flash']["$name"] = $value;
 
-  }
+  } //end setFlash
 
+  // Get a flash variable
   public function readFlash($name) {
 
     if ( isset( $this->session['flash']["$name"] ) ) {
@@ -71,11 +93,10 @@ class BaseController {
       return false;
 
     }
-  }
 
-  /*
-  * This would be logout
-  */
+  } //end readFlash
+
+  // Destroy session (logout mostly)
   public function destroySession() {
 
     session_destroy();
@@ -83,9 +104,7 @@ class BaseController {
 
   }
 
-  /*
-  * Redirect the page
-  */
+  // Redirect to the correct controller and action (page)
   function redirect($controller = 'index', $action = 'index') {
 
     header("Location: /$controller/$action");
@@ -93,9 +112,7 @@ class BaseController {
 
   }
 
-  /*
-  * Call Twig as a view
-  */
+  //Call Twig as a view
   public function twig($viewname = 'index', $vars = array() ) {
 
       //TWIG

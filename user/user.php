@@ -10,7 +10,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 		'post'				=> array(),
 	];
 
-
+	// user/index
 	public function index(){
 
 		$user = new Nickyeoman\Framework\User();
@@ -25,20 +25,16 @@ class userController extends Nickyeoman\Framework\BaseController {
 
 		$this->data['notice'] = $this->readFlash('notice'); // Flash Data for view
 		$this->twig('user/index', $this->data);
-		// If the user is logged in we don't need to proceed
 
 	} // end function index
 
-	/**
-	* /user/registration
-	**/
+	// /user/registration
 	public function registration(){
-
-		$this->data['notice'] = $this->readFlash('notice'); // Flash Data for view
 
 		// Create new user class
     $user = new Nickyeoman\Framework\User();
 
+		// TODO: this should redirect to dashboard
     // If the user is logged in we don't need to proceed
     if ( $user->loggedin() )
       $this->redirect('user', 'index');
@@ -46,65 +42,57 @@ class userController extends Nickyeoman\Framework\BaseController {
 		// Session data
     $this->data['error']    = $this->readFlash('error'); // Flash Data for view
     $this->data['formkey']  = $this->session['formkey']; // Form cross site protection
+		$this->data['notice'] 	= $this->readFlash('notice'); // Flash Data for view
 
     //check Form Was submitted is enabled
-    if ( ! empty( $_POST['formkey'] ) ){
+    if ( $this->post['submitted'] ){
 
 			//check session matches
-      if ( $_POST['formkey'] == $this->session['formkey'] ) {
+      if ( $this->post['error'] ) {
+				$this->error = true;
+				$this->data['error'] .= $this->post['error'];
+			}
 
-				//clean the data (true = good, false = bad)
-				if ( ! $user->checkUsername() ) {
+			//clean the data (true = good, false = bad)
+			if ( ! $user->checkUsername() ) {
+				$this->error = true;
+				$this->data['error'] .= $user->errors['username'];
+			}
 
-					$this->error = true;
+			// check email address
+			if ( ! $user->checkEmail(false) ){
+				$this->error = true;
+				$this->data['error'] .= $user->errors['email'];
+			}
 
-					//For the view
-					$this->data['error'] .= $user->errors['username'];
+			// check password address
+			if ( ! $user->checkPassword() ){
+				$this->error = true;
+				$this->data['error'] .= $user->errors['password'];
+			}
 
-				}
+			/*************************************************************************
+			* No Errors, then save
+			*************************************************************************/
+			if (! $this->error) {
 
-				// check email address
-				if ( ! $user->checkEmail(false) ){
+				//write to database
+				$user->newuser();
 
-					$this->error = true;
-					//For the view
-					$this->data['error'] .= $user->errors['email'];
+				// Send registration Email
+				$user->sendRegistrationEmail();
 
-				}
+				//redirect to verify page
+				$this->redirect($controller = 'user', $action = 'validate');
 
-				// check password address
-				if ( ! $user->checkPassword() ){
+			} else {
 
-					$this->error = true;
-					//For the view
-					$this->data['error'] .= $user->errors['password'];
+				$this->data['post']['email'] = $_POST['email'];
+				$this->data['post']['username'] = $_POST['username'];
 
-				}
+			}
 
-				//No Errors, then save
-				if (! $this->error) {
-
-					//write to database
-					$user->newuser();
-
-					// Send registration Email
-					$user->sendRegistrationEmail();
-
-					//redirect to verify page
-					$this->redirect($controller = 'user', $action = 'validate');
-
-				} else {
-
-					$this->data['post']['email'] = $_POST['email'];
-					$this->data['post']['username'] = $_POST['username'];
-
-				}
-
-      } else {
-        //TODO: cross site scripting, log this
-      }
-
-    }
+    } // end for submited
 
     //Display view
     $this->twig('user/registration', $this->data);
@@ -173,29 +161,21 @@ class userController extends Nickyeoman\Framework\BaseController {
 			$this->redirect('user', 'index');
 		}
 
-		if ( ! empty( $_POST['formkey'] ) ){
+		// Form Submitted
+		if ( $this->post['submitted'] ){
 
-			//check session matches
-      if ( $_POST['formkey'] == $this->session['formkey'] ) {
-				if ( $user->login() ) {
+			if ( $user->login() ) {
 
-					$this->redirect('user', 'index');
-
-				} else {
-
-					$this->error = true;
-					//For the view
-					$this->data['badLogin'] = $user->errors['login'];
-
-				}
+				$this->redirect('user', 'index');
 
 			} else {
-				//TODO: Cross site error
+
+				$this->error = true;
+				$this->data['badLogin'] = $user->errors['login'];
+
 			}
 
-
-    }
-		//formkey
+		} // end submitted
 
 		$this->twig('user/login', $this->data);
 		$this->writeSession();

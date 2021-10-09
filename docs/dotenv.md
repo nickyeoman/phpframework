@@ -61,6 +61,8 @@ DBUSER=""
 DBPASSWORD=""
 DB=""
 
+If you are not using a database, make sure that the DBUSER is null or empty.
+
 # Email
 MAIL_MAILER="smtp"
 MAIL_HOST=""
