@@ -10,7 +10,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 		'post'				=> array(),
 	];
 
-	// user/index
+	// user/index (dashboard, must be logged in)
 	public function index(){
 
 		$user = new Nickyeoman\Framework\User();

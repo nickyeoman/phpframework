@@ -107,7 +107,19 @@ class BaseController {
   // Redirect to the correct controller and action (page)
   function redirect($controller = 'index', $action = 'index') {
 
-    header("Location: /$controller/$action");
+    if ($controller == 'index' || empty($controller) ) {
+      $controller = '/';
+    } else {
+      $controller = "/$controller";
+    }
+
+    if ($action == 'index' || empty($action) ) {
+      $action = '';
+    } else {
+      $action = "/$action";
+    }
+
+    header("Location: $controller . $action");
     exit();
 
   }

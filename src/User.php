@@ -493,9 +493,6 @@ class User {
       'id' => $userdb['id'],
       'username' => $userdb['username'],
       'email' => $userdb['email'],
-      'first_name' => $userdb['first_name'],
-      'last_name' => $userdb['last_name'],
-      'admin' => $userdb['admin'],
       'loggedin' => true,
       ];
 
