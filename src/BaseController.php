@@ -9,7 +9,7 @@ class BaseController {
   public $destroy = false;
   public $loggedin = 0;
   public $db = null;
-  public $post = array(['submitted'] = false;);
+  public $post = array('submitted' => false);
 
   /*
   * Sessions are managed with the Base Controller
@@ -119,7 +119,7 @@ class BaseController {
       $action = "/$action";
     }
 
-    header("Location: $controller . $action");
+    header("Location: $controller$action");
     exit();
 
   }
