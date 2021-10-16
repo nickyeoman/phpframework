@@ -49,7 +49,7 @@ if [ "$DOCKERVOL" == "local" ]; then
     -p 8001:3306 \
     --name ${DOCKERNAME}-db \
     --net ${DOCKERNET} \
-    -v ${DOCKERNAME}-db:/var/lib/mysql \
+    -v ${DOCKERNAME}_db:/var/lib/mysql \
     -e MYSQL_ROOT_PASSWORD=${DBPASSWORD} \
     -e MYSQL_PASSWORD=${DBPASSWORD} \
     -e MYSQL_USER=${DBUSER} \
