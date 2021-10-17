@@ -83,6 +83,7 @@ if [ "$DOCKERVOL" == "local" ]; then
   --name ${DOCKERNAME}-strapi \
   --net ${DOCKERNET} \
   -p 1337:1337 \
+  -v ${DOCKERNAME}_strapi:/srv/app \
   -e DATABASE_CLIENT='mysql' \
   -e DATABASE_SSL='false' \
   -e DATABASE_NAME=${DB} \
