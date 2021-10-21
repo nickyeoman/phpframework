@@ -17,46 +17,14 @@ class BaseController {
   public function __construct() {
 
     // sessions
-    if ( empty( $_SESSION['sessionid'] ) ) {
-
-      // Empty session, create a new one
-      $this->session['sessionid'] = session_id();
-      $this->session['formkey']   = md5( session_id() . date("ymdhis") );
-
-    } else {
-
-      $this->session = $_SESSION; // Store the session to this object in an array
-
-      if ( !empty( $this->session['loggedin'] ) ) {
-
-        if ( $this->session['loggedin'] == 1 )
-          $this->loggedin = 1;
-
-      }
-
-    }
+    $this->setSession();
 
     // Store the database object to a variable in this object
     if ( ! empty( $_ENV['DBUSER'] ) )
       $this->db = new \Nickyeoman\Dbhelper\Dbhelp($_ENV['DBHOST'], $_ENV['DBUSER'], $_ENV['DBPASSWORD'], $_ENV['DB'], $_ENV['DBPORT'] );
 
     // POST
-    if ( ! empty( $_POST['formkey'] ) ){
-      //check session matches
-      if ( $_POST['formkey'] == $this->session['formkey'] ) {
-
-        $this->post['submitted'] = true;
-        foreach( $_POST as $key => $value){
-          $this->post[$key] = trim(strip_tags($value));
-        }
-
-      } else {
-
-        //error no form key.
-        $this->post['error'] = "There was a problem with the session, try again";
-
-      }
-    }
+    $this->setPost();
 
   }
 
@@ -135,8 +103,62 @@ class BaseController {
       ]);
       $this->twig->addExtension(new \Twig\Extension\DebugExtension());
 
+      // loggedin is meant for the template
+      $vars['loggedin'] = $this->session['NY_FRAMEWORK_USER']['loggedin'];
+
       echo $this->twig->render("$viewname.html.twig", $vars);
 
   }
 
+  private function setSession(){
+
+    if ( empty( $_SESSION['sessionid'] ) ) {
+
+      // Empty session, create a new one
+      $this->session['sessionid'] = session_id();
+      $this->session['formkey']   = md5( session_id() . date("ymdhis") );
+      $this->session['NY_FRAMEWORK_USER'] = array('loggedin' => 0);
+      $this->writeSession();
+
+    } else {
+
+      $this->session = $_SESSION; // Store the session to this object in an array
+      bdump($this->session);
+
+    }
+    //end if
+
+  }
+  // end setSession()
+
+  private function setPost() {
+
+    if ( ! empty( $_POST['formkey'] ) ){
+
+      //check session matches
+      if ( $_POST['formkey'] == $this->session['formkey'] ) {
+
+        $this->post['submitted'] = true;
+
+        foreach( $_POST as $key => $value){
+          $prep = trim(strip_tags($value));
+          $this->post[$key] = htmlentities($prep, ENT_QUOTES);
+        }
+
+        //debug
+        bdump($this->post);
+
+      } else {
+
+        //error no form key.
+        $this->post['error'] = "There was a problem with the session, try again";
+
+      }
+
+    }
+    //end if
+  }
+  // end setPost()
+
 }
+// end BaseController
