@@ -90,16 +90,16 @@ class Router {
     }
 
     //set parms even with error
-    $this->controller = $controller;
-    $this->action = $action;
+
+
     $this->params = $uri;
 
     // Now begin error checking
     // Check controller exists
-    $filename = $_ENV['realpath'] . "/" . $_ENV['CONTROLLERPATH'] . '/' . $controller . '.php' )
-    if ( file_exists( $filename ) {
+    $filename = $_ENV['realpath'] . '/' . $_ENV['CONTROLLERPATH'] . '/' . $controller . '.php';
+    if ( file_exists( $filename ) ) {
 
-      return true;
+      $this->controller = $controller;
 
     } else {
 
@@ -115,6 +115,7 @@ class Router {
     if ( strpos( $filecontent, "function $action" ) !== false ) {
 
       // The method exists
+      $this->action = $action;
       return true;
 
     } else {
@@ -122,6 +123,7 @@ class Router {
       // If override exists there are no methods the second parameter is a variable
       if ( strpos( $filecontent, "function override" ) !== false ) {
 
+        $this->action = "override";
         return true;
 
       } else {
