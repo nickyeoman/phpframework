@@ -3,7 +3,7 @@ namespace Nickyeoman\Framework;
 
 /**
 * Router Class
-* v1.0
+* v1.1
 * URL: TBA
 **/
 
@@ -16,14 +16,16 @@ class Router {
   public $env = null;
 
   /**
-  * Find the Controller Paths
+  * Initiated Begin work
   **/
   public function __construct() {
 
-    $this->makeUri();
+    $this->makeUri(); //creates $this->uri array
+
+    // 404 error
     if ( ! $this->makeController() ) {
 
-      //TODO: this is sloppy, should just be a make here, 404 page should probably be i constructor
+      //TODO: call a twig template
       header('HTTP/1.1 404 Not Found');
       echo 'This is 404 page. <a href="/">home</a>';
       exit();  // must stop here or controller will still be called.
@@ -43,7 +45,7 @@ class Router {
     //put into array
     $uriarr = explode("/", $builduri);
 
-    //drop the first empty
+    //drop the first as it should be empty
     array_shift($uriarr);
 
     //make array available
@@ -92,21 +94,47 @@ class Router {
     $this->action = $action;
     $this->params = $uri;
 
-    //Check controller exists
-    if ( file_exists( $_ENV['realpath'] . "/" . $_ENV['CONTROLLERPATH'] . '/' . $controller . '.php' ) ) {
+    // Now begin error checking
+    // Check controller exists
+    $filename = $_ENV['realpath'] . "/" . $_ENV['CONTROLLERPATH'] . '/' . $controller . '.php' )
+    if ( file_exists( $filename ) {
 
       return true;
 
     } else {
 
       //404
+      dump("Error: The Controller file ($filename) doesn't exist");
       return false;
 
     }
 
-    //TODO: what if action doesn't exist?
+    // Check if action exists
+    $filecontent = file_get_contents($filename);
 
-    return true;
+    if ( strpos( $filecontent, "function $action" ) !== false ) {
+
+      // The method exists
+      return true;
+
+    } else {
+
+      // If override exists there are no methods the second parameter is a variable
+      if ( strpos( $filecontent, "function override" ) !== false ) {
+
+        return true;
+
+      } else {
+
+        dump("Error: The Method ($action) doesn't exist in the Controller file ($filename)");
+        return false;
+
+      }
+
+    }
+    //End check if action exists
+
+    dump("Error: you shouldn't get through the Router.");
 
   } //makeController
 
