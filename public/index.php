@@ -33,4 +33,5 @@ $router = new Nickyeoman\Framework\Router();
 $classname = $router->controller . 'Controller';
 
 //Load the child controller
-call_user_func_array( array(new $classname(), $router->action), $router->params );
+//dump( $classname, $router->action, $router->params );
+call_user_func_array( array(new $classname(), $router->action), [$router->params] );
