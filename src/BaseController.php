@@ -10,9 +10,10 @@ class BaseController {
   public $loggedin = 0;
   public $db = null;
   public $post = array('submitted' => false);
+  public $data = array('error' => array(), 'notice' => null);
 
   /*
-  * Sessions are managed with the Base Controller
+  * Base controller manages Sessions, Get, Post and Database
   */
   public function __construct() {
 
@@ -37,32 +38,6 @@ class BaseController {
       session_destroy();
 
   }
-
-  // Set a flash varaiable (only good until next page load)
-  public function setFlash($name, $value){
-
-    $this->session['flash']["$name"] = $value;
-
-  } //end setFlash
-
-  // Get a flash variable
-  public function readFlash($name) {
-
-    if ( isset( $this->session['flash']["$name"] ) ) {
-
-      $value = $this->session['flash']["$name"];
-
-      unset($this->session['flash']["$name"]);
-
-      return $value;
-
-    } else {
-
-      return false;
-
-    }
-
-  } //end readFlash
 
   // Destroy session (logout mostly)
   public function destroySession() {
@@ -110,6 +85,26 @@ class BaseController {
 
   }
 
+  // Add an error
+  public function adderror($string = "No Information Supplied", $name = null ) {
+
+    // current size of array
+    $count = count($this->data['error']);
+
+    //assign key to array
+    if ( empty($name) )
+      $name = $count + 1;
+
+    $this->data['error']["$name"] = $string;
+
+    return( count($this->data['error']) );
+  }
+
+  // count errors
+  public function counterrors() {
+    return( count($this->data['error']) );
+  }
+
   private function setSession(){
 
     if ( empty( $_SESSION['sessionid'] ) ) {
@@ -117,15 +112,32 @@ class BaseController {
       // Empty session, create a new one
       $this->session['sessionid'] = session_id();
       $this->session['formkey']   = md5( session_id() . date("ymdhis") );
-      $this->session['NY_FRAMEWORK_USER'] = array('loggedin' => 0);
+      $this->session['loggedin']  = 0;
+      $this->session['notice'] = '';
+      $this->session['error'] = '';
       $this->writeSession();
+      bdump($this->session, "Session Data, New");
 
     } else {
 
       $this->session = $_SESSION; // Store the session to this object in an array
-      bdump($this->session);
+
+      //flash data
+      if ( !empty( $this->session['notice'] ) ) {
+        $this->data['notice'] = $this->session['notice'];
+        unset($this->session['notice']);
+      }
+      if ( !empty( $this->session['alert']  )) {
+        $this->data['alert'] = $this->session['alert'];
+        unset( $this->session['alert']);
+      }
+
+      //debug
+      bdump($this->session, "Session Data, Existing");
 
     }
+
+    $this->data['formkey'] = $this->session['formkey'];
     //end if
 
   }
@@ -145,13 +157,10 @@ class BaseController {
           $this->post[$key] = htmlentities($prep, ENT_QUOTES);
         }
 
-        //debug
-        bdump($this->post);
-
       } else {
 
         //error no form key.
-        $this->post['error'] = "There was a problem with the session, try again";
+        $this->adderror( 'There was a problem with the session, try again', 'formkey' );
 
       }
 

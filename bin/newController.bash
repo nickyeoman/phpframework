@@ -9,9 +9,7 @@ cat << EOF > controllers/${ControllerName}.php
 
      function index() {
 
-       \$data = array();
-       \$data['notice'] = \$this->readFlash('notice'); // Flash Data for view
-       \$this->twig('${ControllerName}', \$data);
+       \$this->twig('${ControllerName}', \$this->data);
 
      }
    }
@@ -26,4 +24,3 @@ cat << EOF > views/${ControllerName}.html.twig
   <p>Sample ${ControllerName} Page Content.</p>
   {% endblock %}
 EOF
-

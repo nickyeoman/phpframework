@@ -381,61 +381,65 @@ class User {
      * Is the password reset key correct?
      * take a key and email, check the database
      * */
-    public function checkResetKey($key2check) {
+  public function checkResetKey($key2check) {
 
-        $cleanKey = $this->valid->clean( $key2check );
+      $cleanKey = $this->valid->clean( $key2check );
 
-        // Check for empty key
-        if ( empty( $cleanKey ) ) {
-            $this->errors['valid'] = '<div id="error-key">Key is Empty</div>';
-            return false;
-        }
-        // cleankey is not empty
+      // Check for empty key
+      if ( empty( $cleanKey ) ) {
+          $this->errors['valid'] = '<div id="error-key">Key is Empty</div>';
+          return false;
+      }
+      // cleankey is not empty
 
-        // probably alrady checked email by now, but just in case
-        // TODO: add session
-        if ( ! empty( $_POST['email'] ) )
-            $email = $this->valid->clean( $_POST['email'] );
-        else if ( ! empty( $_GET['email'] ) )
-            $email = $this->valid->clean( $_GET['email'] );
-        else {
-            $this->errors['valid'] = '<div id="error-email">Email is Empty</div>';
-            return false;
-        }
+      // probably alrady checked email by now, but just in case
+      // TODO: add session
+      if ( ! empty( $_POST['email'] ) )
+          $email = $this->valid->clean( $_POST['email'] );
+      else if ( ! empty( $_GET['email'] ) )
+          $email = $this->valid->clean( $_GET['email'] );
+      else {
+          $this->errors['valid'] = '<div id="error-email">Email is Empty</div>';
+          return false;
+      }
 
-        // Check if email exists
-        if ( $this->valid->isEmail( $email ) ) {
+      // Check if email exists
+      if ( $this->valid->isEmail( $email ) ) {
 
-            $user = $this->db->findone('users-permissions_user', 'email', $email);
+          $user = $this->db->findone('users-permissions_user', 'email', $email);
 
-        } else {
+      } else {
 
-            $this->errors['valid'] = '<div id="error-email">Email address is not valid</div>';
-            return false;
+          $this->errors['valid'] = '<div id="error-email">Email address is not valid</div>';
+          return false;
 
-        }
-        // the email address exists
+      }
+      // the email address exists
 
-        // Check database returned something
-        if ( isset( $user ) )
-            $this->userTraits['uid'] = $user['id'];
-        else {
-            $this->errors['valid'] = '<div id="error-email">Email not valid</div>';
-            return false;
-        }
+      // Check database returned something
+      if ( isset( $user ) )
+          $this->userTraits['uid'] = $user['id'];
+      else {
+          $this->errors['valid'] = '<div id="error-email">Email not valid</div>';
+          return false;
+      }
 
-        if ( $cleanKey != $user['resetPasswordToken']) {
+      if ( $cleanKey != $user['resetPasswordToken']) {
 
-            $this->errors['valid'] = '<div id="error-token">Key or Email not valid</div>';
-            return false;
+          $this->errors['valid'] = '<div id="error-token">Key or Email not valid</div>';
+          return false;
 
-        }
+      }
 
-        return true;
+      return true;
 
-    }
-    //end Check validationkey
+  }
+  //end Check validationkey
 
+  /**
+  * Checks if a user login request was valid
+  * form name is the name of the post
+  **/
   public function login($formName = 'login') {
 
     //Check if username or email exists
@@ -453,7 +457,7 @@ class User {
 
     if ( empty($userdb) ) {
 
-      $this->errors['login'] = 'Invalid login';
+      $this->errors['login'] = 'Username or password invalid';
       return false;
 
     }

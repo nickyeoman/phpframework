@@ -47,6 +47,7 @@ echo "Creating scaffolding Twig templates in views directory"
 cp vendor/nickyeoman/phpframework/twig/header.html.twig views/modules/header.html.twig
 cp vendor/nickyeoman/phpframework/twig/master.html.twig views/layout/master.html.twig
 cp vendor/nickyeoman/phpframework/twig/footer.html.twig views/modules/footer.html.twig
+cp vendor/nickyeoman/phpframework/twig/nav.html.twig views/modules/nav.html.twig
 cp vendor/nickyeoman/phpframework/twig/user/* views/user/.
 
 ################################################################################
