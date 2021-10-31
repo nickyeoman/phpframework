@@ -93,9 +93,6 @@ if [ "$DOCKERVOL" == "local" ]; then
   -e DATABASE_PASSWORD=${DBPASSWORD} \
   strapi/strapi
 
-  echo "Started docker container ${DOCKERNAME}"
-  echo "When done: docker stop ${DOCKERNAME}; docker rm ${DOCKERNAME}"
-
 else
 
   docker run -d -p ${DOCKERPORT}:80 --name ${DOCKERNAME} -v ${DOCKERNAME}:/website --net ${DOCKERNET} ${DOCKERIMAGE}:${DOCKERVER}

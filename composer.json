@@ -15,6 +15,7 @@
     "minimum-stability": "dev",
     "prefer-stable" : true,
     "require": {
+	"erusev/parsedown": "^1.7",
         "php": ">=7.4 <8.1",
         "nette/robot-loader": "v3.4.0",
         "nette/mail": "^3.1.6",

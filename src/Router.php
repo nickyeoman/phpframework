@@ -4,12 +4,12 @@ namespace Nickyeoman\Framework;
 /**
 * Router Class
 * v1.1
-* URL: TBA
+* URL: https://github.com/nickyeoman/phpframework/blob/main/docs/router.md
 **/
 
 class Router {
 
-  public $uri = array();
+  public $uri = array(); //an array of url segments with controller and action popped off
   public $controller = '';
   public $action = '';
   public $params = array();
@@ -23,7 +23,7 @@ class Router {
     $this->makeUri(); //creates $this->uri array
 
     // 404 error
-    if ( ! $this->makeController() ) {
+    if ( ! $this->sorturi() ) {
 
       //TODO: call a twig template
       header('HTTP/1.1 404 Not Found');
@@ -57,88 +57,92 @@ class Router {
   * Which controller and function do we load?
   *
   * We are going to handle the url's as follows so we can autoload Controllers (similar to codeigniter)
-  * /controller/action/parms
+  * /controller/action/params
   * / and /index would equal /index/index
   * /oneThing would equal /oneThing/index
   **/
-  private function makeController() {
+  private function sorturi() {
 
     $uri = $this->uri;
 
-    // case /
+    /**
+    * set controller
+    **/
     if ( empty( $uri[0] ) ) {
 
-      $controller = 'index';
-
-    } else {
-
-      $controller = strtolower($this->uri[0]);
-      array_shift($uri);
-
-    }
-
-    //get action
-    if ( empty( $uri[0] ) ) {
-
-      $action = 'index';
-
-    } else {
-
-      $action = strtolower($uri[0]);
-      array_shift($uri);
-
-    }
-
-    //set parms even with error
-
-
-    $this->params = $uri;
-
-    // Now begin error checking
-    // Check controller exists
-    $filename = $_ENV['realpath'] . '/' . $_ENV['CONTROLLERPATH'] . '/' . $controller . '.php';
-    if ( file_exists( $filename ) ) {
-
-      $this->controller = $controller;
-
-    } else {
-
-      //404
-      dump("Error: The Controller file ($filename) doesn't exist");
-      return false;
-
-    }
-
-    // Check if action exists
-    $filecontent = file_get_contents($filename);
-
-    if ( strpos( $filecontent, "function $action" ) !== false ) {
-
-      // The method exists
-      $this->action = $action;
+      // we got nothing (just slash)
+      $this->controller = 'index';
+      $this->action = 'index';
+      $this->params = array();
       return true;
 
     } else {
 
-      // If override exists there are no methods the second parameter is a variable
-      if ( strpos( $filecontent, "function override" ) !== false ) {
+      // Controller filename
+      $filename = $_ENV['realpath'] . '/' . $_ENV['CONTROLLERPATH'] . '/' . strtolower($uri[0]) . '.php';
 
-        $this->action = "override";
-        return true;
+      if ( file_exists( $filename ) ) {
+
+        $filecontent = file_get_contents($filename); //set variable
+        $this->controller = strtolower($uri[0]);
+        array_shift($uri);
 
       } else {
 
-        dump("Error: The Method ($action) doesn't exist in the Controller file ($filename)");
+        //404
+        dump("Error: The Controller file ($filename) doesn't exist");
         return false;
 
       }
 
     }
-    //End check if action exists
+    // end controller
 
-    dump("Error: you shouldn't get through the Router.");
+    /**
+    * set action/method
+    **/
+    if ( empty( $uri[0] ) ) {
 
-  } //makeController
+      $this->action = 'index';
+      $this->params = $uri; // case: /page/index/param1/param2 (if no override is used)
+      return true;
+
+    } else { // action is not index or empty
+
+      $action = strtolower($uri[0]);
+      // check the file to see if the function exists
+      if ( strpos( $filecontent, "function $action" ) !== false ) {
+
+        // The function exists
+        $this->action = $action;
+        array_shift($uri);
+        $this->params = $uri;
+        return true;
+
+      } else { // the action does not exist
+
+        // If override exists there are no methods the second parameter is a variable
+        if ( strpos( $filecontent, "function override" ) !== false ) {
+
+          $this->action = "override";
+          $this->params = $uri;
+          return true;
+
+        } else {
+
+          dump("Error: The Method ($action) doesn't exist in the Controller file ($filename)");
+          return false; //404
+
+        }
+
+      }
+      //end check file
+
+    }
+    // end set action/method
+
+
+} //sorturi
 
 
 } //class
