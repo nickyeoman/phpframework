@@ -114,8 +114,6 @@ class userController extends Nickyeoman\Framework\BaseController {
 			if ( ! $user->checkValidationKey($_GET['valid']) ) {
 
 				$this->error = true;
-				//For the view
-				$this->data['error'] = $user->errors['valid'];
 
 			} else {
 
