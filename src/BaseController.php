@@ -79,7 +79,7 @@ class BaseController {
       $this->twig->addExtension(new \Twig\Extension\DebugExtension());
 
       // loggedin is meant for the template
-      $vars['loggedin'] = $this->session['NY_FRAMEWORK_USER']['loggedin'];
+      $vars['loggedin'] = $this->session['loggedin'];
 
       echo $this->twig->render("$viewname.html.twig", $vars);
 
