@@ -7,7 +7,7 @@ class BaseController {
 
   public $session = array();
   public $destroy = false;
-  public $loggedin = 0;
+  public $loggedin = 0; //0 or 1
   public $db = null;
   public $post = array('submitted' => false);
   public $data = array('error' => array(), 'notice' => null);
@@ -131,6 +131,9 @@ class BaseController {
         $this->data['alert'] = $this->session['alert'];
         unset( $this->session['alert']);
       }
+
+      if ( $this->session['NY_FRAMEWORK_USER']['loggedin'] )
+        $this->session['loggedin'] = 1;
 
       //debug
       bdump($this->session, "Session Data, Existing");
