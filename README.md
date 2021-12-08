@@ -17,14 +17,18 @@ Just change "YOUR_PROJECT_NAME" to whatever you want.
 wget https://raw.githubusercontent.com/nickyeoman/phpframework/main/bin/newProject.bash
 bash newProject.bash YOUR_PROJECT_NAME
 ```
+Now you should change your [dotenv](https://github.com/nickyeoman/phpframework/tree/main/docs) file;
+then you should run [startServer](https://github.com/nickyeoman/phpframework/tree/main/docs).
+
+Your development server is configured, use [sass](https://github.com/nickyeoman/phpframework/tree/main/docs) to modify the look.
 
 ## Framework Documentation
 
-* [startServer](https://github.com/nickyeoman/phpframework/tree/main/docs)
 * [dotenv](https://github.com/nickyeoman/phpframework/tree/main/docs)
+* [startServer](https://github.com/nickyeoman/phpframework/tree/main/docs)
+* [sass](https://github.com/nickyeoman/phpframework/tree/main/docs)
 * [tracy](/home/nick/github/phpframework/README.md)
 * [database](https://github.com/nickyeoman/phpframework/tree/main/docs)
-* [sass](https://github.com/nickyeoman/phpframework/tree/main/docs)
 * [robotloader](https://github.com/nickyeoman/phpframework/tree/main/docs)
 * [twig](https://github.com/nickyeoman/phpframework/tree/main/docs)
 * [users](https://github.com/nickyeoman/phpframework/tree/main/docs)
