@@ -132,8 +132,10 @@ class BaseController {
         unset( $this->session['alert']);
       }
 
-      if ( $this->session['NY_FRAMEWORK_USER']['loggedin'] )
-        $this->session['loggedin'] = 1;
+      if ( isset($this->session['NY_FRAMEWORK_USER']) ) {
+        if ( $this->session['NY_FRAMEWORK_USER']['loggedin'] )
+          $this->session['loggedin'] = 1;
+      }
 
       //debug
       bdump($this->session, "Session Data, Existing");
