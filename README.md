@@ -14,8 +14,9 @@
 Just change "YOUR_PROJECT_NAME" to whatever you want.
 
 ```bash
-wget https://raw.githubusercontent.com/nickyeoman/phpframework/main/bin/newProject.bash
-bash newProject.bash YOUR_PROJECT_NAME
+wget fbot.co/nyphp
+bash nyphp YOUR_PROJECT_NAME
+rm nyphp
 ```
 Now you should change your [dotenv](https://github.com/nickyeoman/phpframework/tree/main/docs) file;
 then you should run [startServer](https://github.com/nickyeoman/phpframework/tree/main/docs).
@@ -41,4 +42,4 @@ Your development server is configured, use [sass](https://github.com/nickyeoman/
 1. Docker is king
 1. Framework should play nice with hugo (Apache settings)
 1. Apache is okay
-1. I went with bash for the automation process for two reasons, one I'm more familiar with it and two it seemed more appropriate when working with containers.
+1. I went with bash for the automation process for two reasons, one I'm more familiar with it and two it seemed more appropriate when working with docker containers.
