@@ -9,7 +9,10 @@ When pulling phpframework from composer, it includes the [nickyeoman/sassLibrary
 composer show -- nickyeoman/sassLibrary
 ```
 
-SASS needs to be compiled to work, so have to run sass: sass sass/project.sass public/css/main.css
+SASS needs to be compiled to work, so have to run sass: 
+```sass
+sass sass/project.sass public/css/main.css
+```
 
 The default template already looks for main.css
 
@@ -19,7 +22,10 @@ Then you can modify your project as you normally would for sass.
 
 ### Development SASS
 
-The watch command for live updates: sass --watch sass/master.sass public/css/main.css
+The watch command for live updates: 
+```sass
+sass --watch sass/project.sass public/css/main.css
+```
 
 ### Install SASS on Ubuntu
 
