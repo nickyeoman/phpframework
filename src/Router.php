@@ -3,7 +3,7 @@ namespace Nickyeoman\Framework;
 
 /**
 * Router Class
-* v1.1
+* v1.2
 * URL: https://github.com/nickyeoman/phpframework/blob/main/docs/router.md
 **/
 
@@ -22,15 +22,8 @@ class Router {
 
     $this->makeUri(); //creates $this->uri array
 
-    // 404 error
-    if ( ! $this->sorturi() ) {
-
-      //TODO: call a twig template
-      header('HTTP/1.1 404 Not Found');
-      echo 'This is 404 page. <a href="/">home</a>';
-      exit();  // must stop here or controller will still be called.
-
-    }
+    // Assign the controller and function(action)
+    $this->sorturi();
 
   }
 
@@ -90,8 +83,10 @@ class Router {
       } else {
 
         //404
-        dump("Error: The Controller file ($filename) doesn't exist");
-        return false;
+        $this->controller = 'error';
+        $this->action = '_404';
+        $this->params = array();
+        $filecontent = null;
 
       }
 
@@ -130,8 +125,9 @@ class Router {
 
         } else {
 
-          dump("Error: The Method ($action) doesn't exist in the Controller file ($filename)");
-          return false; //404
+          // 404 should have already been triggered, so should never get here
+          bdump("Error: The Method ($action) doesn't exist in the Controller file ($filename)");
+          return false;
 
         }
 

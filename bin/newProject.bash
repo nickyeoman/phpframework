@@ -63,6 +63,7 @@ touch sass/variables.sass
 ################################################################################
 
 cp vendor/nickyeoman/phpframework/user/user.php controllers/user.php
+cp vendor/nickyeoman/phpframework/error/error.php controllers/error.php
 
 ################################################################################
 # Configuration
