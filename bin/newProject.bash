@@ -25,7 +25,7 @@ fi
 ################################################################################
 
 echo "Creating directories: controllers tmp public views scripts"
-mkdir -p controllers tmp migrations sass scripts
+mkdir -p controllers tmp migrations sass scripts helpers
 mkdir -p public/css public/js public/images
 mkdir -p views/modules views/layout views/user
 
