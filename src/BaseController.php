@@ -3,6 +3,12 @@ namespace Nickyeoman\Framework;
 USE \Nickyeoman\Dbhelper;
 session_start();
 
+// load helpers
+$loader = new \Nette\Loaders\RobotLoader; // https://doc.nette.org/en/3.1/robotloader
+$loader->addDirectory( $_ENV['realpath'] . "/" . $_ENV['HELPERPATH'] ); //helpers
+$loader->setTempDirectory( $_ENV['realpath'] . "/" . $_ENV['LOADERTMPDIR'] ); // use 'temp' directory for cache
+$loader->register(); // Run the RobotLoader
+
 class BaseController {
 
   public $session = array();
