@@ -23,6 +23,10 @@ class BaseController {
   */
   public function __construct() {
 
+    
+    //grab the uri
+    $this->data['uri'] = rtrim(ltrim($_SERVER['REQUEST_URI'], "\/"), "\/");
+    
     // sessions
     $this->setSession();
 
