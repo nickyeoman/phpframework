@@ -6,6 +6,17 @@ You can use phinx to control your database migrations.
 
 Framework uses [Phenix migraitons](https://book.cakephp.org/phinx/0/en/migrations.html)
 
+
+create a new migration.
+```
+vendor/bin/phinx create MyNewMigration
+```
+
+run migration
+```
+vendor/bin/phinx migrate
+```
+
 ### Preparation
 
 Ensure that your dotenv file is correct.
