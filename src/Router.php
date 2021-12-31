@@ -105,6 +105,7 @@ class Router {
     } else { // action is not index or empty
 
       $action = strtolower($uri[0]);
+
       // check the file to see if the function exists
       if ( strpos( $filecontent, "function $action" ) !== false ) {
 
@@ -125,7 +126,11 @@ class Router {
 
         } else {
 
-          // 404 should have already been triggered, so should never get here
+          //404
+          $this->controller = 'error';
+          $this->action = '_404';
+          $this->params = array();
+          $filecontent = null;
           bdump("Error: The Method ($action) doesn't exist in the Controller file ($filename)");
           return false;
 
