@@ -1,4 +1,4 @@
-FROM php:8.0.11-apache-bullseye
+FROM php:8.1.1-apache-bullseye
 LABEL maintainer="Nick Yeoman <c@nickyeoman.com>"
 
 WORKDIR /website

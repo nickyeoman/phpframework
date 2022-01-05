@@ -13,7 +13,8 @@ services:
 
   # Database
   db:
-    image: mariadb:10.5.9
+    #https://hub.docker.com/_/mariadb
+    image: mariadb:10.7.1
     restart: always
     container_name: "${DBHOST}"
     environment:

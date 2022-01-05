@@ -42,4 +42,7 @@ Your development server is configured, use [sass](https://github.com/nickyeoman/
 1. Docker is king
 1. Framework should play nice with hugo (Apache settings)
 1. Apache is okay
-1. I went with bash for the automation process for two reasons, one I'm more familiar with it and two it seemed more appropriate when working with docker containers.
+
+I went with bash for the automation process for two reasons:
+1. I'm more familiar with bash.
+1. It seemed more appropriate when working with docker containers.
