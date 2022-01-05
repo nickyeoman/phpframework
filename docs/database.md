@@ -6,7 +6,6 @@ You can use phinx to control your database migrations.
 
 Framework uses [Phenix migraitons](https://book.cakephp.org/phinx/0/en/migrations.html)
 
-
 create a new migration.
 ```
 vendor/bin/phinx create MyNewMigration
@@ -29,7 +28,6 @@ bash vendor/nickyeoman/phpframework/bin/startServer.bash
 
 ### Using Phinx
 
-<<<<<<< HEAD
 First you need to initialize phinx:
 
 ```bash
@@ -37,16 +35,6 @@ php vendor/bin/phinx init
 ```
 
 in order to create a phinx.php config file. [Phinx Installation](https://book.cakephp.org/phinx/0/en/install.html)
-=======
-First you need to edit your phinx.php file to your needs.
-
-Alternatively, if you prefer to use the original phix file, remove phinx.php the newProject.bash created and run:
-
-php vendor/bin/phinx init
->>>>>>> e6a0d93e30401e4418dda8270fe1577002a9ebb9
-
-in order to create a phinx.php config file. [Phinx Installation](https://book.cakephp.org/phinx/0/en/install.html)
-
 
 ### Create a new migration
 

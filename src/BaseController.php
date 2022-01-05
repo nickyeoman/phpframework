@@ -23,10 +23,10 @@ class BaseController {
   */
   public function __construct() {
 
-    
+
     //grab the uri
     $this->data['uri'] = rtrim(ltrim($_SERVER['REQUEST_URI'], "\/"), "\/");
-    
+
     // sessions
     $this->setSession();
 
@@ -58,7 +58,7 @@ class BaseController {
   }
 
   // Redirect to the correct controller and action (page)
-  function redirect($controller = 'index', $action = 'index') {
+  public function redirect($controller = 'index', $action = 'index') {
 
     if ($controller == 'index' || empty($controller) ) {
       $controller = '/';
@@ -114,6 +114,46 @@ class BaseController {
   public function counterrors() {
     return( count($this->data['error']) );
   }
+
+  /**
+  * A wrapper for the nette SMTP
+  * make sure your ENV is set
+  * won't send in debug mode
+  * easy to use $this->sendEmail($to,$subject,$body);
+  **/
+  public function sendEmail($to = '', $subject = '', $body = '') {
+
+    // Check params
+    if ( empty($to) || empty($subject) || empty($body) )
+      dump('All params required: $this->sendEmail($to,$subject, $body)');
+      return false;
+
+    // Check env
+    if ($_ENV['DEBUG'] != 'display'){
+
+      // https://packagist.org/packages/nette/mail
+      $mail = new \Nette\Mail\Message;
+
+      $mail->setFrom($_ENV['MAIL_FROM_NAME'] . ' <' . $_ENV['MAIL_FROM_ADDRESS'] .'>')
+        ->addTo( $to )
+        ->setSubject( $subject )
+        ->setBody( $body )
+      ;
+
+      $mailer = new \Nette\Mail\SmtpMailer([
+         'host'     => $_ENV['MAIL_HOST'],
+         'username' => $_ENV['MAIL_USERNAME'],
+         'password' => $_ENV['MAIL_PASSWORD'],
+         'secure'   => $_ENV['MAIL_ENCRYPTION'],
+         'port'     => $_ENV['MAIL_PORT'],
+       ]);
+
+      $mailer->send($mail);
+    }
+    // end if debug
+
+  }
+  // end sendEmail
 
   private function setSession(){
 

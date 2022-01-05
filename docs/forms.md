@@ -13,12 +13,13 @@ bash vendor/nickyeoman/phpframework/bin/newController.bash contact
 Make sure you have the formkey from the session.  
 The submit action is whatever you choose, it should be the same page if you want to direct error output and maintain what was entered in the form.
 
+### Example contact.html.twig
 ```html
 {% set title = 'Contact Us' %}
 {% extends "layout/master.html.twig" %}
 
 {% block content %}
-<h1>Contact Us</h1>
+<h1>{{ title }}</h1>
 
 <div class="formContainer">
   <form action="/contact" method="post">
