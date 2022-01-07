@@ -155,6 +155,32 @@ class BaseController {
   }
   // end sendEmail
 
+  /**
+  * Grabs a markdown file
+  * Parm1: Path to file from index.php
+  * Parm2: key from array to populate default: $this->data['content']
+  **/
+  public function markdownFile($filename = '', $datakey = 'content') {
+    if ( empty($filename) ) {
+      die("Error: no filename given to mardownFile");
+    }
+
+    $f = fopen($filename, 'r');
+
+    if ($f) {
+     $contents = fread($f, filesize($filename));
+     fclose($f);
+
+     $Parsedown = new \Parsedown();
+     $this->data[$datakey] = $Parsedown->text( $contents );
+     return $contents;
+   } else {
+     die("Error: mardownFile, file not found");
+   }
+
+  }
+  //end markdownFile
+
   private function setSession(){
 
     if ( empty( $_SESSION['sessionid'] ) ) {
