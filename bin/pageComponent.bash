@@ -28,11 +28,11 @@ cp vendor/nickyeoman/phpframework/components/page/pageController.php controllers
 ################################################################################
 
 echo "Add Helper"
-cp vendor/nickyeoman/phpframework/components/page/userHelper.php helpers/page.php
+cp vendor/nickyeoman/phpframework/components/page/pageHelper.php helpers/page.php
 
 ################################################################################
 # database
 ################################################################################
 
 echo "Move user migrations to migrations folder"
-cp vendor/nickyeoman/phpframework/components/user/20220000000002_pages_database_creation.php migrations/.
+cp vendor/nickyeoman/phpframework/components/page/20220000000002_pages_database_creation.php migrations/.

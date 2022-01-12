@@ -92,6 +92,8 @@ class BaseController {
       $vars['loggedin'] = $this->session['loggedin'];
 
       echo $this->twig->render("$viewname.html.twig", $vars);
+      $this->writeSession();
+      $this->db->close();
 
   }
 

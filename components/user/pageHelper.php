@@ -1,8 +1,8 @@
 <?php
-namespace Nickyeoman\helpers;
+namespace Nickyeoman\Framework;
 USE \Nickyeoman\Validation;
 
-class userHelper {
+class UserHelper {
 
   public $userTraits = array(
     "uid"               => '',

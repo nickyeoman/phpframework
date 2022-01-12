@@ -1,0 +1,8 @@
+{% set title = page.title %}
+{% extends "layout/master.html.twig" %}
+
+{% block content %}
+<h2>{{ page.heading |raw }}</h2>
+<p>{{ page.intro | raw }}</p>
+<p>{{ page.body | raw }}</p>
+{% endblock %}

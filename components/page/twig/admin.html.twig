@@ -1,0 +1,21 @@
+{% set title = 'Pages Administrator' %}
+{% extends "layout/master.html.twig" %}
+
+{% block content %}
+
+<h1>{{ title }}</h1>
+
+<p><a href="/page/new">Create New Page</a></p>
+
+<table id="pages-list">
+  <tr><th>id</th><th>slug</th><th>title</th></tr>
+  {% for page in pages %}
+    <tr>
+      <td>{{ page.id }}</td>
+      <td><a href="/page/edit/{{ page.id }}">{{ page.slug }}</a></td>
+      <td><a href="/page/edit/{{ page.id }}">{{ page.title }}</a></td>
+    </tr>
+  {% endfor %}
+</table>
+
+{% endblock %}

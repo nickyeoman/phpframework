@@ -5,9 +5,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 
 	public function index(){
 
-		$user = new Nickyeoman\Framework\User();
-
-		if ( ! $user->loggedin() ) {
+		if ( ! $this->session['loggedin'] ) {
 
 			$this->session['notice'] = "You need to login.";
 			$this->writeSession();
@@ -21,15 +19,57 @@ class userController extends Nickyeoman\Framework\BaseController {
 	} // end function index
 
 	/**
+	* Login Form
+	**/
+	public function login() {
+
+		// If the user is logged in we don't need to proceed
+		if ( $this->session['loggedin'] ) {
+			$this->redirect('user', 'index');
+		}
+
+		// Check if form Submitted
+		if ( $this->post['submitted'] ) {
+
+			$user = new Nickyeoman\helpers\userHelper();
+			//Process the form
+			if ( $user->login() ) {
+				$this->redirect('user', 'index');
+			} else {
+
+				//prep errors, login failed
+
+				if ( !empty($user->errors) ) {
+
+					foreach( $user->errors as $k => $v ) {
+
+						$this->adderror($string = $v, $k );
+
+					}
+					//end foreach
+
+				}
+				//endif
+
+			}
+			//end else
+
+		}
+		// end POST SUBMITTED
+
+		$this->twig('user/login', $this->data);
+		$this->writeSession();
+
+	}
+	//END Login
+
+	/**
 	* /user/registration
 	**/
 	public function registration(){
 
-		// Create new user class
-    $user = new Nickyeoman\Framework\User();
-
     // If the user is logged in we don't need to proceed
-    if ( $user->loggedin() )
+		if ( $this->session['loggedin'] )
       $this->redirect('user', 'index');
 
 		// Session data
@@ -37,6 +77,8 @@ class userController extends Nickyeoman\Framework\BaseController {
 
     //check Form Was submitted is enabled
     if ( ! empty( $_POST['formkey'] ) ){
+
+			$user = new Nickyeoman\helpers\userHelper();
 
 			//check session matches
       if ( $_POST['formkey'] == $this->session['formkey'] ) {
@@ -106,7 +148,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 		if ( isset( $_GET['valid'] ) ) {
 
 			//A validation key exists, we better check it
-			$user = new Nickyeoman\Framework\User();
+			$user = new Nickyeoman\helpers\userHelper();
 
 			// TODO: Check user isn't already valid.
 
@@ -138,63 +180,16 @@ class userController extends Nickyeoman\Framework\BaseController {
 
 	}
 
-	/**
-	* Login Form
-	**/
-	public function login() {
-
-		// initiate class
-		$user = new Nickyeoman\Framework\User();
-
-		// If the user is logged in we don't need to proceed
-		if ( $user->loggedin() ) {
-			$this->redirect('user', 'index');
-		}
-
-		// Check if form Submitted
-		if ( $this->post['submitted'] ) {
-
-			//Process the form
-			if ( $user->login() ) {
-				$this->redirect('user', 'index');
-			} else {
-
-				//prep errors, login failed
-
-				if ( !empty($user->errors) ) {
-
-					foreach( $user->errors as $k => $v ) {
-
-						$this->adderror($string = $v, $k );
-
-					}
-					//end foreach
-
-				}
-				//endif
-
-			}
-			//end else
-
-		}
-		// end POST SUBMITTED
-
-		$this->twig('user/login', $this->data);
-		$this->writeSession();
-
-	}
-	//END Login
-
     /**
      *  Forgot Password Controller
      */
 	public function forgot() {
 
-		$user = new Nickyeoman\Framework\User();
-
 		// If the user is logged in we don't need to proceed
-		if ( $user->loggedin() )
+		if ( $this->session['loggedin'] )
 		    $this->redirect('user', 'index');
+
+		$user = new Nickyeoman\helpers\userHelper();
 
 		$this->data['formkey'] = $this->session['formkey'];       // Form cross site protection
 
@@ -244,7 +239,7 @@ class userController extends Nickyeoman\Framework\BaseController {
             bdump($_GET, 'Get Data');
 
             //A validation key exists, we better check it
-            $user = new Nickyeoman\Framework\User();
+            $user = new Nickyeoman\helpers\userHelper();
 
             // Check if the key is valid
             if ( ! $user->checkResetKey($_GET['valid']) ) {

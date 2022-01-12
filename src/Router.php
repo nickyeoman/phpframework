@@ -3,7 +3,7 @@ namespace Nickyeoman\Framework;
 
 /**
 * Router Class
-* v2.0
+* v2.1
 * URL: https://github.com/nickyeoman/phpframework/blob/main/docs/router.md
 **/
 
@@ -13,11 +13,11 @@ class Router {
   // uri in array format [controller,method,param1,parm2] from /controller/method/param1/param2
   private $uri         = array();
   // The controller to call (index is default)
-  public $controller  = '';
+  public $controller   = '';
   // The method to call (index is default, override as fallback)
-  public $action      = '';
+  public $action       = '';
   // parameters on URL (not includeing post/get)
-  public $params      = array();
+  public $params       = array();
   // content of contoller file (for method checking)
   private $filecontent = '';
 
@@ -75,7 +75,7 @@ class Router {
     } else {
 
       // Controller filename
-      $filename = $_ENV['realpath'] . '/' . $_ENV['CONTROLLERPATH'] . '/' . strtolower($uri[0]) . '.php';
+      $filename = $_ENV['realpath'] . '/' . $_ENV['CONTROLLERPATH'] . '/' . strtolower($this->uri[0]) . '.php';
 
       if ( file_exists( $filename ) ) {
 
@@ -105,20 +105,19 @@ class Router {
     // set action/method
     if ( empty( $this->uri[0] ) ) {
 
-      $action = 'index';
+      $this->action = 'index';
 
     } else { // action is not index or empty
 
-      $action = strtolower($uri[0]);
+      $this->action = strtolower($this->uri[0]);
 
       // check the file to see if the function exists
-      if ( strpos( $this->filecontent, "function $action" ) !== false ) {
+      if ( strpos( $this->filecontent, "function $this->action" ) !== false ) {
 
         // The function exists
-        $this->action = $action;
-        array_shift($uri);
-        if ( !empty($uri) )
-          $this->params = $uri;
+        array_shift($this->uri);
+        if ( !empty($this->uri) )
+          $this->params = $this->uri;
 
       } else { // the action does not exist
 
@@ -126,8 +125,8 @@ class Router {
         if ( strpos( $this->filecontent, "function override" ) !== false ) {
 
           $this->action = "override";
-          if ( !empty($uri) )
-            $this->params = $uri;
+          if ( !empty($this->uri) )
+            $this->params = $this->uri;
 
         } else {
 
