@@ -2,7 +2,7 @@
 namespace Nickyeoman\Framework;
 USE \Nickyeoman\Validation;
 
-class User {
+class UserHelper {
 
   public $userTraits = array(
     "uid"               => '',
