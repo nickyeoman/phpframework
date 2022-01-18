@@ -28,7 +28,7 @@ cp vendor/nickyeoman/phpframework/components/page/pageController.php controllers
 ################################################################################
 
 echo "Add Helper"
-cp vendor/nickyeoman/phpframework/components/page/pageHelper.php helpers/page.php
+cp vendor/nickyeoman/phpframework/components/page/pageHelper.php helpers/pageHelper.php
 
 ################################################################################
 # database

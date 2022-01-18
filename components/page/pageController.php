@@ -1,103 +1,155 @@
 <?php
-   class pageController extends Nickyeoman\Framework\BaseController {
+class pageController extends Nickyeoman\Framework\BaseController {
 
-     // There is no index page, this will catch
-     function override( $params = array() ) {
-       $slug = $params[0];
-       $this->data['page'] = $this->db->findone('pages', 'slug', $slug);
-       bdump($this->data['page']);
+  // There is no index page, this will catch
+  function override( $params = array() ) {
 
-       $this->twig('page/page', $this->data);
-     }
+    // Grab the slug
+    $slug = $params[0];
 
-     // List pages to edit
-     function admin() {
+    // Check slug isn't empty
+    if ( empty($slug) ) {
+      $this->session['error'] = "No Page given.";
+			$this->writeSession();
+      $this->redirect('error', '_404');
+    }
 
-       if ( ! $this->session['loggedin'] ) {
+    // Grab page from db
+    $this->data['page'] = $this->db->findone('pages', 'slug', $slug);
 
-         $this->session['notice'] = "You need to login to edit pages.";
-         $this->writeSession();
-         $this->redirect('user', 'login');
+    // If you don't get one, error
+    if ( empty( $this->data['page']['slug'] ) ) {
+      $this->session['error'] = "Page not found.";
+			$this->writeSession();
+      $this->redirect('error', '_404');
+    }
 
-       }
+    // View
+    $this->data['pageid'] = $slug; //css page id
+    $this->twig('page/page', $this->data);
 
-       //Grab pages
-       $this->data['pages'] = $this->db->findall('pages','id,title,slug');
-       $this->twig('page/admin', $this->data);
+  }
+  // end override
 
-     }
+  // List pages to edit
+  function admin() {
 
-     // Edit a page
-     function edit($params = null) {
+    // Check if logged in
+    // TODO: anyone can login
+    if ( ! $this->session['loggedin'] ) {
 
-       if ( ! $this->session['loggedin'] ) {
+      $this->session['notice'] = "You need to login to edit pages.";
+      $this->writeSession();
+      $this->redirect('user', 'login');
 
-         $this->session['notice'] = "You need to login to edit pages.";
-         $this->writeSession();
-         $this->redirect('user', 'login');
+    }
 
-       }
+    //Grab pages from db
+    $this->data['pages'] = $this->db->findall('pages','id,title,slug');
+    // TODO: if empty results
 
-       if ( $this->post['submitted'] ) {
-         $page = new Nickyeoman\helpers\pageHelper($this->post);
+    // View
+    $this->data['pageid'] = "page-admin"; //css page id
+    $this->twig('page/admin', $this->data);
 
-         $array = $page->insertArray();
+  }
+  //end admin
 
-         $id = $this->db->update('pages', $array, 'id' );
+  // Edit a page
+  function edit($params = null) {
 
-         $this->session['notice'] = "Saved Page.";
-         $this->writeSession();
-         $this->redirect('page', 'admin');
+    // Check if loggedin
+    // TODO: anyone can login
+    if ( ! $this->session['loggedin'] ) {
 
-       }
+      $this->session['notice'] = "You need to login to edit pages.";
+      $this->writeSession();
+      $this->redirect('user', 'login');
 
-       $pid = $params[0];
+    }
 
-       if ( empty($pid) ) {
-         //TODO: error, page not given
-       }
+    // Check if form submitted
+    if ( $this->post['submitted'] ) {
 
-       $this->data['info'] = $this->db->findone('pages', 'id', $pid);
+      //Create page class (grabs post, cleans data)
+      $page = new Nickyeoman\helpers\pageHelper($this->post);
 
-       $this->twig('page/edit', $this->data);
+      // store to db
+      $id = $this->db->update('pages', $page->page , 'id' );
 
-     }
+      //redirect
+      $this->session['notice'] = "Saved Page.";
+      $this->writeSession();
+      $this->redirect('page', 'admin');
 
-     public function new(){
+    }
 
-       if ( ! $this->session['loggedin'] ) {
+    $pid = $params[0];
 
-         $this->session['notice'] = "You need to login to edit pages.";
-         $this->writeSession();
-         $this->redirect('user', 'login');
+    if ( empty($pid) ) {
+      //TODO: error, page not given
+      //TODO: clean slug, trim, lower
+    }
 
-       }
+    // fetch from db
+    $this->data['info'] = $this->db->findone('pages', 'id', $pid);
 
-       if ( $this->post['submitted'] ) {
-         $page = new Nickyeoman\helpers\pageHelper($this->post);
+    // View
+    $this->data['pageid'] = "page-edit";
+    $this->twig('page/edit', $this->data);
 
-         $array = $page->insertArray();
+  }
+  // end function edit
 
-         $id = $this->db->create('pages', $array);
+  /**
+  * Creating a new page
+  * New pages don't have ids
+  **/
+  public function new(){
 
-         $this->session['notice'] = "Saved Page.";
-         $this->writeSession();
-         $this->redirect('page', 'admin');
+    // TODO: merge with edit above, just add id checking
 
-       }
+    // if loggedin
+    // TODO: anyone can login
+    if ( ! $this->session['loggedin'] ) {
 
-       $this->data['info'] = array(
-         'title' => 'New Title',
-         'slug' => 'slug',
-         'intro' => 'Placeholder Text',
-         'body' => 'Placeholder Text'
-       );
-       $this->data['mode'] = 'new';
+      $this->session['notice'] = "You need to login to edit pages.";
+      $this->writeSession();
+      $this->redirect('user', 'login');
 
-       $this->twig('page/edit', $this->data);
+    }
 
+    if ( $this->post['submitted'] ) {
 
+      $page = new Nickyeoman\helpers\pageHelper($this->post);
 
-     }
+      if( empty($page->error) )
+        $id = $this->db->create('pages', $page->page);
+      else
+        dump($page->error);die("there are page errors");
 
-   }
+      // redirect
+      $this->session['notice'] = "Saved Page.";
+      $this->writeSession();
+      $this->redirect('page', 'admin');
+
+    }
+    //end submitted
+
+    // View
+    $this->data['info'] = array(
+    'title' => 'New Title',
+    'slug' => 'slug',
+    'intro' => 'Placeholder Text',
+    'body' => 'Placeholder Text'
+    );
+    $this->data['mode'] = 'new'; //for the twig template (placeholder vs value)
+    $this->data['pageid'] = "page-edit"; // css body id
+
+    $this->twig('page/edit', $this->data);
+
+  }
+  //end new
+
+}
+//end class

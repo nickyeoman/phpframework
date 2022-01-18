@@ -5,7 +5,7 @@
 <h2>{{ title }}</h2>
 <div class="formContainer">
 
-<a href="/pages/admin">Back/cancel</a>
+<a href="/page/admin">Back/cancel</a>
 
 {% if mode != 'new' %}
   <form action="/page/edit" method="post">
@@ -52,6 +52,26 @@
   <input type="text"   name="heading"   value=""  placeholder="{{ info.heading }}" required>
 {%endif%}
 
+<label for="description">description</label>
+{% if mode != 'new' %}
+  <input type="text"   name="description"    value="{{ info.description }}"   placeholder="description"  required>
+{% else %}
+  <input type="text"   name="description"    value=""   placeholder="{{ info.description }}"  required>
+{%endif%}
+
+<label for="keywords">keywords</label>
+{% if mode != 'new' %}
+  <input type="text"   name="keywords"    value="{{ info.keywords }}"   placeholder="keywords"  required>
+{% else %}
+  <input type="text"   name="keywords"    value=""   placeholder="{{ info.keywords }}"  required>
+{%endif%}
+
+<label for="author">author</label>
+{% if mode != 'new' %}
+  <input type="text"   name="author"    value="{{ info.author }}"   placeholder="author"  required>
+{% else %}
+  <input type="text"   name="author"    value=""   placeholder="{{ info.author }}"  required>
+{%endif%}
 
 <input type="submit" value="Save Page" name="submit" />
 

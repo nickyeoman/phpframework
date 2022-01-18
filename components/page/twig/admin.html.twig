@@ -8,12 +8,18 @@
 <p><a href="/page/new">Create New Page</a></p>
 
 <table id="pages-list">
-  <tr><th>id</th><th>slug</th><th>title</th></tr>
+  <tr>
+    <th>id</th>
+    <th>slug</th>
+    <th>title</th>
+    <th>view</th>
+  </tr>
   {% for page in pages %}
     <tr>
       <td>{{ page.id }}</td>
       <td><a href="/page/edit/{{ page.id }}">{{ page.slug }}</a></td>
       <td><a href="/page/edit/{{ page.id }}">{{ page.title }}</a></td>
+      <td><a href="/page/{{ page.slug }}" target="_new">View {{ page.title }}</a></td>
     </tr>
   {% endfor %}
 </table>

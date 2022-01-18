@@ -23,9 +23,9 @@ class BaseController {
   */
   public function __construct() {
 
-
     //grab the uri
     $this->data['uri'] = rtrim(ltrim($_SERVER['REQUEST_URI'], "\/"), "\/");
+    $this->data['pageid'] = str_replace("/", "-", $this->data['uri']);
 
     // sessions
     $this->setSession();
@@ -249,6 +249,7 @@ class BaseController {
 
     }
     //end if
+    bdump($this->post);
   }
   // end setPost()
 

@@ -6,14 +6,14 @@ use Phinx\Migration\AbstractMigration;
 final class PagesDatabaseCreation extends AbstractMigration
 {
 
-    public function change(): void
-    {
+    public function change(): void {
+
       $pages = $this->table('pages');
         $pages->addColumn('title', 'string', ['limit' => 255])
               ->addColumn('heading', 'string', ['limit' => 255])
-              ->addColumn('meta-description', 'string', ['limit' => 255])
-              ->addColumn('meta-keywords', 'string', ['limit' => 255])
-              ->addColumn('meta-author', 'string', ['limit' => 255])
+              ->addColumn('description', 'string', ['limit' => 255])
+              ->addColumn('keywords', 'string', ['limit' => 255])
+              ->addColumn('author', 'string', ['limit' => 255])
               ->addColumn('slug', 'string', ['limit' => 255])
               ->addColumn('intro', 'text', ['null' => true])
               ->addColumn('body', 'text', ['null' => true])

@@ -28,7 +28,7 @@ cp vendor/nickyeoman/phpframework/components/user/userController.php controllers
 ################################################################################
 
 echo "Add Helper"
-cp vendor/nickyeoman/phpframework/components/user/userHelper.php helpers/user.php
+cp vendor/nickyeoman/phpframework/components/user/userHelper.php helpers/userHelper.php
 
 ################################################################################
 # database
