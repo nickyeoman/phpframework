@@ -5,7 +5,11 @@
 {% extends "layout/master.html.twig" %}
 
 {% block content %}
-<h2>{{ page.heading |raw }}</h2>
-<p>{{ page.intro | raw }}</p>
+{% if page.heading is not empty %}
+  <h2>{{ page.heading |raw }}</h2>
+{% endif %}
+{% if page.intro is not empty %}
+    <p>{{ page.intro | raw }}</p>
+{% endif %}
 <p>{{ page.body | raw }}</p>
 {% endblock %}

@@ -5,7 +5,6 @@ USE \Nickyeoman\Validation;
 class pageHelper {
 
   public  $post = array();
-  // An array that matches the db table
   public  $page = array(
     'id'      => '',
     'title'   => '',
@@ -20,7 +19,6 @@ class pageHelper {
     'updated' => 'NOW()',
     'draft' => ''
   );
-  //Errors
   public $error = array();
 
   /*
@@ -31,7 +29,6 @@ class pageHelper {
     //Save the original post data
     $this->post = $post;
 
-    // clean all the post data
     $this->set_id();
     $this->set_title();
     $this->set_heading();
@@ -42,8 +39,6 @@ class pageHelper {
     $this->set_keywords();
     $this->set_author();
     $this->set_draft();
-
-    unset($this->post);
 
   }
   // End Construct
@@ -152,8 +147,9 @@ class pageHelper {
 
   public function set_body( $body = null ) {
 
-    if ( !empty( $this->post['body'] ) )
-      $body = $this->post['body'];
+    // We want the HTML so we are just going to grap the $_POST
+    if ( !empty( $_POST['body'] ) )
+      $body = $_POST['body'];
 
     trim($body);
     $this->page['body'] = $body;

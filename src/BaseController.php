@@ -236,6 +236,7 @@ class BaseController {
         $this->post['submitted'] = true;
 
         foreach( $_POST as $key => $value){
+          //clean variable TODO: might not want this all the time (html)
           $prep = trim(strip_tags($value));
           $this->post[$key] = htmlentities($prep, ENT_QUOTES);
         }
