@@ -17,61 +17,77 @@
 <input type="hidden" name="formkey" value="{{ formkey }}" />
 <input type="submit" value="Save Page" name="submit" />
 
-<label for="title">Title</label>
-{% if mode != 'new' %}
-  <input type="text"   name="title"   value="{{ info.title}}"  placeholder="Title" required>
-{% else %}
-  <input type="text"   name="title"   value=""  placeholder="{{ info.title}}" required>
-{%endif%}
+<div class="row">
+  <label for="title">Title</label>
+  {% if mode != 'new' %}
+    <input type="text"   name="title"   value="{{ info.title}}"  placeholder="Title" required>
+  {% else %}
+    <input type="text"   name="title"   value=""  placeholder="{{ info.title}}" required>
+  {%endif%}
+</div>
 
-<label for="slug">slug</label>
-{% if mode != 'new' %}
-  <input type="text"   name="slug"    value="{{ info.slug}}"   placeholder="slug"  required>
-{% else %}
-  <input type="text"   name="slug"    value=""   placeholder="{{ info.slug}}"  required>
-{%endif%}
+<div class="row">
+  <label for="slug">slug</label>
+  {% if mode != 'new' %}
+    <input type="text"   name="slug"    value="{{ info.slug}}"   placeholder="slug"  required>
+  {% else %}
+    <input type="text"   name="slug"    value=""   placeholder="{{ info.slug}}"  required>
+  {%endif%}
+</div>
 
-<label for="intro">Intro</label>
-{% if mode != 'new' %}
-  <textarea name="intro" rows="4" cols="50" placeholder="Enter your page content here.">{{ info.intro }}</textarea>
-{% else %}
-  <textarea name="intro" rows="4" cols="50" placeholder="{{ info.intro }}"></textarea>
-{%endif%}
+<div class="row">
+  <label for="intro">Intro</label>
+  {% if mode != 'new' %}
+    <textarea name="intro" rows="4" cols="50" placeholder="Enter your page content here.">{{ info.intro }}</textarea>
+  {% else %}
+    <textarea name="intro" rows="4" cols="50" placeholder="{{ info.intro }}"></textarea>
+  {%endif%}
+</div>
 
-<label for="body">Body</label>
-{% if mode != 'new' %}
-  <textarea id="nytinymce" name="body" rows="4" cols="50" placeholder="Enter your page content here.">{{ info.body }}</textarea>
-{% else %}
-  <textarea id="nytinymce" name="body" rows="4" cols="50" placeholder="{{ info.body }}"></textarea>
-{%endif%}
+<div class="row">
+  <label for="body">Body</label>
+  {% if mode != 'new' %}
+    <textarea id="nytinymce" name="body" rows="4" cols="50" placeholder="Enter your page content here.">{{ info.body }}</textarea>
+  {% else %}
+    <textarea id="nytinymce" name="body" rows="4" cols="50" placeholder="{{ info.body }}"></textarea>
+  {%endif%}
+</div>
 
-<label for="heading">Heading</label>
-{% if mode != 'new' %}
-  <input type="text"   name="heading"   value="{{ info.heading}}"  placeholder="Heading" required>
-{% else %}
-  <input type="text"   name="heading"   value=""  placeholder="{{ info.heading }}" required>
-{%endif%}
+<div class="row">
+  <label for="heading">Heading</label>
+  {% if mode != 'new' %}
+    <input type="text"   name="heading"   value="{{ info.heading}}"  placeholder="Heading" required>
+  {% else %}
+    <input type="text"   name="heading"   value=""  placeholder="{{ info.heading }}" required>
+  {%endif%}
+</div>
 
-<label for="description">description</label>
-{% if mode != 'new' %}
-  <input type="text"   name="description"    value="{{ info.description }}"   placeholder="description"  required>
-{% else %}
-  <input type="text"   name="description"    value=""   placeholder="{{ info.description }}"  required>
-{%endif%}
+<div class="row">
+  <label for="description">description</label>
+  {% if mode != 'new' %}
+    <input type="text"   name="description"    value="{{ info.description }}"   placeholder="description"  required>
+  {% else %}
+    <input type="text"   name="description"    value=""   placeholder="{{ info.description }}"  required>
+  {%endif%}
+</div>
 
-<label for="keywords">keywords</label>
-{% if mode != 'new' %}
-  <input type="text"   name="keywords"    value="{{ info.keywords }}"   placeholder="keywords"  required>
-{% else %}
-  <input type="text"   name="keywords"    value=""   placeholder="{{ info.keywords }}"  required>
-{%endif%}
+<div class="row">
+  <label for="keywords">keywords</label>
+  {% if mode != 'new' %}
+    <input type="text"   name="keywords"    value="{{ info.keywords }}"   placeholder="keywords"  required>
+  {% else %}
+    <input type="text"   name="keywords"    value=""   placeholder="{{ info.keywords }}"  required>
+  {%endif%}
+</div>
 
-<label for="author">author</label>
-{% if mode != 'new' %}
-  <input type="text"   name="author"    value="{{ info.author }}"   placeholder="author"  required>
-{% else %}
-  <input type="text"   name="author"    value=""   placeholder="{{ info.author }}"  required>
-{%endif%}
+<div class="row">
+  <label for="author">author</label>
+  {% if mode != 'new' %}
+    <input type="text"   name="author"    value="{{ info.author }}"   placeholder="author"  required>
+  {% else %}
+    <input type="text"   name="author"    value=""   placeholder="{{ info.author }}"  required>
+  {%endif%}
+</div>
 
 <input type="submit" value="Save Page" name="submit" />
 
