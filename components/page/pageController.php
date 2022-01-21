@@ -4,28 +4,16 @@ class pageController extends Nickyeoman\Framework\BaseController {
   // There is no index page, this will catch
   function override( $params = array() ) {
 
-    // Grab the slug
+    //TODO: 404 if empty
     $slug = $params[0];
-
-    // Check slug isn't empty
-    if ( empty($slug) ) {
-      $this->session['error'] = "No Page given.";
-			$this->writeSession();
-      $this->redirect('error', '_404');
-    }
-
-    // Grab page from db
     $this->data['page'] = $this->db->findone('pages', 'slug', $slug);
 
-    // If you don't get one, error
-    if ( empty( $this->data['page']['slug'] ) ) {
-      $this->session['error'] = "Page not found.";
-			$this->writeSession();
-      $this->redirect('error', '_404');
+    if ( empty($this->data['page'])) {
+      header('HTTP/1.1 404 Not Found');
+      $this->twig('404', $this->data);
+      die();
     }
-
-    // View
-    $this->data['pageid'] = $slug; //css page id
+    $this->data['pageid'] = $slug;
     $this->twig('page/page', $this->data);
 
   }
@@ -34,8 +22,6 @@ class pageController extends Nickyeoman\Framework\BaseController {
   // List pages to edit
   function admin() {
 
-    // Check if logged in
-    // TODO: anyone can login
     if ( ! $this->session['loggedin'] ) {
 
       $this->session['notice'] = "You need to login to edit pages.";
@@ -44,12 +30,9 @@ class pageController extends Nickyeoman\Framework\BaseController {
 
     }
 
-    //Grab pages from db
+    //Grab pages
     $this->data['pages'] = $this->db->findall('pages','id,title,slug');
-    // TODO: if empty results
-
-    // View
-    $this->data['pageid'] = "page-admin"; //css page id
+    $this->data['pageid'] = "page-admin";
     $this->twig('page/admin', $this->data);
 
   }
@@ -58,8 +41,6 @@ class pageController extends Nickyeoman\Framework\BaseController {
   // Edit a page
   function edit($params = null) {
 
-    // Check if loggedin
-    // TODO: anyone can login
     if ( ! $this->session['loggedin'] ) {
 
       $this->session['notice'] = "You need to login to edit pages.";
@@ -68,16 +49,11 @@ class pageController extends Nickyeoman\Framework\BaseController {
 
     }
 
-    // Check if form submitted
     if ( $this->post['submitted'] ) {
-
-      //Create page class (grabs post, cleans data)
       $page = new Nickyeoman\helpers\pageHelper($this->post);
 
-      // store to db
       $id = $this->db->update('pages', $page->page , 'id' );
 
-      //redirect
       $this->session['notice'] = "Saved Page.";
       $this->writeSession();
       $this->redirect('page', 'admin');
@@ -88,29 +64,17 @@ class pageController extends Nickyeoman\Framework\BaseController {
 
     if ( empty($pid) ) {
       //TODO: error, page not given
-      //TODO: clean slug, trim, lower
+      //TODO: clean it up, trim, lower
     }
 
-    // fetch from db
     $this->data['info'] = $this->db->findone('pages', 'id', $pid);
-
-    // View
     $this->data['pageid'] = "page-edit";
     $this->twig('page/edit', $this->data);
 
   }
   // end function edit
 
-  /**
-  * Creating a new page
-  * New pages don't have ids
-  **/
   public function new(){
-
-    // TODO: merge with edit above, just add id checking
-
-    // if loggedin
-    // TODO: anyone can login
     if ( ! $this->session['loggedin'] ) {
 
       $this->session['notice'] = "You need to login to edit pages.";
@@ -120,15 +84,17 @@ class pageController extends Nickyeoman\Framework\BaseController {
     }
 
     if ( $this->post['submitted'] ) {
-
       $page = new Nickyeoman\helpers\pageHelper($this->post);
 
-      if( empty($page->error) )
-        $id = $this->db->create('pages', $page->page);
-      else
-        dump($page->error);die("there are page errors");
+      if( empty($page->error) ) {
 
-      // redirect
+        $id = $this->db->create('pages', $page->page);
+
+      } else {
+        dump($page->error);die("there are page errors");
+      }
+
+
       $this->session['notice'] = "Saved Page.";
       $this->writeSession();
       $this->redirect('page', 'admin');
@@ -136,15 +102,14 @@ class pageController extends Nickyeoman\Framework\BaseController {
     }
     //end submitted
 
-    // View
     $this->data['info'] = array(
     'title' => 'New Title',
     'slug' => 'slug',
     'intro' => 'Placeholder Text',
     'body' => 'Placeholder Text'
     );
-    $this->data['mode'] = 'new'; //for the twig template (placeholder vs value)
-    $this->data['pageid'] = "page-edit"; // css body id
+    $this->data['mode'] = 'new';
+    $this->data['pageid'] = "page-edit";
 
     $this->twig('page/edit', $this->data);
 

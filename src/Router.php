@@ -41,6 +41,8 @@ class Router {
     unset($this->filecontent);
     unset($this->uri);
 
+    $this->controllerClass = $this->controller . 'Controller';
+
   }
 
   //Grab the URI and make it a usable array
@@ -98,53 +100,52 @@ class Router {
     }
     //end empty uri
 
-    $this->controllerClass = $this->controller . 'Controller';
-
   }
   // end setController()
 
   // set the method
   private function _setMethod() {
 
-    // set action/method
-    if ( empty( $this->uri[0] ) ) {
-
+    // empty so index
+    if ( empty( $this->uri[0] ) )
       $this->action = 'index';
-
-      // If override exists there are no methods the second parameter is a variable
-      if ( strpos( $this->filecontent, "function override" ) !== false ) {
-
-        $this->action = "override";
-        if ( !empty($this->uri) )
-          $this->params = $this->uri;
-
-      }
-
-    } else { // action is not index or empty
-
+    else
       $this->action = strtolower($this->uri[0]);
 
-      // check the file to see if the function exists
-      if ( strpos( $this->filecontent, "function $this->action" ) !== false ) {
+    // check the file to see if the function exists
+    if ( strpos( $this->filecontent, "function $this->action" ) !== false ) {
 
         // The function exists
         array_shift($this->uri);
         if ( !empty($this->uri) )
           $this->params = $this->uri;
 
-      } else { // the action does not exist
+    } elseif ( strpos( $this->filecontent, "function override" ) !== false ) {
 
-          //404
-          $this->controller = 'error';
-          $this->action = '_404';
+      $this->action = "override";
 
-          bdump("Error: The Method ($action) doesn't exist in the Controller file ($filename)", 'Router Error');
+      if ( !empty($this->uri[0]) ) {
+        $this->params = $this->uri;
+      } else {
 
+        $this->controller = 'error';
+        $this->action = '_404';
+
+        bdump('Error: the override exists but no parameter given');
       }
-      //end check file
+
+    } else { // action is not index or empty
+
+      //404
+      $this->controller = 'error';
+      $this->action = '_404';
+
+      bdump("Error: The Method ($action) doesn't exist in the Controller file ($filename)", 'Router Error');
+
+    }
+    //end check file
 
     }
     // end set action/method
-  }
 
 } //class
