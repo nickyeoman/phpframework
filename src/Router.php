@@ -3,7 +3,7 @@ namespace Nickyeoman\Framework;
 
 /**
 * Router Class
-* v2.1
+* v2.2
 * URL: https://github.com/nickyeoman/phpframework/blob/main/docs/router.md
 **/
 
@@ -14,6 +14,8 @@ class Router {
   private $uri         = array();
   // The controller to call (index is default)
   public $controller   = '';
+  // Controller Class (just appends 'Controller')
+  public $controllerClass = "";
   // The method to call (index is default, override as fallback)
   public $action       = '';
   // parameters on URL (not includeing post/get)
@@ -96,6 +98,8 @@ class Router {
     }
     //end empty uri
 
+    $this->controllerClass = $this->controller . 'Controller';
+
   }
   // end setController()
 
@@ -106,6 +110,15 @@ class Router {
     if ( empty( $this->uri[0] ) ) {
 
       $this->action = 'index';
+
+      // If override exists there are no methods the second parameter is a variable
+      if ( strpos( $this->filecontent, "function override" ) !== false ) {
+
+        $this->action = "override";
+        if ( !empty($this->uri) )
+          $this->params = $this->uri;
+
+      }
 
     } else { // action is not index or empty
 
@@ -121,22 +134,11 @@ class Router {
 
       } else { // the action does not exist
 
-        // If override exists there are no methods the second parameter is a variable
-        if ( strpos( $this->filecontent, "function override" ) !== false ) {
-
-          $this->action = "override";
-          if ( !empty($this->uri) )
-            $this->params = $this->uri;
-
-        } else {
-
           //404
           $this->controller = 'error';
           $this->action = '_404';
 
           bdump("Error: The Method ($action) doesn't exist in the Controller file ($filename)", 'Router Error');
-
-        }
 
       }
       //end check file
