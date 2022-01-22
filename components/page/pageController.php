@@ -31,7 +31,13 @@ class pageController extends Nickyeoman\Framework\BaseController {
     }
 
     //Grab pages
-    $this->data['pages'] = $this->db->findall('pages','id,title,slug');
+    $result = $this->db->findall('pages','id,title,slug,tags,draft');
+
+    foreach ($result as $key => $value){
+      $value['tags'] = explode(',',$value['tags']);
+      $this->data['pages'][$key] = $value;
+    }
+
     $this->data['pageid'] = "page-admin";
     $this->twig('page/admin', $this->data);
 
@@ -115,6 +121,21 @@ class pageController extends Nickyeoman\Framework\BaseController {
 
   }
   //end new
+
+  public function tagadmin($params = null) {
+    $tag = $params[0];
+    if ( empty( $tag ) )
+      die("no tag supplied, TODO: 404");
+
+    $result = $this->db->findall('pages', '*', "`tags` LIKE '%$tag%'");
+    foreach ($result as $key => $value){
+      $value['tags'] = explode(',',$value['tags']);
+      $this->data['pages'][$key] = $value;
+    }
+
+    $this->data['pageid'] = "page-admin";
+    $this->twig('page/admin', $this->data);
+  }
 
 }
 //end class

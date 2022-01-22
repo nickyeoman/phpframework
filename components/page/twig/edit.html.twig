@@ -1,4 +1,6 @@
 {% set title = 'Edit Page' %}
+{% set wysiwyg = 'show' %}
+
 {% extends "layout/master.html.twig" %}
 
 {% block content %}
@@ -36,6 +38,15 @@
 </div>
 
 <div class="row">
+  <label for="tags">tags</label>
+  {% if mode != 'new' %}
+    <input type="text"   name="tags"    value="{{ info.tags}}"   placeholder="tags"  required>
+  {% else %}
+    <input type="text"   name="tags"    value=""   placeholder="{{ info.tags}}"  required>
+  {%endif%}
+</div>
+
+<div class="row">
   <label for="intro">Intro</label>
   {% if mode != 'new' %}
     <textarea name="intro" rows="4" cols="50" placeholder="Enter your page content here.">{{ info.intro }}</textarea>
@@ -47,9 +58,9 @@
 <div class="row">
   <label for="body">Body</label>
   {% if mode != 'new' %}
-    <textarea id="nytinymce" name="body" rows="4" cols="50" placeholder="Enter your page content here.">{{ info.body }}</textarea>
+    <textarea id="tinymce" name="body" rows="4" cols="50" placeholder="Enter your page content here.">{{ info.body }}</textarea>
   {% else %}
-    <textarea id="nytinymce" name="body" rows="4" cols="50" placeholder="{{ info.body }}"></textarea>
+    <textarea id="tinymce" name="body" rows="4" cols="50" placeholder="{{ info.body }}"></textarea>
   {%endif%}
 </div>
 
@@ -86,6 +97,15 @@
     <input type="text"   name="author"    value="{{ info.author }}"   placeholder="author"  required>
   {% else %}
     <input type="text"   name="author"    value=""   placeholder="{{ info.author }}"  required>
+  {%endif%}
+</div>
+
+<div class="row">
+  <label for="draft">draft</label>
+  {% if mode != 'new' %}
+    <input type="checkbox"   name="draft" {% if info.draft %}checked{% endif %} />
+  {% else %}
+    <input type="checkbox"   name="draft" />
   {%endif%}
 </div>
 

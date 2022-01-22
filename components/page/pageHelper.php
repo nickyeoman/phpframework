@@ -9,6 +9,7 @@ class pageHelper {
     'id'      => '',
     'title'   => '',
     'slug'    => '',
+    'tags'    => '',
     'intro'   => '',
     'body'    => '',
     'heading' => '',
@@ -33,6 +34,7 @@ class pageHelper {
     $this->set_title();
     $this->set_heading();
     $this->set_slug();
+    $this->set_tags();
     $this->set_intro();
     $this->set_body();
     $this->set_description();
@@ -134,6 +136,29 @@ class pageHelper {
 
   }
 
+  public function set_tags( $tags = null ) {
+
+    if ( !empty( $this->post['tags'] ) ) {
+      $tagArr = explode(',',trim($this->post['tags']));
+
+      $cleanArr = array();
+      foreach ($tagArr as $key => $value) {
+        $value = trim($value);  //remove whitespace
+        $value = preg_replace('/\s+/', ' ', $value); //remove double spaces
+        $value = preg_replace("![^a-z0-9]+!i", "-", $value);//all special characters to dash
+        $value = strtolower($value);//lowercase
+        $cleanArr[$key] = $value;
+      }
+
+      $tags = implode(',',$cleanArr);
+
+    }
+
+    $this->page['tags'] = $tags;
+    return $tags;
+
+  }
+
   public function set_intro( $intro = null ) {
 
     if ( !empty( $this->post['intro'] ) )
@@ -195,7 +220,7 @@ class pageHelper {
     if ( !empty( $this->post['draft'] ) )
       $draft = $this->post['draft'];
 
-    if ( empty($draft) || ! is_numeric($draft) )
+    if ( $draft == "on" )
       $draft = '1';
     else
       $draft = '0';

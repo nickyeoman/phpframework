@@ -15,6 +15,7 @@ final class PagesDatabaseCreation extends AbstractMigration
               ->addColumn('keywords', 'string', ['limit' => 255])
               ->addColumn('author', 'string', ['limit' => 255])
               ->addColumn('slug', 'string', ['limit' => 255])
+              ->addColumn('tags', 'string', ['limit' => 255])
               ->addColumn('intro', 'text', ['null' => true])
               ->addColumn('body', 'text', ['null' => true])
               ->addColumn('created', 'datetime')
