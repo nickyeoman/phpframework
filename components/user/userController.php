@@ -34,6 +34,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 			$user = new Nickyeoman\helpers\userHelper();
 			//Process the form
 			if ( $user->login() ) {
+				$this->log('notice','LOGIN Success', 'Controller/user.php/login()' );
 				$this->redirect('user', 'index');
 			} else {
 
@@ -47,6 +48,8 @@ class userController extends Nickyeoman\Framework\BaseController {
 
 					}
 					//end foreach
+
+					$this->log('notice','LOGIN Fail', 'Controller/user.php/login()' );
 
 				}
 				//endif

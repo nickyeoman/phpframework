@@ -183,6 +183,53 @@ class BaseController {
   }
   //end markdownFile
 
+  // A little bit of logging
+  public function log($level = 'DEBUG', $content = 'Called log', $location = '') {
+    if ($_ENV['LOGGING'] == 'mysql') {
+
+      //prepare post
+      if ( $this->post['submitted'] )
+        $post = json_encode($this->post);
+      else
+        $post = null;
+
+      $log = array(
+        'level' => strtoupper($level),
+        'content' => $content,
+        'location' => $location, //location of code
+        'ip' => $this->_getRealIpAddr(),
+        'url' => $this->data['uri'],
+        'session' => json_encode($this->session),
+        'post' => $post,
+        'time' => 'NOW()'
+      );
+
+      foreach ($log as $key => $value) {
+        if ( empty($value) ) {
+          unset($log[$key]);
+        }
+      }
+
+      $this->db->create('logs', $log);
+    }
+    // end mysql
+  }
+  // end function log
+
+  private function _getRealIpAddr(){
+   if ( !empty($_SERVER['HTTP_CLIENT_IP']) ) {
+    // Check IP from internet.
+    $ip = $_SERVER['HTTP_CLIENT_IP'];
+   } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']) ) {
+    // Check IP is passed from proxy.
+    $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+   } else {
+    // Get IP address from remote address.
+    $ip = $_SERVER['REMOTE_ADDR'];
+   }
+   return $ip;
+  }
+
   private function setSession(){
 
     if ( empty( $_SESSION['sessionid'] ) ) {

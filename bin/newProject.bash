@@ -76,11 +76,11 @@ echo "Setting up sample phinx config file in root directory. Please edit phinx.p
 cp vendor/nickyeoman/phpframework/phinx.php.sample phinx.php
 
 ################################################################################
-# database
+# database migrations
 ################################################################################
 
 echo "Move user migrations to migrations folder"
-cp vendor/nickyeoman/phpframework/user/20210721230307_users_database_creation.php migrations/20210721230307_users_database_creation.php
+cp vendor/nickyeoman/phpframework/migrations/20220000000003_logs_database_creation.php migrations/20220000000003_logs_database_creation.php
 
 ################################################################################
 # Docker
