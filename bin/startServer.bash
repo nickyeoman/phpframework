@@ -78,21 +78,6 @@ if [ "$DOCKERVOL" == "local" ]; then
 
   fi
 
-  sleep 10;
-  docker run -d \
-  --name ${DOCKERNAME}-strapi \
-  --net ${DOCKERNET} \
-  -p 1337:1337 \
-  -v ${DOCKERNAME}_strapi:/srv/app \
-  -e DATABASE_CLIENT='mysql' \
-  -e DATABASE_SSL='false' \
-  -e DATABASE_NAME=${DB} \
-  -e DATABASE_HOST=${DOCKERNAME}-db \
-  -e DATABASE_PORT=${DBPORT} \
-  -e DATABASE_USERNAME=${DBUSER} \
-  -e DATABASE_PASSWORD=${DBPASSWORD} \
-  strapi/strapi
-
 else
 
   docker run -d -p ${DOCKERPORT}:80 --name ${DOCKERNAME} -v ${DOCKERNAME}:/website --net ${DOCKERNET} ${DOCKERIMAGE}:${DOCKERVER}
