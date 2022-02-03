@@ -61,39 +61,35 @@ class pageHelper {
 
   public function set_title( $title = null ) {
 
-    if ( !empty( $this->post['title'] ) )
-      $title = $this->post['title'];
+    if ( !empty( $_POST['title'] ) )
+      $title = $_POST['title'];
 
     trim($title);
     // is the title empty?
     if ( empty($title) ) {
 
       //if so check if the heading is also
-      if ( empty( $this->post['heading']) ) {
+      if ( empty( $_POST['heading']) ) {
 
         $this->addError('Missing Title');
         return false;
 
       } else {
 
-        $this->page['title'] = trim($this->post['heading']);
+        $title = trim($_POST['heading']);
 
       }
 
-    } else {
-
-      $this->page['title'] = $title;
-
     }
 
-    return $this->page['title'];
+    $this->page['title'] = str_replace("'",'&#39;',$title);
 
   }
 
   public function set_heading( $heading = null ) {
 
-    if ( !empty( $this->post['heading'] ) )
-      $title = $this->post['heading'];
+    if ( !empty( $_POST['heading'] ) )
+      $heading = $_POST['heading'];
 
     if ( !empty($heading) )
       trim($heading);
@@ -102,24 +98,21 @@ class pageHelper {
     if ( empty($heading) ) {
 
       //if so check if the title is also
-      if ( empty( $this->post['title']) ) {
+      if ( empty( $_POST['title']) ) {
 
         $this->addError('Missing Heading');
         return false;
 
       } else {
 
-        $this->page['heading'] = trim($this->post['title']);
+        $heading = trim($_POST['title']);
 
       }
 
-    } else {
-
-      $this->page['heading'] = $heading;
-
     }
 
-    return $this->page['heading'];
+    // clean for database
+    $this->page['heading'] = str_replace("'",'&#39;',$heading);
 
   }
 
@@ -161,12 +154,17 @@ class pageHelper {
 
   public function set_intro( $intro = null ) {
 
-    if ( !empty( $this->post['intro'] ) )
-      $intro = $this->post['intro'];
+    // We want the HTML so we are just going to grap the $_POST
+    if ( !empty( $_POST['intro'] ) ) {
 
-    trim($intro);
-    $this->page['intro'] = $intro;
-    return $intro;
+      $intro = $this->post['intro'];
+      $intro = trim($intro);
+      $intro = str_replace("'",'&#39;',$intro);
+      $this->page['intro'] = $intro;
+
+    } else {
+      $this->page['intro'] = "";
+    }
 
   }
 
@@ -176,9 +174,9 @@ class pageHelper {
     if ( !empty( $_POST['body'] ) )
       $body = $_POST['body'];
 
-    trim($body);
+    $body = trim($body);
+    $body = str_replace("'",'&#39;',$body);
     $this->page['body'] = $body;
-    return $body;
 
   }
 

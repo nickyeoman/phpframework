@@ -188,10 +188,12 @@ class BaseController {
     if ($_ENV['LOGGING'] == 'mysql') {
 
       //prepare post
-      if ( $this->post['submitted'] )
+      if ( $this->post['submitted'] ) {
+        unset($this->post['password']);
         $post = json_encode($this->post);
-      else
+      } else {
         $post = null;
+      }
 
       $log = array(
         'level' => strtoupper($level),
