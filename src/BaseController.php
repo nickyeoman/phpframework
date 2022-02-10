@@ -26,6 +26,8 @@ class BaseController {
     //grab the uri
     $this->data['uri'] = rtrim(ltrim($_SERVER['REQUEST_URI'], "\/"), "\/");
     $this->data['pageid'] = str_replace("/", "-", $this->data['uri']);
+    $this->data['ip'] = $_SERVER['REMOTE_ADDR'];
+    $this->data['agent'] = $_SERVER['HTTP_USER_AGENT'];
 
     // sessions
     $this->setSession();
