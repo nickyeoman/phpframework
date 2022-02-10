@@ -6,13 +6,19 @@ class pageController extends Nickyeoman\Framework\BaseController {
 
     //TODO: 404 if empty
     $slug = $params[0];
-    $this->data['page'] = $this->db->findone('pages', 'slug', $slug);
+    $pagedata = $this->db->findone('pages', 'slug', $slug);
 
-    if ( empty($this->data['page'])) {
+    if ( empty($pagedata)) {
       header('HTTP/1.1 404 Not Found');
       $this->twig('404', $this->data);
       die();
     }
+
+    foreach( $pagedata as $key => $value ){
+      $pagedata[$key] = html_entity_decode($value);
+    }
+
+    $this->data['page'] = $pagedata;
     $this->data['pageid'] = $slug;
     $this->twig('page/page', $this->data);
 
@@ -33,9 +39,11 @@ class pageController extends Nickyeoman\Framework\BaseController {
     //Grab pages
     $result = $this->db->findall('pages','id,title,slug,tags,draft');
 
-    foreach ($result as $key => $value){
-      $value['tags'] = explode(',',$value['tags']);
-      $this->data['pages'][$key] = $value;
+    if ( !empty( $result ) ) {
+      foreach ($result as $key => $value){
+        $value['tags'] = explode(',',$value['tags']);
+        $this->data['pages'][$key] = $value;
+      }
     }
 
     $this->data['pageid'] = "page-admin";
@@ -135,6 +143,38 @@ class pageController extends Nickyeoman\Framework\BaseController {
 
     $this->data['pageid'] = "page-admin";
     $this->twig('page/admin', $this->data);
+  }
+
+  public function sitemap() {
+
+    // xml for the sitemap
+    // https://www.sitemaps.org/protocol.html
+    header('Content-Type: text/xml');
+
+    //Get the pages (priority of zero will remove it from the sitemap, drafts are not shown)
+    $thepages = $this->db->findall('pages', 'draft, slug, updated, changefreq, priority', 'priority > 0 AND draft < 1', 'updated');
+
+    // Start the view
+    echo '<?xml version="1.0" encoding="UTF-8"?>';
+    echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+
+    // Loop through the pages
+    foreach( $thepages as $v) {
+
+      $date = new DateTime($v['updated']);
+      $date = $date->format('Y-m-d');
+
+      echo "<url>";
+      echo "<loc>" . $_ENV['BASEURL'] . '/page/' . $v['slug'] . "</loc>";
+      echo "<lastmod>" . $date . "</lastmod>";
+      echo "<changefreq>" . $v['changefreq'] . "</changefreq>";
+      echo "<priority>" . $v['priority'] . "</priority>";
+      echo "</url>";
+    }
+
+    echo "</urlset>";
+
+    // TODO: add caching
   }
 
 }
