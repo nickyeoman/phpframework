@@ -161,7 +161,7 @@ class pageHelper {
       $intro = trim($intro);
       $intro = str_replace("'",'&#39;',$intro);
       $this->page['intro'] = $intro;
-
+      
     } else {
       $this->page['intro'] = "";
     }

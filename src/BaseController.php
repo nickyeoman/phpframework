@@ -194,7 +194,7 @@ class BaseController {
       } else {
         $post = null;
       }
-
+      
       $log = array(
         'level' => strtoupper($level),
         'content' => $content,

@@ -94,7 +94,7 @@ class userHelper {
     }
 
     //Check database
-    $existingUser = $this->db->findone('users-permissions_user', 'username', $username);
+    $existingUser = $this->db->findone('users', 'username', $username);
 
     if ( ! empty( $existingUser ) ) {
 
@@ -131,7 +131,7 @@ class userHelper {
     }
 
     //Check database
-    $existingEmail = $this->db->findone('users-permissions_user', 'email', $email);
+    $existingEmail = $this->db->findone('users', 'email', $email);
 
     if ( ! empty($existingEmail) ) {
 
@@ -214,18 +214,15 @@ class userHelper {
     $user = array(
       'username'          => $this->userTraits['username'],
       'email'             => $this->userTraits['email'],
-      'provider'          => 'local',
       'password'          => $this->userTraits['password'],
       'confirmationToken' => $this->userTraits['confirmationToken'],
       'confirmed'         => '0',
       'blocked'           => '0',
-      'role'              => '1',
-      'created_by'        => '1',
-      'created_at'        => date("Y-m-d H:i:s"),
-      'updated_at'        => date("Y-m-d H:i:s")
+      'created'        => date("Y-m-d H:i:s"),
+      'updated'        => date("Y-m-d H:i:s")
     );
 
-    $id = $this->db->create("users-permissions_user", $user );
+    $id = $this->db->create("users", $user );
 
     if ( ! empty( $id ) ) {
       return true;
@@ -271,7 +268,7 @@ class userHelper {
     $resetkey = md5( $this->userTraits['email'] . $_ENV['SALT'] );
 
     //Passed Checks, Remove Key from database
-    $user = $this->db->findone('users-permissions_user', 'email', $this->userTraits['email']);
+    $user = $this->db->findone('users', 'email', $this->userTraits['email']);
 
     // Create array for db
     $userdb = array(
@@ -281,7 +278,7 @@ class userHelper {
     );
 
     // Update db
-    $id = $this->db->update("users-permissions_user", $userdb, 'id' );
+    $id = $this->db->update("users", $userdb, 'id' );
 
     // https://packagist.org/packages/nette/mail
     $mail = new \Nette\Mail\Message;
@@ -319,7 +316,7 @@ class userHelper {
         );
 
         // Update db
-        $id = $this->db->update("users-permissions_user", $userdb, 'id' );
+        $id = $this->db->update("users", $userdb, 'id' );
   }
   // End resetUserPassword
 
@@ -342,7 +339,7 @@ class userHelper {
     // Check if email exists
     if ( $this->valid->isEmail( $email ) ) {
 
-      $user = $this->db->findone('users-permissions_user', 'email', $email);
+      $user = $this->db->findone('users', 'email', $email);
 
     } else {
 
@@ -367,7 +364,7 @@ class userHelper {
       'updated_at'        => date("Y-m-d H:i:s")
     );
 
-    $id = $this->db->update("users-permissions_user", $user, 'id' );
+    $id = $this->db->update("users", $user, 'id' );
 
     if ( ! empty( $id ) ) {
       return true;
@@ -406,7 +403,7 @@ class userHelper {
       // Check if email exists
       if ( $this->valid->isEmail( $email ) ) {
 
-          $user = $this->db->findone('users-permissions_user', 'email', $email);
+          $user = $this->db->findone('users', 'email', $email);
 
       } else {
 
@@ -446,12 +443,12 @@ class userHelper {
     if ( $this->valid->isEmail( $_POST[$formName] ) ) {
 
       //validate with email
-      $userdb = $this->db->findone('users-permissions_user', 'email', $_POST[$formName]);
+      $userdb = $this->db->findone('users', 'email', $_POST[$formName]);
 
     } else {
 
       //validate with username
-      $userdb = $this->db->findone('users-permissions_user', 'username', $_POST[$formName]);
+      $userdb = $this->db->findone('users', 'username', $_POST[$formName]);
 
     }
 
