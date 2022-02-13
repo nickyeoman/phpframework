@@ -23,23 +23,32 @@ class BaseController {
   */
   public function __construct() {
 
-    //grab the uri
-    $this->data['uri'] = rtrim(ltrim($_SERVER['REQUEST_URI'], "\/"), "\/");
-    $this->data['pageid'] = str_replace("/", "-", $this->data['uri']);
-    $this->data['ip'] = $_SERVER['REMOTE_ADDR'];
-    $this->data['agent'] = $_SERVER['HTTP_USER_AGENT'];
+    // Set all the Global view variables
+    $this->data[
+      'uri'     => rtrim(ltrim($_SERVER['REQUEST_URI'], "\/"), "\/")
+      ,'pageid' => str_replace("/", "-", $this->data['uri'])
+      ,'ip'     => $_SERVER['REMOTE_ADDR']
+      ,'agent'  => $_SERVER['HTTP_USER_AGENT']
+    ];
 
     // sessions
     $this->setSession();
 
     // Store the database object to a variable in this object
     if ( ! empty( $_ENV['DBUSER'] ) )
-      $this->db = new \Nickyeoman\Dbhelper\Dbhelp($_ENV['DBHOST'], $_ENV['DBUSER'], $_ENV['DBPASSWORD'], $_ENV['DB'], $_ENV['DBPORT'] );
+      $this->db = new \Nickyeoman\Dbhelper\Dbhelp(
+        $_ENV['DBHOST']
+        , $_ENV['DBUSER']
+        , $_ENV['DBPASSWORD']
+        , $_ENV['DB']
+        , $_ENV['DBPORT']
+      );
 
     // POST
     $this->setPost();
 
   }
+  // End construct
 
   // Write the current session to PHP session
   public function writeSession() {
@@ -50,6 +59,7 @@ class BaseController {
       session_destroy();
 
   }
+  // End writeSession
 
   // Destroy session (logout mostly)
   public function destroySession() {
@@ -59,25 +69,29 @@ class BaseController {
 
   }
 
-  // Redirect to the correct controller and action (page)
+  /**
+  * Redirect to the correct controller and action (page)
+  **/
   public function redirect($controller = 'index', $action = 'index') {
 
-    if ($controller == 'index' || empty($controller) ) {
+    // set controller
+    if ($controller == 'index' || empty($controller) )
       $controller = '/';
-    } else {
+    else
       $controller = "/$controller";
-    }
 
-    if ($action == 'index' || empty($action) ) {
+    // set method/action
+    if ($action == 'index' || empty($action) )
       $action = '';
-    } else {
+    else
       $action = "/$action";
-    }
 
+    // php redirect
     header("Location: $controller$action");
-    exit();
+    exit(); // do not execute anything more
 
   }
+  // END redirect
 
   //Call Twig as a view
   public function twig($viewname = 'index', $vars = array() ) {
@@ -93,23 +107,27 @@ class BaseController {
         $loader->addPath($_ENV['realpath'] . "/vendor/nickyeoman/phpframework/components/$component/twig");
 
       }
+      // end if load component view
 
       $this->twig = new \Twig\Environment($loader, [
           'cache' => $_ENV['realpath'] . '/' .$_ENV['TWIGCACHE'],
           'debug' => true,
       ]);
-      $this->twig->addExtension(new \Twig\Extension\DebugExtension());
 
-      // loggedin is meant for the template
-      $vars['loggedin'] = $this->session['loggedin'];
+      $this->twig->addExtension(new \Twig\Extension\DebugExtension());
 
       echo $this->twig->render("$viewname.html.twig", $vars);
       $this->writeSession();
       $this->db->close();
 
   }
+  // End twig
 
-  // Add an error
+  /**
+  * Add an error
+  * Errors are an array stored to a session
+  * Returns the count of errors
+  **/
   public function adderror($string = "No Information Supplied", $name = null ) {
 
     // current size of array
@@ -117,14 +135,17 @@ class BaseController {
 
     //assign key to array
     if ( empty($name) )
-      $name = $count + 1;
+      $name = $count + 1; // TODO: I don't think this is right
 
     $this->data['error']["$name"] = $string;
 
     return( count($this->data['error']) );
+
   }
+  // End adderror
 
   // count errors
+  //TODO: the above function adderror does the same with no parameters, merge them
   public function counterrors() {
     return( count($this->data['error']) );
   }
@@ -230,6 +251,7 @@ class BaseController {
   }
   // end function log
 
+  // Grab user IP
   private function _getRealIpAddr(){
    if ( !empty($_SERVER['HTTP_CLIENT_IP']) ) {
     // Check IP from internet.
@@ -243,7 +265,9 @@ class BaseController {
    }
    return $ip;
   }
+  // End function get Real IP Address
 
+  // Takes the SESSION and places it in session
   private function setSession(){
 
     if ( empty( $_SESSION['sessionid'] ) ) {
@@ -281,12 +305,16 @@ class BaseController {
 
     }
 
-    $this->data['formkey'] = $this->session['formkey'];
-    //end if
+    // Session Data for the view
+    $this->data[
+      'formkey'   => $this->session['formkey']
+      ,'loggedin' => $this->session['loggedin']
+    ]
 
   }
   // end setSession()
 
+  // Gets the POST and puts it in post
   private function setPost() {
 
     if ( ! empty( $_POST['formkey'] ) ){

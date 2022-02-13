@@ -37,7 +37,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 
 				//$this->log('notice','LOGIN Success', 'Controller/user.php/login()' );
 				$this->redirect('user', 'index');
-				
+
 			} else {
 
 				//prep errors, login failed

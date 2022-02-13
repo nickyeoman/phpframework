@@ -57,6 +57,11 @@ Note, the router will check for a method first, so if you have a function nichol
 
 If there is a better way to do this, let me know.
 
+### Components
+
+As this framework has grown to more of a CMS there are components included in the vendor/components directory that will load automatically.
+To stop the loading of all base components put USECMS=no in the dotenv.
+
 ### Error Controller
 
 If the controller is not found, the 'error' controller is called with action _404.
