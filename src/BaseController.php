@@ -84,6 +84,16 @@ class BaseController {
 
       //TWIG
       $loader     = new \Twig\Loader\FilesystemLoader($_ENV['realpath'] . '/' . $_ENV['VIEWPATH']);
+
+      //load component view
+      if ( str_contains($_ENV['CONTROLLERPATH'], 'vendor') ) {
+
+        $arr = explode('/' , $_ENV['CONTROLLERPATH']);
+        $component = $arr[4];
+        $loader->addPath($_ENV['realpath'] . "/vendor/nickyeoman/phpframework/components/$component/twig");
+
+      }
+
       $this->twig = new \Twig\Environment($loader, [
           'cache' => $_ENV['realpath'] . '/' .$_ENV['TWIGCACHE'],
           'debug' => true,

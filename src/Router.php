@@ -78,8 +78,10 @@ class Router {
 
     } else {
 
+      $controller = strtolower($this->uri[0]);
+
       // Controller filename
-      $filename = $_ENV['realpath'] . '/' . $_ENV['CONTROLLERPATH'] . '/' . strtolower($this->uri[0]) . '.php';
+      $filename = $_ENV['realpath'] . '/' . $_ENV['CONTROLLERPATH'] . '/' . $controller . '.php';
 
       if ( file_exists( $filename ) ) {
 
@@ -89,13 +91,31 @@ class Router {
 
       } else {
 
-        //404
-        $this->controller = 'error';
-        $this->action = '_404';
-        $this->params = array();
+        $filename = $_ENV['realpath'] . '/vendor/nickyeoman/phpframework/components/' . $controller . '/' . $controller . 'Controller.php';
+
+        /**
+        * You can override this in env to disable all
+        * or just create controller of same name for specific components
+        **/
+        if ( file_exists( $filename ) && $_ENV['USECMS'] != "no" ) {
+
+          $_ENV['CONTROLLERPATH'] = "vendor/nickyeoman/phpframework/components/$controller/";
+          $this->filecontent = file_get_contents($filename); //set variable
+          $this->controller = $controller;
+          array_shift($this->uri);
+
+        } else {
+
+          //404
+          $this->controller = 'error';
+          $this->action = '_404';
+          $this->params = array();
+
+        }
+        // end cms file exists
 
       }
-      // end file exists
+      // end user controller file exists
 
     }
     //end empty uri
