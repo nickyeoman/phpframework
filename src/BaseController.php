@@ -24,12 +24,12 @@ class BaseController {
   public function __construct() {
 
     // Set all the Global view variables
-    $this->data[
+    $this->data = array_merge($this->data, [
       'uri'     => rtrim(ltrim($_SERVER['REQUEST_URI'], "\/"), "\/")
       ,'pageid' => str_replace("/", "-", $this->data['uri'])
       ,'ip'     => $_SERVER['REMOTE_ADDR']
       ,'agent'  => $_SERVER['HTTP_USER_AGENT']
-    ];
+    ]);
 
     // sessions
     $this->setSession();
@@ -306,10 +306,10 @@ class BaseController {
     }
 
     // Session Data for the view
-    $this->data[
+    $this->data = array_merge($this->data, [
       'formkey'   => $this->session['formkey']
       ,'loggedin' => $this->session['loggedin']
-    ]
+    ]);
 
   }
   // end setSession()
