@@ -26,7 +26,7 @@ class BaseController {
     // Set all the Global view variables
     $this->data = array_merge($this->data, [
       'uri'     => rtrim(ltrim($_SERVER['REQUEST_URI'], "\/"), "\/")
-      ,'pageid' => str_replace("/", "-", $this->data['uri'])
+      ,'pageid' => str_replace("/", "-", rtrim(ltrim($_SERVER['REQUEST_URI'], "\/"), "\/"))
       ,'ip'     => $_SERVER['REMOTE_ADDR']
       ,'agent'  => $_SERVER['HTTP_USER_AGENT']
     ]);
