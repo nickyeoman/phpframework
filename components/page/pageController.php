@@ -20,7 +20,7 @@ class pageController extends Nickyeoman\Framework\BaseController {
 
     $this->data['page'] = $pagedata;
     $this->data['pageid'] = $slug;
-    $this->twig('page/page', $this->data);
+    $this->twig('page', $this->data);
 
   }
   // end override
