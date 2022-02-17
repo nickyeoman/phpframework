@@ -47,7 +47,7 @@ class pageController extends Nickyeoman\Framework\BaseController {
     }
 
     $this->data['pageid'] = "page-admin";
-    $this->twig('page/admin', $this->data);
+    $this->twig('admin', $this->data);
 
   }
   //end admin
@@ -83,7 +83,7 @@ class pageController extends Nickyeoman\Framework\BaseController {
 
     $this->data['info'] = $this->db->findone('pages', 'id', $pid);
     $this->data['pageid'] = "page-edit";
-    $this->twig('page/edit', $this->data);
+    $this->twig('edit', $this->data);
 
   }
   // end function edit
@@ -125,7 +125,7 @@ class pageController extends Nickyeoman\Framework\BaseController {
     $this->data['mode'] = 'new';
     $this->data['pageid'] = "page-edit";
 
-    $this->twig('page/edit', $this->data);
+    $this->twig('edit', $this->data);
 
   }
   //end new
@@ -142,7 +142,7 @@ class pageController extends Nickyeoman\Framework\BaseController {
     }
 
     $this->data['pageid'] = "page-admin";
-    $this->twig('page/admin', $this->data);
+    $this->twig('admin', $this->data);
   }
 
   public function sitemap() {
