@@ -13,7 +13,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 
 		}
 
-		$this->twig('user/index', $this->data);
+		$this->twig('index', $this->data);
 		// If the user is logged in we don't need to proceed
 
 	} // end function index
@@ -62,7 +62,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 		}
 		// end POST SUBMITTED
 
-		$this->twig('user/login', $this->data);
+		$this->twig('login', $this->data);
 		$this->writeSession();
 
 	}
@@ -142,7 +142,7 @@ class userController extends Nickyeoman\Framework\BaseController {
     }
 
     //Display view
-    $this->twig('user/registration', $this->data);
+    $this->twig('registration', $this->data);
 		$this->writeSession();
 
 	}
@@ -172,7 +172,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 		//end check key
 
 		// display view
-		$this->twig('user/validate', $this->data);
+		$this->twig('validate', $this->data);
 
 	}
 	// End validate action (page)
@@ -233,7 +233,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 		}
 
 		//Display view
-		$this->twig('user/forgot', $this->data);
+		$this->twig('forgot', $this->data);
 		$this->writeSession();
 	}
 
@@ -332,7 +332,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 
         }
 
-        $this->twig('user/reset', $this->data); // display view
+        $this->twig('reset', $this->data); // display view
 
     } //End Function reset
 
