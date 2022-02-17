@@ -15,7 +15,10 @@ class pageController extends Nickyeoman\Framework\BaseController {
     }
 
     foreach( $pagedata as $key => $value ){
-      $pagedata[$key] = html_entity_decode($value);
+      if (!empty($value))
+        $pagedata[$key] = html_entity_decode($value);
+      else
+        $pagedata[$key] = null;
     }
 
     $this->data['page'] = $pagedata;
