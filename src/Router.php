@@ -3,7 +3,7 @@ namespace Nickyeoman\Framework;
 
 /**
 * Router Class
-* v2.3
+* v2.4
 * URL: https://github.com/nickyeoman/phpframework/blob/main/docs/router.md
 **/
 
@@ -75,6 +75,13 @@ class Router {
       $this->controller = 'index';
       $this->action = 'index';
       $this->params = array();
+
+    } else if ($this->uri[0] == "sitemap.xml") {
+
+      //TODO: make some sort of check file for special paths like this
+      $this->controller = 'page';
+      $this->action = 'sitemap';
+      $_ENV['CONTROLLERPATH'] = "vendor/nickyeoman/phpframework/components/$controller/";
 
     } else {
 
