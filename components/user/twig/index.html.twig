@@ -1,6 +1,13 @@
-{% set title = 'Title of Page' %}
+{% set title = 'Dashboard' %}
 {% extends "layout/master.html.twig" %}
 
 {% block content %}
 <p>You are logged in.</p>
+<p>
+<ul>
+  <li><a href="/">Pages</a></li>
+  <li><a href="/">Messages</a></li>
+  <li><a href="/">Site Map</a></li>
+  <li><a href="/">Users</a></li>
+</ul>
 {% endblock %}
