@@ -104,7 +104,7 @@ class BaseController {
 
         $arr = explode('/' , $_ENV['CONTROLLERPATH']);
         $component = $arr[4];
-        $loader->addPath($_ENV['realpath'] . "/vendor/nickyeoman/phpframework/components/$component/twig");
+        $loader->prependPath($_ENV['realpath'] . "/vendor/nickyeoman/phpframework/components/$component/twig");
 
       }
       // end if load component view
