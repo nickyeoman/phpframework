@@ -3,7 +3,7 @@ namespace Nickyeoman\Framework;
 
 /**
 * Router Class
-* v2.4
+* v2.3
 * URL: https://github.com/nickyeoman/phpframework/blob/main/docs/router.md
 **/
 

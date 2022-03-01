@@ -1,0 +1,26 @@
+{% set title = 'Contact Nick Yeoman' %}
+{% extends "layout/master.html.twig" %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+{% if showform %}
+  <div class="formContainer">
+
+    {% if badEmail is not empty %}
+      <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <form action="/contact" method="post">
+      <input type="hidden" name="formkey" value="{{ formkey }}" />
+
+      <input type="text" placeholder="Your Email address" name="email" value="{{ email }}" required>
+      <textarea name="message" rows="4" cols="50" placeholder="Enter your message here."></textarea>
+      <input type="submit" value="Send Message" name="submit" />
+    </form>
+  </div>
+{% else %}
+  <p>Your message has been sent.</p>
+{% endif %}
+
+{% endblock %}
