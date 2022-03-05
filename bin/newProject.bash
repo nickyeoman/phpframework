@@ -48,7 +48,6 @@ cp vendor/nickyeoman/phpframework/twig/head.html.twig views/modules/head.html.tw
 cp vendor/nickyeoman/phpframework/twig/master.html.twig views/layout/master.html.twig
 cp vendor/nickyeoman/phpframework/twig/footer.html.twig views/modules/footer.html.twig
 cp vendor/nickyeoman/phpframework/twig/nav.html.twig views/modules/nav.html.twig
-cp vendor/nickyeoman/phpframework/twig/user/* views/user/.
 
 ################################################################################
 # SASS
@@ -57,13 +56,6 @@ cp vendor/nickyeoman/phpframework/twig/user/* views/user/.
 echo "Creating SASS directory for css"
 cp vendor/nickyeoman/phpframework/sass/project.sass sass/.
 touch sass/variables.sass
-
-################################################################################
-# Controller
-################################################################################
-
-cp vendor/nickyeoman/phpframework/user/user.php controllers/user.php
-cp vendor/nickyeoman/phpframework/error/error.php controllers/error.php
 
 ################################################################################
 # Configuration

@@ -117,6 +117,7 @@ class Router {
           $this->controller = 'error';
           $this->action = '_404';
           $this->params = array();
+          $_ENV['CONTROLLERPATH'] = "vendor/nickyeoman/phpframework/components/$this->controller/"; //TODO: can't override this
 
         }
         // end cms file exists
