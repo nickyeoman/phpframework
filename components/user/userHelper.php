@@ -172,13 +172,13 @@ class userHelper {
 
     //validate minimum length
     if ( ! $this->valid->minLength( $password, $minlength ) ) {
-      $this->errors['password'] = "<div id=\"error-password\">Password must be at least $minlength characters long.</div>";
+      $this->errors['password'] = "Password must be at least $minlength characters long.";
       return false;
     }
 
     //validate max length
     if ( ! $this->valid->maxLength( $password, $maxlength ) ) {
-      $this->errors['password'] = "<div id=\"error-password\">Password must be shorter than $maxlength characters.</div>";
+      $this->errors['password'] = "Password must be shorter than $maxlength characters.";
       return false;
     }
 
@@ -189,7 +189,7 @@ class userHelper {
 
         if ( $password != $_POST[$confirm] ) {
 
-          $this->errors['password'] = '<div id="error-password">Passwords do not match</div>';
+          $this->errors['password'] = 'Passwords do not match';
           return false;
 
         }
@@ -219,7 +219,8 @@ class userHelper {
       'confirmed'         => '0',
       'blocked'           => '0',
       'created'        => date("Y-m-d H:i:s"),
-      'updated'        => date("Y-m-d H:i:s")
+      'updated'        => date("Y-m-d H:i:s"),
+      'admin'          => 0
     );
 
     $id = $this->db->create("users", $user );
@@ -228,7 +229,7 @@ class userHelper {
       return true;
     }
 
-    $this->errors['database'] = "<div id=\"error-user\">User not created in database</div>";
+    $this->errors['database'] = "User not created in database";
     return false;
 
   }

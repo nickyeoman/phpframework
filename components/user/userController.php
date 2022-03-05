@@ -121,7 +121,8 @@ class userController extends Nickyeoman\Framework\BaseController {
 
 					//write to database
 					$user->newuser();
-					$this->log('INFO', $content = 'Created User', json_encode($user->userTraits));
+					$userTraits = json_encode($user->userTraits);
+					$this->log('INFO', 'Created User', $userTraits);
 
 					// Send registration Email
 					$user->sendRegistrationEmail();

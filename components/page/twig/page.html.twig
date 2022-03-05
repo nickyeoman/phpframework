@@ -5,11 +5,13 @@
 {% extends "layout/master.html.twig" %}
 
 {% block content %}
-{% if page.heading is not empty %}
-  <h2>{{ page.heading |raw }}</h2>
-{% endif %}
-{% if page.intro is not empty %}
-    <p>{{ page.intro | raw }}</p>
-{% endif %}
-<p>{{ page.body | raw }}</p>
+<div id="component-page">
+  {% if page.heading is not empty %}
+    <h2>{{ page.heading |raw }}</h2>
+  {% endif %}
+  {% if page.intro is not empty %}
+      <p>{{ page.intro | raw }}</p>
+  {% endif %}
+  <p>{{ page.body | raw }}</p>
+</div>
 {% endblock %}

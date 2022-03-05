@@ -217,7 +217,7 @@ class BaseController {
   //end markdownFile
 
   // A little bit of logging
-  public function log($level = 'DEBUG', $content = 'Called log', $location = '') {
+  public function log($level = 'DEBUG', $title = 'Called log', $location = '', $content = "") {
     if ($_ENV['LOGGING'] == 'mysql') {
 
       //prepare post
@@ -229,14 +229,15 @@ class BaseController {
       }
 
       $log = array(
-        'level' => strtoupper($level),
-        'content' => $content,
-        'location' => $location, //location of code
-        'ip' => $this->_getRealIpAddr(),
-        'url' => $this->data['uri'],
-        'session' => json_encode($this->session),
-        'post' => $post,
-        'time' => 'NOW()'
+        'level'     => strtoupper($level),
+        'title'     => $title,
+        'content'   => $content,
+        'location'  => $location, //location of code
+        'ip'        => $this->_getRealIpAddr(),
+        'url'       => $this->data['uri'],
+        'session'   => json_encode($this->session),
+        'post'      => $post,
+        'time'      => 'NOW()'
       );
 
       foreach ($log as $key => $value) {
