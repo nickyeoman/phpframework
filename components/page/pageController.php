@@ -37,6 +37,12 @@ class pageController extends Nickyeoman\Framework\BaseController {
       $this->writeSession();
       $this->redirect('user', 'login');
 
+    } elseif ( !$this->session['NY_FRAMEWORK_USER']['admin'] ) {
+
+      $this->session['notice'] = "You need Admin permissions to edit pages.";
+      $this->writeSession();
+      $this->redirect('user', 'login');
+
     }
 
     //Grab pages
@@ -61,6 +67,12 @@ class pageController extends Nickyeoman\Framework\BaseController {
     if ( ! $this->session['loggedin'] ) {
 
       $this->session['notice'] = "You need to login to edit pages.";
+      $this->writeSession();
+      $this->redirect('user', 'login');
+
+    } elseif ( !$this->session['NY_FRAMEWORK_USER']['admin'] ) {
+
+      $this->session['notice'] = "You need Admin permissions to edit pages.";
       $this->writeSession();
       $this->redirect('user', 'login');
 

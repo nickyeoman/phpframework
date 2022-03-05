@@ -491,10 +491,11 @@ class userHelper {
 
     //set session
     $_SESSION['NY_FRAMEWORK_USER'] = [
-      'id' => $userdb['id'],
-      'username' => $userdb['username'],
-      'email' => $userdb['email'],
-      'loggedin' => true,
+      'id'        => $userdb['id'],
+      'username'  => $userdb['username'],
+      'email'     => $userdb['email'],
+      'loggedin'  => true,
+      'admin'     => $userdb['admin']
       ];
 
     $this->userTraits['loggedin'] = true;

@@ -35,7 +35,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 			//Process the form
 			if ( $user->login() ) {
 
-				//$this->log('notice','LOGIN Success', 'Controller/user.php/login()' );
+				$this->log('notice','LOGIN Success', 'Controller/user.php/login()' );
 				$this->redirect('user', 'index');
 
 			} else {
