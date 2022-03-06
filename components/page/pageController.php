@@ -21,6 +21,14 @@ class pageController extends Nickyeoman\Framework\BaseController {
         $pagedata[$key] = null;
     }
 
+    $taglinks = explode(',',$pagedata['tags']);
+    $pagedata['taglinks'] = ''; //string
+
+    foreach ( $taglinks as $value) {
+      // TODO: this only works with Nick's website
+      $pagedata['taglinks'] .= ' <a class="taglinks" href="/blog/tag/' . $value . '/1">' . $value . '</a>';
+    }
+
     $this->data['page'] = $pagedata;
     $this->data['pageid'] = $slug;
     $this->twig('page', $this->data);

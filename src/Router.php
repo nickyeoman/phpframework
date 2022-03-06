@@ -152,12 +152,14 @@ class Router {
 
       $this->action = "override";
 
+      // TODO: You always need a parameter with an override (controller might handle this though)
       if ( !empty($this->uri[0]) ) {
         $this->params = $this->uri;
       } else {
 
         $this->controller = 'error';
         $this->action = '_404';
+        $_ENV['CONTROLLERPATH'] = "vendor/nickyeoman/phpframework/components/$this->controller/"; //TODO: can't override this
 
         bdump('Error: the override exists but no parameter given');
       }
@@ -167,6 +169,7 @@ class Router {
       //404
       $this->controller = 'error';
       $this->action = '_404';
+      $_ENV['CONTROLLERPATH'] = "vendor/nickyeoman/phpframework/components/$this->controller/"; //TODO: can't override this
 
       bdump("Error: The Method ($action) doesn't exist in the Controller file ($filename)", 'Router Error');
 

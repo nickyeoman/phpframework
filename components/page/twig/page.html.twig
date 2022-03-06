@@ -7,11 +7,24 @@
 {% block content %}
 <div id="component-page">
   {% if page.heading is not empty %}
-    <h2>{{ page.heading |raw }}</h2>
+    <h1>{{ page.heading |raw }}</h1>
   {% endif %}
+
+  <div class="page-meta">
+    {% if page.updated is not empty %}
+        <span class="page-updated">Last Updated: {{ page.updated | date("M\\. jS Y \\a\\t g:ia") }}</span>
+    {% endif %}
+
+    {% if page.taglinks is not empty %}
+        <span class="tags">Tags: {{ page.taglinks | raw }}</span>
+    {% endif %}
+  </div>
+
   {% if page.intro is not empty %}
-      <p>{{ page.intro | raw }}</p>
+      <p class="intro">{{ page.intro | raw }}</p>
   {% endif %}
-  <p>{{ page.body | raw }}</p>
+
+  {{ page.body | raw }}
+
 </div>
 {% endblock %}
