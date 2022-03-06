@@ -18,7 +18,9 @@ class pageHelper {
     'author' => '',
     'created' => 'NOW()',
     'updated' => 'NOW()',
-    'draft' => ''
+    'draft' => '',
+    'path' => '',
+    'notes' => ''
   );
   public $error = array();
 
@@ -41,6 +43,8 @@ class pageHelper {
     $this->set_keywords();
     $this->set_author();
     $this->set_draft();
+    $this->set_path();
+    $this->set_notes();
 
   }
   // End Construct
@@ -129,6 +133,33 @@ class pageHelper {
 
   }
 
+  public function set_path( $path = null ) {
+
+    if ( !empty( $this->post['path'] ) )
+      $path = $this->post['path'];
+
+    if ( !empty($path) )
+      trim($path);
+
+    $this->page['path'] = $path;
+    return $path;
+
+  }
+
+  public function set_notes( $notes = null ) {
+
+    if ( !empty( $this->post['notes'] ) )
+      $notes = $this->post['notes'];
+
+    if ( !empty($notes) )
+      trim($notes);
+
+    $this->page['notes'] = $notes;
+    return $notes;
+
+  }
+
+
   public function set_tags( $tags = null ) {
 
     if ( !empty( $this->post['tags'] ) ) {
@@ -161,7 +192,7 @@ class pageHelper {
       $intro = trim($intro);
       $intro = str_replace("'",'&#39;',$intro);
       $this->page['intro'] = $intro;
-      
+
     } else {
       $this->page['intro'] = "";
     }

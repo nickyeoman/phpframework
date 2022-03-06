@@ -101,6 +101,24 @@
 </div>
 
 <div class="row">
+  <label for="path">Path (include pre and post slashes)</label>
+  {% if mode != 'new' %}
+    <input type="text"   name="path"    value="{{ info.path}}"   placeholder="path">
+  {% else %}
+    <input type="text"   name="path"    value=""   placeholder="{{ info.path}}">
+  {%endif%}
+</div>
+
+<div class="row">
+  <label for="notes">Notes</label>
+  {% if mode != 'new' %}
+    <textarea name="notes" rows="4" cols="50" placeholder="Enter your page notes here.">{{ info.notes }}</textarea>
+  {% else %}
+    <textarea name="notes" rows="4" cols="50" placeholder="{{ info.notes }}"></textarea>
+  {%endif%}
+</div>
+
+<div class="row">
   <label for="draft">draft</label>
   {% if mode != 'new' %}
     <input type="checkbox"   name="draft" {% if info.draft %}checked{% endif %} />

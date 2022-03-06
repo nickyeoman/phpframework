@@ -79,7 +79,7 @@ class Router {
     } else if ($this->uri[0] == "sitemap.xml") {
 
       //TODO: make some sort of check file for special paths like this
-      $this->controller = 'page';
+      $this->controller = 'sitemap';
       $this->action = 'sitemap';
       $_ENV['CONTROLLERPATH'] = "vendor/nickyeoman/phpframework/components/$controller/";
 
