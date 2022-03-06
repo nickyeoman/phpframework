@@ -244,7 +244,7 @@ class userHelper {
     $mail->setFrom($_ENV['MAIL_FROM_NAME'] . ' <' . $_ENV['MAIL_FROM_ADDRESS'] .'>')
       ->addTo( $this->userTraits['email'] )
       ->setSubject('Validate your email address at GOPOLI')
-      ->setBody('Hello, please go to this link to veirfy your email address ' . $_ENV['BASEURL'] . 'user/validate/?valid=' . $this->userTraits['confirmationToken'] . '&email=' . $this->userTraits['email'])
+      ->setBody('Hello, please go to this link to veirfy your email address ' . $_ENV['BASEURL'] . '/user/validate/?valid=' . $this->userTraits['confirmationToken'] . '&email=' . $this->userTraits['email'])
     ;
 
     $mailer = new \Nette\Mail\SmtpMailer([
@@ -275,7 +275,7 @@ class userHelper {
     $userdb = array(
       'id'                 => $user['id'],
       'resetPasswordToken' => $resetkey,
-      'updated_at'         => date("Y-m-d H:i:s")
+      'updated'         => date("Y-m-d H:i:s")
     );
 
     // Update db
@@ -313,7 +313,7 @@ class userHelper {
           'id'                 => $this->userTraits['uid'],
           'resetPasswordToken' => '',
           'password'           => $this->userTraits['password'],
-          'updated_at'         => date("Y-m-d H:i:s")
+          'updated'         => date("Y-m-d H:i:s")
         );
 
         // Update db
@@ -362,7 +362,7 @@ class userHelper {
       'id'                => $user['id'],
       'confirmationToken' => 'NULL',
       'confirmed'         => '1',
-      'updated_at'        => date("Y-m-d H:i:s")
+      'updated'        => date("Y-m-d H:i:s")
     );
 
     $id = $this->db->update("users", $user, 'id' );
