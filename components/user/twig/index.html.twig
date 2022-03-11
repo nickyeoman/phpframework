@@ -2,6 +2,8 @@
 {% extends "layout/master.html.twig" %}
 
 {% block content %}
+
+{% if admin == 1 %}
 <p>You are logged in.</p>
 <p>
 <ul>
@@ -10,4 +12,5 @@
   <li><a href="/">Site Map</a></li>
   <li><a href="/">Users</a></li>
 </ul>
+{% endif %}
 {% endblock %}

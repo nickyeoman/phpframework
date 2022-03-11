@@ -47,6 +47,12 @@ class BaseController {
     // POST
     $this->setPost();
 
+    // Admin
+    if ( $this->session['loggedin'] )
+      $this->data['admin'] = 1;
+    else
+      $this->data['admin'] = 0;
+
   }
   // End construct
 
