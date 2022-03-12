@@ -81,7 +81,7 @@ class Router {
       //TODO: make some sort of check file for special paths like this
       $this->controller = 'sitemap';
       $this->action = 'sitemap';
-      $_ENV['CONTROLLERPATH'] = "vendor/nickyeoman/phpframework/components/$controller/";
+      $_ENV['CONTROLLERPATH'] = "vendor/nickyeoman/phpframework/components/$this->controller/";
 
     } else {
 
