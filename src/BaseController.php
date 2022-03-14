@@ -27,7 +27,7 @@ class BaseController {
     $this->data = array_merge($this->data, [
       'uri'     => rtrim(ltrim($_SERVER['REQUEST_URI'], "\/"), "\/")
       ,'pageid' => str_replace("/", "-", rtrim(ltrim($_SERVER['REQUEST_URI'], "\/"), "\/"))
-      ,'ip'     => $_SERVER['REMOTE_ADDR']
+      ,'ip'     => $_SERVER['HTTP_X_REAL_IP']
       ,'agent'  => $_SERVER['HTTP_USER_AGENT']
     ]);
 
