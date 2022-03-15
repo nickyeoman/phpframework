@@ -27,9 +27,13 @@ class BaseController {
     $this->data = array_merge($this->data, [
       'uri'     => rtrim(ltrim($_SERVER['REQUEST_URI'], "\/"), "\/")
       ,'pageid' => str_replace("/", "-", rtrim(ltrim($_SERVER['REQUEST_URI'], "\/"), "\/"))
-      ,'ip'     => $_SERVER['REMOTE_ADDR']
-      ,'agent'  => $_SERVER['HTTP_X_REAL_IP']
+      ,'agent'  => $_SERVER['HTTP_USER_AGENT']
     ]);
+
+    if ( empty($_SERVER['HTTP_X_REAL_IP']) )
+      $this->data['ip'] = $_SERVER['REMOTE_ADDR'];
+    else
+      $this->data['ip'] = $_SERVER['HTTP_X_REAL_IP'];
 
     // sessions
     $this->setSession();
@@ -239,7 +243,7 @@ class BaseController {
         'title'     => $title,
         'content'   => $content,
         'location'  => $location, //location of code
-        'ip'        => $_SERVER['HTTP_X_REAL_IP'],
+        'ip'        => $this->data['ip'],
         'url'       => $this->data['uri'],
         'session'   => json_encode($this->session),
         'post'      => $post,
