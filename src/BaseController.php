@@ -27,8 +27,8 @@ class BaseController {
     $this->data = array_merge($this->data, [
       'uri'     => rtrim(ltrim($_SERVER['REQUEST_URI'], "\/"), "\/")
       ,'pageid' => str_replace("/", "-", rtrim(ltrim($_SERVER['REQUEST_URI'], "\/"), "\/"))
-      ,'ip'     => $_SERVER['HTTP_X_REAL_IP']
-      ,'agent'  => $_SERVER['HTTP_USER_AGENT']
+      ,'ip'     => $_SERVER['REMOTE_ADDR']
+      ,'agent'  => $_SERVER['HTTP_X_REAL_IP']
     ]);
 
     // sessions
@@ -239,7 +239,7 @@ class BaseController {
         'title'     => $title,
         'content'   => $content,
         'location'  => $location, //location of code
-        'ip'        => $this->_getRealIpAddr(),
+        'ip'        => $_SERVER['HTTP_X_REAL_IP'],
         'url'       => $this->data['uri'],
         'session'   => json_encode($this->session),
         'post'      => $post,
@@ -257,22 +257,6 @@ class BaseController {
     // end mysql
   }
   // end function log
-
-  // Grab user IP
-  private function _getRealIpAddr(){
-   if ( !empty($_SERVER['HTTP_CLIENT_IP']) ) {
-    // Check IP from internet.
-    $ip = $_SERVER['HTTP_CLIENT_IP'];
-   } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']) ) {
-    // Check IP is passed from proxy.
-    $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-   } else {
-    // Get IP address from remote address.
-    $ip = $_SERVER['REMOTE_ADDR'];
-   }
-   return $ip;
-  }
-  // End function get Real IP Address
 
   // Takes the SESSION and places it in session
   private function setSession(){
