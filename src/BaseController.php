@@ -27,9 +27,13 @@ class BaseController {
     $this->data = array_merge($this->data, [
       'uri'     => rtrim(ltrim($_SERVER['REQUEST_URI'], "\/"), "\/")
       ,'pageid' => str_replace("/", "-", rtrim(ltrim($_SERVER['REQUEST_URI'], "\/"), "\/"))
-      ,'ip'     => $_SERVER['REMOTE_ADDR']
       ,'agent'  => $_SERVER['HTTP_USER_AGENT']
     ]);
+
+    if ( empty($_SERVER['HTTP_X_REAL_IP']) )
+      $this->data['ip'] = $_SERVER['REMOTE_ADDR'];
+    else
+      $this->data['ip'] = $_SERVER['HTTP_X_REAL_IP'];
 
     // sessions
     $this->setSession();
@@ -46,6 +50,12 @@ class BaseController {
 
     // POST
     $this->setPost();
+
+    // Admin
+    if ( $this->session['loggedin'] )
+      $this->data['admin'] = 1;
+    else
+      $this->data['admin'] = 0;
 
   }
   // End construct
@@ -233,7 +243,7 @@ class BaseController {
         'title'     => $title,
         'content'   => $content,
         'location'  => $location, //location of code
-        'ip'        => $this->_getRealIpAddr(),
+        'ip'        => $this->data['ip'],
         'url'       => $this->data['uri'],
         'session'   => json_encode($this->session),
         'post'      => $post,
@@ -251,22 +261,6 @@ class BaseController {
     // end mysql
   }
   // end function log
-
-  // Grab user IP
-  private function _getRealIpAddr(){
-   if ( !empty($_SERVER['HTTP_CLIENT_IP']) ) {
-    // Check IP from internet.
-    $ip = $_SERVER['HTTP_CLIENT_IP'];
-   } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']) ) {
-    // Check IP is passed from proxy.
-    $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-   } else {
-    // Get IP address from remote address.
-    $ip = $_SERVER['REMOTE_ADDR'];
-   }
-   return $ip;
-  }
-  // End function get Real IP Address
 
   // Takes the SESSION and places it in session
   private function setSession(){
@@ -294,6 +288,14 @@ class BaseController {
       if ( !empty( $this->session['alert']  )) {
         $this->data['alert'] = $this->session['alert'];
         unset( $this->session['alert']);
+      }
+
+      if ( !empty( $this->session['error'] ) ) {
+        foreach ($this->session['error'] as $k => $v) {
+          $this->adderror($v,$k);
+        }
+        unset($this->session['error']);
+        unset($_SESSION['error']);
       }
 
       if ( isset($this->session['NY_FRAMEWORK_USER']) ) {
