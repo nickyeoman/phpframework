@@ -273,6 +273,8 @@ class BaseController {
       $this->session['loggedin']  = 0;
       $this->session['notice'] = '';
       $this->session['error'] = '';
+      $this->session['page'] = strtok($_SERVER['REQUEST_URI'], '?');
+      $this->session['pageid'] = null; //this is the last pageid set, if you visit other pages that don't have an id, the one with an id will remain
       $this->writeSession();
       bdump($this->session, "Session Data, New");
 
@@ -302,6 +304,8 @@ class BaseController {
         if ( $this->session['NY_FRAMEWORK_USER']['loggedin'] )
           $this->session['loggedin'] = 1;
       }
+
+      $this->session['page'] = strtok($_SERVER['REQUEST_URI'], '?');
 
       //debug
       bdump($this->session, "Session Data, Existing");
