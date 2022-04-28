@@ -3,7 +3,7 @@ namespace Nickyeoman\Framework;
 session_start();
 /**
 * Session Class
-* v1.0
+* v1.1
 **/
 
 class SessionManager {
@@ -51,12 +51,14 @@ class SessionManager {
 
   public function inGroup($group = '', $msg = '', $writeS = false) {
 
+    $adminGroups = array();
     $group = trim(strtolower($group));
 
     if ( empty($group) )
       return false;
 
-    $adminGroups = explode(',',$this->session['admin']);
+    if ( !empty($this->session['admin']) )
+      $adminGroups = explode(',',$this->session['admin']);
 
     if ( is_int(array_search($group, $adminGroups, true ) ) ) {
       return true;
@@ -86,6 +88,7 @@ class SessionManager {
 
     session_destroy();
     unset($this->session);
+    $this->newSession();
 
   }
 
@@ -149,7 +152,7 @@ class SessionManager {
   }
 
   public function loggedin($flashmsg = '', $writeS = false) {
-    
+
     if ( $this->session['loggedin'] ) {
       return true;
     } else {
