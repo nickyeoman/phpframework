@@ -1,7 +1,8 @@
 <?php
 namespace Nickyeoman\Framework;
 USE \Nickyeoman\Dbhelper;
-session_start();
+USE Nickyeoman\Framework\SessionManager as Session;
+
 
 // load helpers
 $loader = new \Nette\Loaders\RobotLoader; // https://doc.nette.org/en/3.1/robotloader
@@ -11,10 +12,8 @@ $loader->register(); // Run the RobotLoader
 
 class BaseController {
 
-  public $session = array();
-  public $destroy = false;
-  public $loggedin = 0; //0 or 1
-  public $db = null;
+  public $db = null; //class
+  public $session = null; //class
   public $post = array('submitted' => false);
   public $data = array('error' => array(), 'notice' => null);
 
@@ -23,20 +22,10 @@ class BaseController {
   */
   public function __construct() {
 
-    // Set all the Global view variables
-    $this->data = array_merge($this->data, [
-      'uri'     => rtrim(ltrim($_SERVER['REQUEST_URI'], "\/"), "\/")
-      ,'pageid' => str_replace("/", "-", rtrim(ltrim($_SERVER['REQUEST_URI'], "\/"), "\/"))
-      ,'agent'  => $_SERVER['HTTP_USER_AGENT']
-    ]);
-
-    if ( empty($_SERVER['HTTP_X_REAL_IP']) )
-      $this->data['ip'] = $_SERVER['REMOTE_ADDR'];
-    else
-      $this->data['ip'] = $_SERVER['HTTP_X_REAL_IP'];
-
     // sessions
-    $this->setSession();
+    $this->session = new Session();
+
+    $this->populateData();
 
     // Store the database object to a variable in this object
     if ( ! empty( $_ENV['DBUSER'] ) )
@@ -51,31 +40,52 @@ class BaseController {
     // POST
     $this->setPost();
 
-    // Admin
-    if ( $this->session['loggedin'] )
-      $this->data['admin'] = 1;
-    else
-      $this->data['admin'] = 0;
-
   }
   // End construct
 
-  // Write the current session to PHP session
-  public function writeSession() {
+  // sets the data array for view
+  public function populateData() {
 
-    if ( ! $this->destroy )
-      $_SESSION = $this->session;
+    // Set all the Global view variables
+    $this->data = [
+      'uri'     => rtrim(ltrim($_SERVER['REQUEST_URI'], "\/"), "\/")
+      ,'pageid' => str_replace("/", "-", rtrim(ltrim($_SERVER['REQUEST_URI'], "\/"), "\/"))
+      ,'agent'  => $_SERVER['HTTP_USER_AGENT']
+    ];
+
+    if ( empty($_SERVER['HTTP_X_REAL_IP']) )
+      $this->data['ip'] = $_SERVER['REMOTE_ADDR'];
     else
-      session_destroy();
+      $this->data['ip'] = $_SERVER['HTTP_X_REAL_IP'];
 
-  }
-  // End writeSession
+      // Session Data for the view
+      $this->data = array_merge($this->data, [
+        'formkey'   => $this->session->getKey('formkey')
+        ,'loggedin' => $this->session->getKey('loggedin')
+      ]);
 
-  // Destroy session (logout mostly)
-  public function destroySession() {
+      // Session flash data for the view
+      foreach ( $this->session->session['flash'] as $key => $value ) {
 
-    session_destroy();
-    $this->destroy = true;
+        if ( is_array($value) ) {
+          foreach( $value as $k => $v ) {
+            if ( !empty($v) )
+              $this->adderror($v, $key );
+          }
+        } else {
+          if ( !empty($value) )
+            $this->adderror($value, $key );
+        }
+
+      }
+
+      $this->session->clearflash();
+
+      //permissions
+      if ( $this->session->inGroup('admin') )
+        $this->data['admin'] = 'admin';
+
+      bdump($this->data,"View Data");
 
   }
 
@@ -96,9 +106,10 @@ class BaseController {
     else
       $action = "/$action";
 
+    $this->session->writeSession();
+
     // php redirect
-    header("Location: $controller$action");
-    exit(); // do not execute anything more
+    exit(header("Location: $controller$action"));
 
   }
   // END redirect
@@ -127,7 +138,7 @@ class BaseController {
       $this->twig->addExtension(new \Twig\Extension\DebugExtension());
 
       echo $this->twig->render("$viewname.html.twig", $vars);
-      $this->writeSession();
+      $this->session->writeSession();
       $this->db->close();
 
   }
@@ -140,24 +151,24 @@ class BaseController {
   **/
   public function adderror($string = "No Information Supplied", $name = null ) {
 
-    // current size of array
-    $count = count($this->data['error']);
+    if ( !isset($this->data['messages']) )
+      $this->data['messages'] = array();
 
-    //assign key to array
-    if ( empty($name) )
-      $name = $count + 1; // TODO: I don't think this is right
+    array_push($this->data['messages'], array($name => $string));
 
-    $this->data['error']["$name"] = $string;
-
-    return( count($this->data['error']) );
+    return true;
 
   }
   // End adderror
 
   // count errors
-  //TODO: the above function adderror does the same with no parameters, merge them
   public function counterrors() {
-    return( count($this->data['error']) );
+
+    $count = count($this->data['error']);
+    if ( empty($count) )
+      $count = 0;
+    return( $count );
+
   }
 
   /**
@@ -262,72 +273,13 @@ class BaseController {
   }
   // end function log
 
-  // Takes the SESSION and places it in session
-  private function setSession(){
-
-    if ( empty( $_SESSION['sessionid'] ) ) {
-
-      // Empty session, create a new one
-      $this->session['sessionid'] = session_id();
-      $this->session['formkey']   = md5( session_id() . date("ymdhis") );
-      $this->session['loggedin']  = 0;
-      $this->session['notice'] = '';
-      $this->session['error'] = '';
-      $this->session['page'] = strtok($_SERVER['REQUEST_URI'], '?');
-      $this->session['pageid'] = null; //this is the last pageid set, if you visit other pages that don't have an id, the one with an id will remain
-      $this->writeSession();
-      bdump($this->session, "Session Data, New");
-
-    } else {
-
-      $this->session = $_SESSION; // Store the session to this object in an array
-
-      //flash data
-      if ( !empty( $this->session['notice'] ) ) {
-        $this->data['notice'] = $this->session['notice'];
-        unset($this->session['notice']);
-      }
-      if ( !empty( $this->session['alert']  )) {
-        $this->data['alert'] = $this->session['alert'];
-        unset( $this->session['alert']);
-      }
-
-      if ( !empty( $this->session['error'] ) ) {
-        foreach ($this->session['error'] as $k => $v) {
-          $this->adderror($v,$k);
-        }
-        unset($this->session['error']);
-        unset($_SESSION['error']);
-      }
-
-      if ( isset($this->session['NY_FRAMEWORK_USER']) ) {
-        if ( $this->session['NY_FRAMEWORK_USER']['loggedin'] )
-          $this->session['loggedin'] = 1;
-      }
-
-      $this->session['page'] = strtok($_SERVER['REQUEST_URI'], '?');
-
-      //debug
-      bdump($this->session, "Session Data, Existing");
-
-    }
-
-    // Session Data for the view
-    $this->data = array_merge($this->data, [
-      'formkey'   => $this->session['formkey']
-      ,'loggedin' => $this->session['loggedin']
-    ]);
-
-  }
-  // end setSession()
-
   // Gets the POST and puts it in post
   private function setPost() {
 
     if ( ! empty( $_POST['formkey'] ) ){
 
       //check session matches
-      if ( $_POST['formkey'] == $this->session['formkey'] ) {
+      if ( $_POST['formkey'] == $this->session->getKey('formkey') ) {
 
         $this->post['submitted'] = true;
 
@@ -340,13 +292,13 @@ class BaseController {
       } else {
 
         //error no form key.
-        $this->adderror( 'There was a problem with the session, try again', 'formkey' );
+        $this->adderror( 'There was a problem with the session, try again', 'error' );
 
       }
 
     }
     //end if
-    bdump($this->post);
+    bdump($this->post, 'BC set post');
   }
   // end setPost()
 

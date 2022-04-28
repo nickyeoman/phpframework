@@ -14,10 +14,10 @@ if ( $_ENV['DEBUG'] == 'display' )
   Debugger::enable(Debugger::DEVELOPMENT);
 
 //Use The namespace for the framework in composer
-USE Nickyeoman\Framework;
+USE Nickyeoman\Framework\Router as Router;
 
 //create the class for the router
-$router = new Nickyeoman\Framework\Router();
+$router = new Router();
 
 // Require framework (autoload controllers)
 $loader = new Nette\Loaders\RobotLoader; // https://doc.nette.org/en/3.1/robotloader
