@@ -65,21 +65,23 @@ class BaseController {
       ]);
 
       // Session flash data for the view
-      foreach ( $this->session->session['flash'] as $key => $value ) {
+      if ( !empty($this->session->session['flash']) ){
+        foreach ( $this->session->session['flash'] as $key => $value ) {
 
-        if ( is_array($value) ) {
-          foreach( $value as $k => $v ) {
-            if ( !empty($v) )
-              $this->adderror($v, $key );
+          if ( is_array($value) ) {
+            foreach( $value as $k => $v ) {
+              if ( !empty($v) )
+                $this->adderror($v, $key );
+            }
+          } else {
+            if ( !empty($value) )
+              $this->adderror($value, $key );
           }
-        } else {
-          if ( !empty($value) )
-            $this->adderror($value, $key );
+
         }
+        $this->session->clearflash();
 
       }
-
-      $this->session->clearflash();
 
       //permissions
       if ( $this->session->inGroup('admin') )
