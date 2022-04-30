@@ -449,38 +449,4 @@ class userController extends Nickyeoman\Framework\BaseController {
 
 	} // end save profile
 
-
-	// TODO: Remove after use
-	public function createcomments() {
-		$sql = <<<EOSQL
-		CREATE TABLE `comments` (
-		  `id` int(11) NOT NULL AUTO_INCREMENT,
-		  `pageid` int(11) DEFAULT NULL,
-		  `userid` int(11) DEFAULT NULL,
-		  `body` text DEFAULT NULL,
-		  `date` datetime NOT NULL DEFAULT current_timestamp(),
-		  PRIMARY KEY (`id`)
-		) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
-EOSQL;
-		$this->db->query($sql);
-
-	}
-
-	public function dbAlter() {
-		$sql = <<<EOSQL
-		ALTER TABLE `users` CHANGE `admin` `admin` VARCHAR(255) NULL DEFAULT NULL COMMENT 'CSV';
-EOSQL;
-		$this->db->query($sql);
-		die("admin changed");
-	}
-
-
-	public function dbfix() {
-		$sql = <<<EOSQL
-		UPDATE `users` SET `admin` = 'admin' WHERE `users`.`id` = 1;
-EOSQL;
-		$this->db->query($sql);
-		die("admin per fixed");
-	}
-
 } //End Class
