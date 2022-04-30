@@ -1,0 +1,39 @@
+{% set title = '404 logs' %}
+{% extends "layout/master.html.twig" %}
+
+{% block content %}
+<h2>{{ title }}</h2>
+
+<p><a href="logs/deletequerystrings">Remove Query strings</a> - <a href="logs/deleteall">Delete all</a></p>
+
+<h2>Results</h2>
+
+<table id="notfound">
+<tr>
+  <th>delete</th>
+  <th>url</th>
+  <th>IP</th>
+  <th>time</th>
+  <th>count</th>
+</tr>
+{% for log in logs %}
+
+  <tr>
+    <td><a href="/logs/delete/{{ log.id }}">Row</a> - <a href="/logs/deletegroup/{{ log.url }}">Group</a> -</td>
+    <td><a href="/{{ log.url }}" target="_new">/{{ log.url }}</a></td>
+    <td>{{ log.ip }}</td>
+    <td>{{ log.time }}</td>
+    <td>{{ log.num }}</td>
+  </tr>
+
+{% endfor %}
+</table>
+
+<h2>Suggested htaccess modifications</h2>
+<pre>
+{% for log in logs %}
+redirect 301 /{{ log.url }} /honeypot.html
+{% endfor %}
+</pre>
+
+{% endblock %}
