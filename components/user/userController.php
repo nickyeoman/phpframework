@@ -11,7 +11,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 
 		$this->data['username'] = $this->session->getKey('username');
 
-		$this->twig('user/index', $this->data);
+		$this->twig('index', $this->data);
 
 	} // end function index
 
@@ -63,7 +63,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 		// end POST SUBMITTED
 
 		$this->data['page']['slug'] = 'user-login';
-		$this->twig('user/login', $this->data);
+		$this->twig('login', $this->data);
 
 	}
 	//END Login
@@ -141,7 +141,7 @@ class userController extends Nickyeoman\Framework\BaseController {
     }
 
     //Display view
-    $this->twig('user/registration', $this->data);
+    $this->twig('registration', $this->data);
 		$this->session->writeSession();
 
 	}
@@ -171,7 +171,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 		//end check key
 
 		// display view
-		$this->twig('user/validate', $this->data);
+		$this->twig('validate', $this->data);
 
 	}
 	// End validate action (page)
@@ -232,7 +232,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 		}
 
 		//Display view
-		$this->twig('user/login', $this->data);
+		$this->twig('login', $this->data);
 		$this->session->writeSession();
 	}
 
@@ -331,7 +331,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 
         }
 
-        $this->twig('user/reset', $this->data); // display view
+        $this->twig('reset', $this->data); // display view
 				$this->session->writeSession();
 
     }
@@ -356,7 +356,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 	  }
 
 	  $this->data['page']['slug'] = "user-admin";
-	  $this->twig('user/admin', $this->data);
+	  $this->twig('admin', $this->data);
 		$this->session->writeSession();
 
 	} //end admin
@@ -381,7 +381,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 
 		$this->data['page']['slug'] = "myprofile";
 
-	  $this->twig('user/myprofile', $this->data);
+	  $this->twig('myprofile', $this->data);
 		$this->session->writeSession();
 	} //end my profile
 

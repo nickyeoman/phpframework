@@ -44,7 +44,7 @@
 
        } //end if submitted
 
-       $this->twig('contact/contact', $this->data);
+       $this->twig('contact', $this->data);
        $this->session->writeSession();
 
      }
@@ -73,7 +73,7 @@
          }
 
          $this->data['pageid'] = "contact-admin";
-       $this->twig('contact/admin', $this->data);
+       $this->twig('admin', $this->data);
      }
 
      public function view($parms = null) {
@@ -99,6 +99,6 @@
 
 
          $this->data['pageid'] = "contact-admin-edit";
-       $this->twig('contact/view', $this->data);
+       $this->twig('view', $this->data);
      }
    }

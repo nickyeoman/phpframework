@@ -1,0 +1,31 @@
+{% set title = 'Search Nick\'s blog' %}
+{% extends "layout/master.html.twig" %}
+
+{% block content %}
+<h1>Search</h1>
+<div class="formContainer">
+  <form action="/search/index" method="post">
+    <input type="hidden" name="formkey" value="{{ formkey }}" />
+    <div class="formGroup">
+      {% if searchTerm is not null %}
+        <input type="text" value="{{ searchTerm }}" name="search" required>
+      {% else %}
+        <input type="text" placeholder="Enter Search Term" name="search" required>
+      {% endif %}
+    </div>
+    <div class="formGroup">
+      <button type="submit">Search</button>
+    </div>
+  </form>
+
+  {% if searchCount is not null %}
+  <hr />
+  <div id="searchResults">
+    <div class="resultCount">Search for {{ searchTerm}} found {{ searchCount }} results.</div>
+  {% for result in searchResults %}
+    <h3><a href="/page/{{result.slug}}">{{result.title}}</a></h3>
+    <div class="desc">{{result.description}}</div>
+  {% endfor %}
+  </div>
+  {% endif %}
+{% endblock %}

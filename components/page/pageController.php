@@ -52,7 +52,7 @@ EOSQL;
     $this->data['page'] = $pagedata;
 
     $this->session->writeSession();
-    $this->twig('page/page', $this->data);
+    $this->twig('page', $this->data);
 
   }
   // end override
@@ -86,7 +86,7 @@ EOSQL;
 
     $this->data['pageid'] = "page-admin";
     $this->session->writeSession();
-    $this->twig('page/admin', $this->data);
+    $this->twig('admin', $this->data);
 
   }
   //end admin
@@ -120,7 +120,7 @@ EOSQL;
 
     $this->data['info'] = $this->db->findone('pages', 'id', $pid);
     $this->data['pageid'] = "page-edit";
-    $this->twig('page/edit', $this->data);
+    $this->twig('edit', $this->data);
 
   }
   // end function edit
@@ -159,7 +159,7 @@ EOSQL;
     $this->data['mode'] = 'new';
     $this->data['pageid'] = "page-edit";
     $this->session->writeSession();
-    $this->twig('page/edit', $this->data);
+    $this->twig('edit', $this->data);
 
   }
   //end new
@@ -189,7 +189,7 @@ EOSQL;
     }
 
     $this->data['pageid'] = "page-admin";
-    $this->twig('page/admin', $this->data);
+    $this->twig('admin', $this->data);
   }
 
   public function createcomment() {
@@ -268,7 +268,7 @@ EOSQL;
     $this->data['comments'] = $this->db->query($SQL);
 
     $this->data['pageid'] = "comments-admin";
-    $this->twig('page/adminComments', $this->data);
+    $this->twig('adminComments', $this->data);
   }
 
 }
