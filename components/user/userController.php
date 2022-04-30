@@ -3,18 +3,15 @@ class userController extends Nickyeoman\Framework\BaseController {
 
 	public bool $error = false;
 
+	// This is the dashboard
 	public function index(){
 
-		if ( ! $this->session['loggedin'] ) {
-
-			$this->session['notice'] = "You need to login.";
-			$this->writeSession();
+		if ( ! $this->session->loggedin("You need to login to access dashboard.") )
 			$this->redirect('user', 'login');
 
-		}
+		$this->data['username'] = $this->session->getKey('username');
 
-		$this->twig('index', $this->data);
-		// If the user is logged in we don't need to proceed
+		$this->twig('user/index', $this->data);
 
 	} // end function index
 
@@ -24,9 +21,8 @@ class userController extends Nickyeoman\Framework\BaseController {
 	public function login() {
 
 		// If the user is logged in we don't need to proceed
-		if ( $this->session['loggedin'] ) {
+		if ( $this->session->loggedin() )
 			$this->redirect('user', 'index');
-		}
 
 		// Check if form Submitted
 		if ( $this->post['submitted'] ) {
@@ -34,6 +30,10 @@ class userController extends Nickyeoman\Framework\BaseController {
 			$user = new Nickyeoman\helpers\userHelper();
 			//Process the form
 			if ( $user->login() ) {
+
+				foreach ($user->userTraits as $k => $v) {
+					$this->session->setKey($k,$v);
+				}
 
 				$this->log('notice','LOGIN Success', 'Controller/user.php/login()' );
 				$this->redirect('user', 'index');
@@ -46,7 +46,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 
 					foreach( $user->errors as $k => $v ) {
 
-						$this->adderror($string = $v, $k );
+						$this->adderror($string = $v, "$k error" );
 
 					}
 					//end foreach
@@ -62,8 +62,8 @@ class userController extends Nickyeoman\Framework\BaseController {
 		}
 		// end POST SUBMITTED
 
-		$this->twig('login', $this->data);
-		$this->writeSession();
+		$this->data['page']['slug'] = 'user-login';
+		$this->twig('user/login', $this->data);
 
 	}
 	//END Login
@@ -74,11 +74,8 @@ class userController extends Nickyeoman\Framework\BaseController {
 	public function registration(){
 
     // If the user is logged in we don't need to proceed
-		if ( $this->session['loggedin'] )
+		if ( $this->session->loggedin() )
       $this->redirect('user', 'index');
-
-		// Session data
-    $this->data['formkey']  = $this->session['formkey']; // Form cross site protection
 
     //check Form Was submitted is enabled
     if ( ! empty( $_POST['formkey'] ) ){
@@ -86,12 +83,12 @@ class userController extends Nickyeoman\Framework\BaseController {
 			$user = new Nickyeoman\helpers\userHelper();
 
 			//check session matches
-      if ( $_POST['formkey'] == $this->session['formkey'] ) {
+      if ( $_POST['formkey'] == $this->session->getKey('formkey') ) {
 
 				//clean the data (true = good, false = bad)
 				if ( ! $user->checkUsername() ) {
 
-					$this->error = true;
+					$this->error = true;  // TODO: not sure this is needed just a count(data-error). this appears elsewhere
 
 					//For the view
 					$this->data['error'] .= $user->errors['username'];
@@ -128,7 +125,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 					$user->sendRegistrationEmail();
 
 					//redirect to verify page
-					$this->redirect($controller = 'user', $action = 'validate');
+					$this->redirect('user', 'validate');
 
 				} else {
 
@@ -144,15 +141,15 @@ class userController extends Nickyeoman\Framework\BaseController {
     }
 
     //Display view
-    $this->twig('registration', $this->data);
-		$this->writeSession();
+    $this->twig('user/registration', $this->data);
+		$this->session->writeSession();
 
 	}
 	//end register action (page)
 
 	public function validate(){
 
-		if ( isset( $_GET['valid'] ) ) {
+		if ( isset( $_GET['valid'] ) ) { //TODO: change this to param
 
 			//A validation key exists, we better check it
 			$user = new Nickyeoman\helpers\userHelper();
@@ -174,7 +171,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 		//end check key
 
 		// display view
-		$this->twig('validate', $this->data);
+		$this->twig('user/validate', $this->data);
 
 	}
 	// End validate action (page)
@@ -182,7 +179,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 	public function logout() {
 
 		//TODO: Logout message
-		$this->destroySession();
+		$this->session->destroySession();
 		$this->redirect('index', 'index');
 
 	}
@@ -193,18 +190,18 @@ class userController extends Nickyeoman\Framework\BaseController {
 	public function forgot() {
 
 		// If the user is logged in we don't need to proceed
-		if ( $this->session['loggedin'] )
+		if ( $this->session->loggedin() )
 		    $this->redirect('user', 'index');
 
 		$user = new Nickyeoman\helpers\userHelper();
 
-		$this->data['formkey'] = $this->session['formkey'];       // Form cross site protection
+		$this->data['formkey'] = $this->session->getKey('formkey');       // Form cross site protection
 
 		//check Form Was submitted is enabled
 		if ( ! empty( $_POST['formkey'] ) ) {
 
 			//check session matches
-			if ( $_POST['formkey'] == $this->session['formkey'] ) {
+			if ( $_POST['formkey'] == $this->session->getKey('formkey') ) {
 
 				// check email address (and exists in the database)
 				// TODO: if validation key is present
@@ -235,8 +232,8 @@ class userController extends Nickyeoman\Framework\BaseController {
 		}
 
 		//Display view
-		$this->twig('forgot', $this->data);
-		$this->writeSession();
+		$this->twig('user/login', $this->data);
+		$this->session->writeSession();
 	}
 
 	public function reset() {
@@ -274,7 +271,7 @@ class userController extends Nickyeoman\Framework\BaseController {
             bdump($_POST, 'Post Data');
 
             // Check form key matches session
-            if ( $_POST['formkey'] == $this->session['formkey'] ) {
+            if ( $_POST['formkey'] == $this->session->getKey('formkey') ) {
 
                 if ( ! empty( $_POST['resetkey'] ) ) {
 
@@ -311,9 +308,9 @@ class userController extends Nickyeoman\Framework\BaseController {
                         $user->resetUserPassword(); //write to database
 
                         $this->setFlash('notice', "Password Change Successful, please login.");
-                        $this->writeSession();
+                        $this->session->writeSession();
 
-                        $this->redirect($controller = 'user', $action = 'login');  //redirect to login page
+                        $this->redirect('user', 'login');  //redirect to login page
 
                     }
                     // If all was good, data was written to database
@@ -334,8 +331,156 @@ class userController extends Nickyeoman\Framework\BaseController {
 
         }
 
-        $this->twig('reset', $this->data); // display view
+        $this->twig('user/reset', $this->data); // display view
+				$this->session->writeSession();
 
-    } //End Function reset
+    }
+		//End Function reset
+
+	function admin() {
+
+		if ( ! $this->session->loggedin('You need to login to edit users.') )
+      $this->redirect('user', 'login');
+
+    if ( !$this->session->inGroup('admin', 'You need Admin permissions to edit users.') )
+      $this->redirect('user', 'login');
+
+	  //Grab pages
+	  $result = $this->db->findall('users','id,username,email,blocked,admin');
+
+	  if ( !empty( $result ) ) {
+	    foreach ($result as $key => $value){
+	      //$value['tags'] = explode(',',$value['tags']);
+	      $this->data['users'][$key] = $value;
+	    }
+	  }
+
+	  $this->data['page']['slug'] = "user-admin";
+	  $this->twig('user/admin', $this->data);
+		$this->session->writeSession();
+
+	} //end admin
+
+	public function myprofile() {
+		if ( $this->session->loggedin() ) {
+
+			$this->session->addflash("You need to login to edit your profile.",'error');
+	    $this->session->writeSession();
+	    $this->redirect('user', 'login');
+
+		}
+
+		// based on session id
+		$result = $this->db->findone('users', 'id', $this->session->getKey('userid'));
+
+		$this->data['userdata'] = array(
+			'username' => $result['username']
+			,'email' => $result['email']
+			,'created' => $result['created']
+		);
+
+		$this->data['page']['slug'] = "myprofile";
+
+	  $this->twig('user/myprofile', $this->data);
+		$this->session->writeSession();
+	} //end my profile
+
+	public function saveprofile() {
+
+		$userdb = array();
+
+		// form was submitted prepare helper class
+		if ( ! empty( $_POST['formkey'] ) )
+			$user = new Nickyeoman\helpers\userHelper();
+
+		// Change username
+		if ( !empty($this->post['username']) && $this->post['username'] != $this->session->getKey('userid') ) {
+
+			// make sure username is valid (this includes a db check)
+			if ( ! $user->checkUsername() ) {
+
+				//For the view
+				$this->data['error'] .= $user->errors['username'];
+
+			} else {
+
+				$username = strtolower(trim( $this->post['username']));
+				$userdb['id'] = $this->session->getKey('userid');
+				$userdb['username'] = $username;
+				// update session data
+				$this->session->setKey($username);
+
+			}
+
+		} // end username
+
+		// Change Password
+		if ( !empty($this->post['currentpassword']) && !empty($this->post['newpassword']) && !empty($this->post['confirm']) ){
+
+			// check password matches
+			if ( ! $user->checkPassword('newpassword', $this->post['confirmpassword']) ){
+
+					$this->adderror($user->errors['password']);  //TODO: Adderror function
+
+			} else {
+
+				$userdb['password'] = $user->userTraits['password'];
+				$userdb['id'] = $this->session->getKey('userid');
+
+			}
+
+		}
+
+		// update database
+		if ( !empty($userdb) ) {
+
+			$id = $this->db->update("users", $userdb, 'id' );
+
+			// TODO: you need to create the array handler like adderror in the base controller
+			$this->data['notice'] = "Profile Updated";
+
+			$this->writeSession();
+		}
+
+		//dump($this->post);dump($this->session);dump($this->data);dump($userdb);
+		//die();
+		$this->redirect('user', 'myprofile');
+
+
+	} // end save profile
+
+
+	// TODO: Remove after use
+	public function createcomments() {
+		$sql = <<<EOSQL
+		CREATE TABLE `comments` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `pageid` int(11) DEFAULT NULL,
+		  `userid` int(11) DEFAULT NULL,
+		  `body` text DEFAULT NULL,
+		  `date` datetime NOT NULL DEFAULT current_timestamp(),
+		  PRIMARY KEY (`id`)
+		) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+EOSQL;
+		$this->db->query($sql);
+
+	}
+
+	public function dbAlter() {
+		$sql = <<<EOSQL
+		ALTER TABLE `users` CHANGE `admin` `admin` VARCHAR(255) NULL DEFAULT NULL COMMENT 'CSV';
+EOSQL;
+		$this->db->query($sql);
+		die("admin changed");
+	}
+
+
+	public function dbfix() {
+		$sql = <<<EOSQL
+		UPDATE `users` SET `admin` = 'admin' WHERE `users`.`id` = 1;
+EOSQL;
+		$this->db->query($sql);
+		die("admin per fixed");
+	}
 
 } //End Class

@@ -3,5 +3,24 @@
 
 {% block content %}
 <h1>{{ title }}</h1>
-<p>This is where the contact admin goes.</p>
+<table id="contactMessages">
+<tr>
+  <th>view</th>
+  <th>email</th>
+  <th>message</th>
+  <th>created</th>
+  <th>unread</th>
+</tr>
+{% for msg in contactMessages %}
+
+  <tr>
+    <td><a href="/contact/view/{{ msg.id}}">View Message {{ msg.id }}</a></td>
+    <td>{{ msg.email }}</td>
+    <td>{{ msg.message|raw }}</td>
+    <td>{{ msg.created}}</td>
+    <td>{{ msg.unread}}</td>
+  </tr>
+
+{% endfor %}
+</table>
 {% endblock %}

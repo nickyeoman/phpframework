@@ -26,11 +26,7 @@ class userHelper {
   */
   public function __construct() {
 
-    $this->checkSession();
     $this->valid = new \Nickyeoman\Validation\Validate();
-
-    // debugging
-    bdump($this->userTraits, "User Traits.");
 
     //database
     if ( ! empty( $_ENV['DBUSER'] ) )
@@ -38,40 +34,6 @@ class userHelper {
 
   }
   // End Construct
-
-  /*
-  * Set session array if exists
-  */
-  private function checkSession() {
-
-    if ( ! empty( $_SESSION['NY_FRAMEWORK_USER']['email'] ) ) {
-
-      $this->userTraits = $_SESSION['NY_FRAMEWORK_USER'];
-
-    } else {
-
-      $this->userTraits['loggedin'] = false;
-
-    }
-
-  }
-  // End Check Session
-
-  /**
-  * Check if login is set
-  **/
-  public function loggedin() {
-
-    if ( $this->userTraits['loggedin'] ) {
-
-      return true;
-
-    }
-
-    return false;
-
-  }
-  //End loggedin
 
   /**
   * Checks if username is valid based on length
@@ -87,7 +49,7 @@ class userHelper {
     //validate minimum length
     if ( ! $this->valid->minLength( $username, $minlength ) ) {
 
-      $this->errors['username'] = "<div id=\"error-username\">Username must be at least $minlength characters</div>";
+      $this->errors['username'] = "Username must be at least $minlength characters";
       $this->userTraits['username'] = '';
       return false;
 
@@ -98,7 +60,7 @@ class userHelper {
 
     if ( ! empty( $existingUser ) ) {
 
-      $this->errors['username'] = '<div id="error-username">Username is taken.</div>';
+      $this->errors['username'] = 'Username is taken.';
       $this->userTraits['username'] = '';
       return false;
 
@@ -183,7 +145,7 @@ class userHelper {
     }
 
     //Check it matches confirm
-    if ( ! empty($confirm) ) {
+    if ( ! empty($confirm) ) { //TODO: this is not right, confirm should overide and no post.
 
       if ( !empty($_POST[$confirm]) ) {
 
@@ -453,6 +415,7 @@ class userHelper {
 
     }
 
+    // didn't find the username
     if ( empty($userdb) ) {
 
       $this->errors['login'] = 'Username or password invalid';
@@ -462,21 +425,21 @@ class userHelper {
 
     if ( ! empty( $userdb['confirmationToken'] ) && $userdb['confirmationToken'] != "NULL" ) {
 
-      $this->errors['login'] = '<div id="error-email">Please validate your email address</div>';
+      $this->errors['login'] = 'Please validate your email address';
       return false;
 
     }
 
     if ( $userdb['blocked'] == 1 ) {
 
-      $this->errors['login'] = '<div id="error-login">Your account has been blocked</div>';
+      $this->errors['login'] = 'Your account has been blocked';
       return false;
 
     }
 
     if (  empty( $_POST['password'] ) ) {
 
-      $this->errors['login'] = '<div id="error-blank-password">blank password</div>';
+      $this->errors['login'] = 'blank password';
       return false;
 
     }
@@ -491,16 +454,16 @@ class userHelper {
     //Passed all the checks
 
     //set session
-    $_SESSION['NY_FRAMEWORK_USER'] = [
+    $this->userTraits = [
       'id'        => $userdb['id'],
       'username'  => $userdb['username'],
       'email'     => $userdb['email'],
-      'loggedin'  => true,
+      'loggedin'  => 1,
       'admin'     => $userdb['admin']
       ];
 
     $this->userTraits['loggedin'] = true;
     return true;
-  }
+  } // end login
 
 }

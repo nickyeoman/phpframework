@@ -26,5 +26,10 @@
 
   {{ page.body | raw }}
 
+  <div id="comment-area">
+    <h2>Comments</h2>
+    {% include 'page/comment.html.twig' %}
+  </div>
+
 </div>
 {% endblock %}

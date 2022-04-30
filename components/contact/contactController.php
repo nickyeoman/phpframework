@@ -1,7 +1,7 @@
 <?php
    class contactController extends Nickyeoman\Framework\BaseController {
 
-     function index() {
+     public function index() {
 
        $this->data['menuActive'] = 'contact';
        $this->data['showform'] = true;
@@ -44,12 +44,61 @@
 
        } //end if submitted
 
-       $this->twig('contact', $this->data);
-       $this->writeSession();
+       $this->twig('contact/contact', $this->data);
+       $this->session->writeSession();
 
      }
 
-     function admin() {
-       $this->twig('admin', $this->data);
+     public function admin() {
+
+       if ( ! $this->session->loggedin() ) {
+
+         $this->session->addflash("You need to login to edit messages.",'error');
+         $this->writeSession();
+         $this->redirect('user', 'login');
+
+       } elseif ( !$this->session->inGroup('admin') ) {
+
+         $this->session->addflash('You need Admin permissions to edit pages.','error');
+         $this->writeSession();
+         $this->redirect('user', 'login');
+
+       }
+       //Grab pages
+         $result = $this->db->findall('contactForm', 'id,email,message,created,unread');
+
+         $this->data['contactMessages'] = array();
+         foreach ($result as $key => $value){
+           $this->data['contactMessages'][$key] = $value;
+         }
+
+         $this->data['pageid'] = "contact-admin";
+       $this->twig('contact/admin', $this->data);
+     }
+
+     public function view($parms = null) {
+
+       if ( ! $this->session->loggedin() ) {
+
+         $this->session->addflash("You need to login to edit messages.",'error');
+         $this->session->writeSession();
+         $this->redirect('user', 'login');
+
+       } elseif ( !$this->session->inGroup('admin') ) {
+
+         $this->session->addflash("You need to login to edit messages.",'error');
+         $this->writeSession();
+         $this->redirect('user', 'login');
+
+       }
+
+       $pid = $parms[0];
+
+       //Grab pages
+       $this->data['msg'] = $this->db->findone('contactForm', 'id', $pid);
+
+
+         $this->data['pageid'] = "contact-admin-edit";
+       $this->twig('contact/view', $this->data);
      }
    }

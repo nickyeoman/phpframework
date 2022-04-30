@@ -1,31 +1,103 @@
-{% set title = 'Login' %}
+{% set title = 'User Login' %}
 {% extends "layout/master.html.twig" %}
 
 {% block content %}
-<h1>Login</h1>
-<p>Login to your account.</p>
 
-<div class="formContainer">
-  <form action="/user/login" method="post">
-    <input type="hidden" name="formkey" value="{{ formkey }}" />
+{# Tab Container --------------------------------------------------------------- #}
+<div id="tabcontainer">
+  {# Tab Login       ----------------------------------------------------------- #}
+  <input type="radio" id="tablogin" name="tabs" checked="checked">
+  <label for="tablogin" class="tabnav">Login</label>
 
-    <div class="formGroup">
+  <div class="tab" id="tab1">
 
-      <label for="login"><b>Your Username or Email</b></label>
-      <input type="text" placeholder="Enter Username" name="login" value="{{ login }}" required>
+    {# content #}
+    <div class="row" id="draftbox-container">
+      <p>Login to your account.</p>
 
+      <div class="formContainer">
+        <form action="/user/login" method="post">
+          <input type="hidden" name="formkey" value="{{ formkey }}" />
+          <div class="formGroup">
+            <label for="login"><b>Your Username or Email</b></label>
+            <input type="text" placeholder="Enter Username" name="login" value="{{ login }}" required>
+          </div>
+          <div class="formGroup">
+            <label for="password"><b>Password</b></label>
+            <input type="password" placeholder="Enter Password" name="password" required>
+          </div>
+          <div class="formGroup">
+            <button type="submit">Login</button>
+          </div>
+        </form>
+      </div>
     </div>
-    <div class="formGroup">
-      <label for="password"><b>Password</b></label>
-      <input type="password" placeholder="Enter Password" name="password" required>
+  </div>
+
+  {# Tab Forgot ------------------------------------------------------------------- #}
+  <input type="radio" id="tabforgot" name="tabs">
+  <label for="tabforgot" class="tabnav">Forgot Password</label>
+  <div class="tab" id="tabforgot">
+    <div class="formContainer">
+      <form action="/user/forgot" method="post">
+        <input type="hidden" name="formkey" value="{{ formkey }}" />
+
+        <div class="formGroup">
+
+          <label for="login"><b>Enter Your Email</b></label>
+          <input type="text" placeholder="Enter Email Address" name="email" value="{{ post.email }}" required>
+
+        </div>
+
+        <div class="formGroup">
+          <button type="submit">Reset Password</button>
+        </div>
+      </form>
     </div>
-    <div class="formGroup">
-      <button type="submit">Login</button>
+  </div>
+
+  {# Tab Registration ------------------------------------------------------------------- #}
+  <input type="radio" id="tabregistration" name="tabs">
+  <label for="tabregistration" class="tabnav">Register Account</label>
+  <div class="tab" id="tabregistration">
+    <div class="formContainer">
+
+      <form action="/user/registration" method="post">
+        <input type="hidden" name="formkey" value="{{ formkey }}" />
+
+        <div class="formGroup">
+          <label for="email"><b>Your Email</b></label>
+          {% if badEmail is not empty %}
+            <div class="error">{{ badEmail }}</div>
+          {% endif %}
+          <input type="text" placeholder="Enter Email" name="email" value="{{ post.email }}" required>
+        </div>
+
+        <div class="formGroup">
+          <label for="username"><b>Username</b></label>
+          {% if badUsername is not empty %}
+            <div class="error">{{ badUsername }}</div>
+          {% endif %}
+          <input type="text" placeholder="Enter A Username" name="username" value="{{ post.username }}" required>
+        </div>
+
+        <div class="formGroup">
+          <label for="password"><b>Password</b></label>
+          {% if badPassword is not empty %}
+            <div class="error">{{ badPassword }}</div>
+          {% endif %}
+          <input type="password" placeholder="Enter Password" name="password" required>
+
+          <label for="password-confirm"><b>Password Confirm</b></label>
+          <input type="password" placeholder="Confirm Password" name="password-confirm" required>
+        </div>
+
+        <div class="formGroup">
+          <button type="submit">Register My Account</button>
+        </div>
+      </form>
     </div>
-  </form>
-  <div class="user-links">
-    <div><a href="/user/forgot">Did you forget your password?</a></div>
-    <div><a href="/user/registration">Create An Account</a></div>
   </div>
 </div>
+
 {% endblock %}

@@ -1,0 +1,26 @@
+{% if loggedin %}
+<h3>Leave A comment</h3>
+<div class="formContainer" id="commentForm">
+  <form action="/page/createcomment" method="post">
+    <input type="hidden" name="formkey" value="{{ formkey }}" />
+    <input type="hidden" name="slug" value="{{ page.slug }}" />
+    <div class="formGroup">
+      <label for="comment"><b>Your comment</b></label>
+      <textarea name="comment"></textarea>
+    </div>
+    <div class="formGroup">
+      <button type="submit">Leave a comment</button>
+    </div>
+  </form>
+</div>
+{% else %}
+  <p>You need to <a href="/user/login">login</a> to comment.</p>
+{% endif %}
+
+{% for comment in comments %}
+<div class="comment-row">
+  <div class="date">{{comment.date}}</div>
+  <div class="username">{{comment.username}} says:</div>
+  <div class="body">{{comment.body}}</div>
+</div>
+{% endfor %}

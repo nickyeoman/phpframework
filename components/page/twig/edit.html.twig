@@ -1,13 +1,13 @@
 {% set title = 'Edit Page' %}
 {% set wysiwyg = 'show' %}
+{# Thanks to ieatwebsites for the tab css trick https://www.youtube.com/watch?v=oLqdy95LZSw #}
 
 {% extends "layout/master.html.twig" %}
 
 {% block content %}
 <h2>{{ title }}</h2>
-<div class="formContainer">
 
-<a href="/page/admin">Back/cancel</a>
+<div class="formContainer">
 
 {% if mode != 'new' %}
   <form action="/page/edit" method="post">
@@ -17,10 +17,14 @@
 {%endif%}
 
 <input type="hidden" name="formkey" value="{{ formkey }}" />
-<input type="submit" value="Save Page" name="submit" />
 
+<input type="submit" value="Save Page" name="submit" class="button save" />
+<a href="/page/admin" class="button">Back/cancel</a>
+
+{# Title #}
 <div class="row">
   <label for="title">Title</label>
+  <p>The Title of the page (if heading isn't set).  This appears in the browser tab.</p>
   {% if mode != 'new' %}
     <input type="text"   name="title"   value="{{ info.title}}"  placeholder="Title" required>
   {% else %}
@@ -28,108 +32,178 @@
   {%endif%}
 </div>
 
-<div class="row">
-  <label for="slug">slug</label>
-  {% if mode != 'new' %}
-    <input type="text"   name="slug"    value="{{ info.slug}}"   placeholder="slug"  required>
-  {% else %}
-    <input type="text"   name="slug"    value=""   placeholder="{{ info.slug}}"  required>
-  {%endif%}
+{# Tab Container --------------------------------------------------------------- #}
+<div id="tabcontainer">
+
+  {# Tab Body & Draft----------------------------------------------------------- #}
+  <input type="radio" id="tabhome" name="tabs" checked="checked">
+  <label for="tabhome" class="tabnav">Body Content</label>
+
+  <div class="tab" id="tab1">
+
+    {# Draft binary #}
+    <div class="row" id="draftbox-container">
+      <h2>Draft</h2>
+      <p>If checked, draft it won't show up on the public side (red).</p>
+      {% if mode != 'new' %}
+        <div class="button"><input type="checkbox" id="draftbox" name="draft" {% if info.draft %}checked{% endif %} /><label for="draftbox">is draft</label></div>
+      {% else %}
+        <div class="button"><input type="checkbox" id="draftbox" name="draft" /><label for="draftbox">is draft</label></div>
+      {% endif %}
+    </div>
+
+    {# Main Body Content #}
+    <div class="row">
+      <label for="body">Body</label>
+      {% if mode != 'new' %}
+        <textarea id="tinymce" name="body" rows="4" cols="50" placeholder="Enter your page content here.">{{ info.body }}</textarea>
+      {% else %}
+        <textarea id="tinymce" name="body" rows="4" cols="50" placeholder="{{ info.body }}"></textarea>
+      {%endif%}
+    </div>
+
+  </div>
+
+  {# Tab CMS ------------------------------------------------------------------- #}
+  <input type="radio" id="tabcms" name="tabs">
+  <label for="tabcms" class="tabnav">CMS</label>
+  <div class="tab" id="tabcmscontent">
+
+    {# slug #}
+    <div class="row">
+      <label for="slug">Slug</label>
+      <p>Slug is the unique key for this page, which will translate to /pages/slug</p>
+      {% if mode != 'new' %}
+        <input type="text"   name="slug"    value="{{ info.slug}}"   placeholder="slug"  required>
+      {% else %}
+        <input type="text"   name="slug"    value=""   placeholder="{{ info.slug}}"  required>
+      {%endif%}
+    </div>
+
+    {# Tags #}
+    <div class="row">
+      <label for="tags">Tags</label>
+      <p>How the articles are grouped by tag.  Comma separated.</p>
+      {% if mode != 'new' %}
+        <input type="text"   name="tags"    value="{{ info.tags}}"   placeholder="tags"  required>
+      {% else %}
+        <input type="text"   name="tags"    value=""   placeholder="{{ info.tags}}"  required>
+      {%endif%}
+    </div>
+
+    {# Heading #}
+    <div class="row">
+      <label for="heading">Heading</label>
+      <p>Heading is the h1 of the page, it's not the title</p>
+      {% if mode != 'new' %}
+        <input type="text"   name="heading"   value="{{ info.heading}}"  placeholder="Heading" required>
+      {% else %}
+        <input type="text"   name="heading"   value=""  placeholder="{{ info.heading }}" required>
+      {%endif%}
+
+    </div>
+
+    {# Intro #}
+    <div class="row">
+      <label for="intro">Intro</label>
+      <p>The intro is what shows up on the blog preview page.</p>
+      {% if mode != 'new' %}
+        <textarea name="intro" rows="4" cols="50" placeholder="Enter your page content here.">{{ info.intro }}</textarea>
+      {% else %}
+        <textarea name="intro" rows="4" cols="50" placeholder="{{ info.intro }}"></textarea>
+      {%endif%}
+    </div>
+
+  </div>
+
+  {# Tab SEO ------------------------------------------------------------------- #}
+  <input type="radio" id="tabseo" name="tabs">
+  <label for="tabseo" class="tabnav">SEO</label>
+
+  <div class="tab" id="tabseocontent">
+
+    <h2>SEO Page Metadata</h2>
+    <p>The metadata content in the source of the page.</p>
+
+    {# Author #}
+    <div class="row">
+      <label for="author">Author</label>
+      <p>The author is shown in the metadata and on the page.</p>
+      {% if mode != 'new' %}
+        <input type="text"   name="author"    value="{{ info.author }}"   placeholder="author"  required>
+      {% else %}
+        <input type="text"   name="author"    value=""   placeholder="{{ info.author }}"  required>
+      {%endif%}
+    </div>
+
+    {# Description #}
+    <div class="row">
+      <label for="description">Description</label>
+      {% if mode != 'new' %}
+        <input type="text"   name="description"    value="{{ info.description }}"   placeholder="description"  required>
+      {% else %}
+        <input type="text"   name="description"    value=""   placeholder="{{ info.description }}"  required>
+      {%endif%}
+    </div>
+
+    {# Keywords #}
+    <div class="row">
+      <label for="keywords">Keywords</label>
+      {% if mode != 'new' %}
+        <input type="text"   name="keywords"    value="{{ info.keywords }}"   placeholder="keywords"  required>
+      {% else %}
+        <input type="text"   name="keywords"    value=""   placeholder="{{ info.keywords }}"  required>
+      {%endif%}
+    </div>
+
+  </div>
+
+  {# Tab notes ------------------------------------------------------------------- #}
+  <input type="radio" id="tabnotes" name="tabs">
+  <label for="tabnotes" class="tabnav">Notes</label>
+
+  <div class="tab" id="tabnotescontent">
+
+    {# notes #}
+    <div class="row">
+      <label for="notes">Notes</label>
+      <p>Notes are only used on this page, they do not appear anywhere on the site.</p>
+      {% if mode != 'new' %}
+        <textarea name="notes" rows="4" cols="50" placeholder="Enter your page notes here.">{{ info.notes }}</textarea>
+      {% else %}
+        <textarea name="notes" rows="4" cols="50" placeholder="{{ info.notes }}"></textarea>
+      {%endif%}
+    </div>
+
+  </div>
+
+  {# Tab sitemap ------------------------------------------------------------------- #}
+  <input type="radio" id="tabsitemap" name="tabs">
+  <label for="tabsitemap" class="tabnav">Site Map</label>
+
+  <div class="tab" id="tabsitemapcontent">
+
+    <h2>Site Map Settings</h2>
+
+    {# Sitemap #}
+    <div class="row">
+      <label for="path">Path (include pre and post slashes)</label>
+      <p>If you want to add a dynamic page to the sitemap.</p>
+      {% if mode != 'new' %}
+        <input type="text"   name="path"    value="{{ info.path}}"   placeholder="path">
+      {% else %}
+        <input type="text"   name="path"    value=""   placeholder="{{ info.path}}">
+      {%endif%}
+    </div>
+
+  </div>
+
+
 </div>
 
-<div class="row">
-  <label for="tags">tags</label>
-  {% if mode != 'new' %}
-    <input type="text"   name="tags"    value="{{ info.tags}}"   placeholder="tags"  required>
-  {% else %}
-    <input type="text"   name="tags"    value=""   placeholder="{{ info.tags}}"  required>
-  {%endif%}
-</div>
-
-<div class="row">
-  <label for="intro">Intro</label>
-  {% if mode != 'new' %}
-    <textarea name="intro" rows="4" cols="50" placeholder="Enter your page content here.">{{ info.intro }}</textarea>
-  {% else %}
-    <textarea name="intro" rows="4" cols="50" placeholder="{{ info.intro }}"></textarea>
-  {%endif%}
-</div>
-
-<div class="row">
-  <label for="body">Body</label>
-  {% if mode != 'new' %}
-    <textarea id="tinymce" name="body" rows="4" cols="50" placeholder="Enter your page content here.">{{ info.body }}</textarea>
-  {% else %}
-    <textarea id="tinymce" name="body" rows="4" cols="50" placeholder="{{ info.body }}"></textarea>
-  {%endif%}
-</div>
-
-<div class="row">
-  <label for="heading">Heading</label>
-  {% if mode != 'new' %}
-    <input type="text"   name="heading"   value="{{ info.heading}}"  placeholder="Heading" required>
-  {% else %}
-    <input type="text"   name="heading"   value=""  placeholder="{{ info.heading }}" required>
-  {%endif%}
-</div>
-
-<div class="row">
-  <label for="description">description</label>
-  {% if mode != 'new' %}
-    <input type="text"   name="description"    value="{{ info.description }}"   placeholder="description"  required>
-  {% else %}
-    <input type="text"   name="description"    value=""   placeholder="{{ info.description }}"  required>
-  {%endif%}
-</div>
-
-<div class="row">
-  <label for="keywords">keywords</label>
-  {% if mode != 'new' %}
-    <input type="text"   name="keywords"    value="{{ info.keywords }}"   placeholder="keywords"  required>
-  {% else %}
-    <input type="text"   name="keywords"    value=""   placeholder="{{ info.keywords }}"  required>
-  {%endif%}
-</div>
-
-<div class="row">
-  <label for="author">author</label>
-  {% if mode != 'new' %}
-    <input type="text"   name="author"    value="{{ info.author }}"   placeholder="author"  required>
-  {% else %}
-    <input type="text"   name="author"    value=""   placeholder="{{ info.author }}"  required>
-  {%endif%}
-</div>
-
-<div class="row">
-  <label for="path">Path (include pre and post slashes)</label>
-  {% if mode != 'new' %}
-    <input type="text"   name="path"    value="{{ info.path}}"   placeholder="path">
-  {% else %}
-    <input type="text"   name="path"    value=""   placeholder="{{ info.path}}">
-  {%endif%}
-</div>
-
-<div class="row">
-  <label for="notes">Notes</label>
-  {% if mode != 'new' %}
-    <textarea name="notes" rows="4" cols="50" placeholder="Enter your page notes here.">{{ info.notes }}</textarea>
-  {% else %}
-    <textarea name="notes" rows="4" cols="50" placeholder="{{ info.notes }}"></textarea>
-  {%endif%}
-</div>
-
-<div class="row">
-  <label for="draft">draft</label>
-  {% if mode != 'new' %}
-    <input type="checkbox"   name="draft" {% if info.draft %}checked{% endif %} />
-  {% else %}
-    <input type="checkbox"   name="draft" />
-  {%endif%}
-</div>
-
-<input type="submit" value="Save Page" name="submit" />
+<input type="submit" value="Save Page" name="submit" class="button save" />
 
 </form>
 
-</div>
+</div>{# End div.formContainer #}
 {% endblock %}

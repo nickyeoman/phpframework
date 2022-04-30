@@ -1,0 +1,16 @@
+{% set title = 'Contact Admin' %}
+{% extends "layout/master.html.twig" %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+<a href="/contact/admin">back to admin</a>
+<pre>
+Message id: {{ msg.id }}
+Email: {{ msg.email }}
+Message: {{ msg.message|raw }}
+Created: {{ msg.created}}
+Read: {{ msg.unread}}
+</pre>
+
+{% endblock %}

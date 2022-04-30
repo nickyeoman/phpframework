@@ -1,0 +1,26 @@
+{% set title = 'Edit Comments' %}
+
+{% extends "layout/master.html.twig" %}
+
+{% block content %}
+
+<h1>Comments</h1>
+<table>
+  <tr>
+    <th>id</th>
+    <th>username</th>
+    <th>date</th>
+    <th>body</th>
+    <th>delte</th>
+  </tr>
+  {% for comment in comments %}
+    <tr>
+      <td>{{comment.id}}</td>
+      <td>{{comment.username}}</td>
+      <td>{{comment.date}}</td>
+      <td>{{comment.body}}</td>
+      <td><a href="/page/admincomment/delete/{{comment.id}}">delete {{comment.id}}</a></td>
+    </tr>
+  {% endfor %}
+</table>
+{% endblock %}
