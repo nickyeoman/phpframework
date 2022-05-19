@@ -15,7 +15,7 @@ class logsController extends Nickyeoman\Framework\BaseController {
     //$result = $this->db->findall('logs', 'id,ip,url,time');
     // do the search
 $sql = <<<EOSQL
-SELECT id,ip,url,time, count(url) as num FROM `logs` WHERE num > 1 GROUP BY url ORDER BY num DESC
+SELECT id,ip,url,time, count(url) as num FROM `logs` GROUP BY url HAVING count(url) > 1 ORDER BY num DESC
 EOSQL;
 
    $result = $this->db->query($sql);
