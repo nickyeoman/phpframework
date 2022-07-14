@@ -3,7 +3,7 @@ namespace Nickyeoman\Framework;
 session_start();
 /**
 * Session Class
-* v1.1
+* v1.2
 **/
 
 class SessionManager {
@@ -26,18 +26,24 @@ class SessionManager {
     $this->session['page'] = strtok($_SERVER['REQUEST_URI'], '?');
 
   }
+  // end construct
 
   public function newSession() {
 
     // Empty session, create a new one
-    $this->session['sessionid'] = session_id();
-    $this->session['formkey']   = md5( session_id() . date("ymdhis") ); //xss
-    $this->session['loggedin']  = false;
-    $this->session['usrgrps'] = array();
-    $this->session['flash'] = array();
-    $this->session['page'] = strtok($_SERVER['REQUEST_URI'], '?');
-    $this->session['pageid'] = null; //this is the last pageid set, if you visit other pages that don't have an id, the one with an id will remain
+    $this->session = array(
+      'sessionid' => session_id()
+      ,'formkey'  => md5( session_id() . date("ymdhis") ) //xss
+      ,'loggedin' => false
+      ,'usrgrps'  => array()
+      ,'flash'    => array()
+      ,'page'     => strtok($_SERVER['REQUEST_URI'], '?')
+      ,'pageid'   => null; //this is the last pageid set, if you visit other pages that don't have an id, the one with an id will remain
+    );
+
     $this->writeSession();
+
+    //debug
     bdump($this->session, "New Session");
 
   }
@@ -49,6 +55,9 @@ class SessionManager {
 
   }
 
+  /**
+  * Currently we can only flash error messages
+  **/
   public function inGroup($group = '', $msg = '', $writeS = false) {
 
     $adminGroups = array();
@@ -61,7 +70,9 @@ class SessionManager {
       $adminGroups = explode(',',$this->session['admin']);
 
     if ( is_int(array_search($group, $adminGroups, true ) ) ) {
+
       return true;
+
     } else {
 
       if ( ! empty($msg) )
@@ -71,8 +82,12 @@ class SessionManager {
         $this->writeSession();
 
       return false;
+
     }
+    //end if
+
   }
+  //end function inGroup
 
   // Write the current session array to PHP session
   public function writeSession() {
@@ -145,22 +160,27 @@ class SessionManager {
 
   }
 
-  public function dump() {
+  public function dump($title = "session dump requested") {
 
-    bdump($this->session);
+    bdump($this->session, $title);
 
   }
 
   public function loggedin($flashmsg = '', $writeS = false) {
 
     if ( $this->session['loggedin'] ) {
+
       return true;
+
     } else {
+
       $this->addflash($flashmsg, 'error');
+
       if ($writeS)
         $this->writeSession();
 
       return false;
+
     }
 
   }

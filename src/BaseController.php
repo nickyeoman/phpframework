@@ -3,7 +3,6 @@ namespace Nickyeoman\Framework;
 USE \Nickyeoman\Dbhelper;
 USE Nickyeoman\Framework\SessionManager as Session;
 
-
 // load helpers
 $loader = new \Nette\Loaders\RobotLoader; // https://doc.nette.org/en/3.1/robotloader
 $loader->addDirectory( $_ENV['realpath'] . "/" . $_ENV['HELPERPATH'] ); //helpers
@@ -120,7 +119,7 @@ class BaseController {
   public function twig($viewname = 'index', $vars = array() ) {
 
       //TWIG
-      $loader     = new \Twig\Loader\FilesystemLoader($_ENV['realpath'] . '/' . $_ENV['VIEWPATH']);
+      $loader = new \Twig\Loader\FilesystemLoader($_ENV['realpath'] . '/' . $_ENV['VIEWPATH']);
 
       //load component view
       if ( str_contains($_ENV['CONTROLLERPATH'], 'vendor') ) {
