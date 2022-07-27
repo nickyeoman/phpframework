@@ -43,6 +43,15 @@ If left blank? (how do we allow for anything?)
 
 LOADERTMPDIR="tmp"
 
+## LOGGING
+
+tells the cms where to log.
+mysql is currently the only option
+
+## USECMS
+
+The framework has a build in CMS.
+
 
 # Docker
 USEDOCKER="docker"
