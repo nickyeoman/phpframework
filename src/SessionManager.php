@@ -38,7 +38,7 @@ class SessionManager {
       ,'usrgrps'  => array()
       ,'flash'    => array()
       ,'page'     => strtok($_SERVER['REQUEST_URI'], '?')
-      ,'pageid'   => null; //this is the last pageid set, if you visit other pages that don't have an id, the one with an id will remain
+      ,'pageid'   => null //this is the last pageid set, if you visit other pages that don't have an id, the one with an id will remain
     );
 
     $this->writeSession();

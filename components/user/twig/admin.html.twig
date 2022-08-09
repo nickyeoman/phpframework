@@ -7,19 +7,30 @@
 
 <table id="users-list">
   <tr>
-    <th>id</th>
-    <th>username</th>
-    <th>email</th>
-    <th>blocked</th>
-    <th>admin</th>
+    <th>Username</th>
+    <th>Email</th>
+    <th>Block</th>
+    <th>Remove</th>
   </tr>
   {% for user in users %}
     <tr>
-      <td>{{ user.id }}</td>
-      <td>{{ user.username }}</td>
-      <td>{{ user.email }}</td>
-      <td>{{ user.blocked }}</td>
-      <td>{{ user.admin }}</td>
+      <td>
+        {{ user.username }}
+        {% if user.admin != 0 %}
+          ( <span class="usr-grp">{{ user.admin }}</span> )
+        {% endif %}
+      </td>
+      <td><a href="mailto:{{ user.email }}">{{ user.email }}</a></td>
+      <td>
+        {% if user.blocked == 0 %}
+          <a href="/user/block/{{ user.id }}">block user</a>
+        {% else %}
+          <a href="/user/block/{{ user.id }}">unblock user</a>
+        {% endif %}
+      </td>
+      <td>
+        <a href="/user/delete/{{ user.id }}">Delete {{ user.username }}</a>
+      </td>
     </tr>
   {% endfor %}
 </table>

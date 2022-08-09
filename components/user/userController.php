@@ -351,7 +351,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 		if ( !empty( $result ) ) {
 
 	    	foreach ($result as $key => $value){
-	      	
+
 				//$value['tags'] = explode(',',$value['tags']);
 	      		$this->data['users'][$key] = $value;
 
@@ -381,12 +381,12 @@ class userController extends Nickyeoman\Framework\BaseController {
 			$this->redirect('user', 'admin');
 
 		}
-		
+
 		// Check user exists
 		$result = $this->db->findone('users','id',$userid);
 
 		if ( empty($result ) ) {
-			
+
 			$this->session->addFlash('error', "User does not exist");
 			$this->redirect('user', 'admin');
 
@@ -406,9 +406,45 @@ class userController extends Nickyeoman\Framework\BaseController {
 				'blocked' => $blocked
 				,'id' => $result['id']
 			);
-			
+
 			$this->db->update('users',$update,'id');
-			
+
+			$this->redirect('user', 'admin');
+		}
+
+	} // end block user
+
+	public function delete($params) {
+
+		if ( ! $this->session->loggedin('You need to login to edit users.') )
+      		$this->redirect('user', 'login');
+
+    	if ( !$this->session->inGroup('admin', 'You need Admin permissions to edit users.') )
+      		$this->redirect('user', 'login');
+
+		if ( !empty($params))
+			$userid = $params[0];
+
+		if ( empty($userid) || !is_numeric($userid) ) {
+
+			$this->session->addFlash("User id not correct", 'error');
+			$this->redirect('user', 'admin');
+
+		}
+
+		// Check user exists
+		$result = $this->db->findone('users','id',$userid);
+
+		if ( empty($result ) ) {
+
+			$this->session->addFlash("User does not exist", 'error');
+			$this->redirect('user', 'admin');
+
+		} else {
+
+			$this->db->delete('users',"id = $userid");
+			$this->session->addFlash('Notice: user removed (deleted)', "notice");
+
 			$this->redirect('user', 'admin');
 		}
 
