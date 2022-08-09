@@ -28,6 +28,12 @@ class contactHelper {
       if ( empty( $message ) )
         $this->error[] = "Message can't be blank.";
 
+      if ( $valid->checkSpam($message, $_ENV['SPAMWORDS'] ) )
+        $this->error[] = "Contains spammy words.";
+
+      if ( !empty($badwords) )
+        $this->session->addflash("You can't use these words: $badwords",'error');
+
       // debug
       bdump($post, "Modified Post in Helper");
       bdump($this->error, "Error Array in helper");

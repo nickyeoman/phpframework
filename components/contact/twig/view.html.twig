@@ -1,16 +1,33 @@
-{% set title = 'Contact Admin' %}
+{% set title = 'View Message' %}
 {% extends "layout/master.html.twig" %}
 
 {% block content %}
 <h1>{{ title }}</h1>
 
-<a href="/contact/admin">back to admin</a>
-<pre>
-Message id: {{ msg.id }}
-Email: {{ msg.email }}
-Message: {{ msg.message|raw }}
-Created: {{ msg.created}}
-Read: {{ msg.unread}}
-</pre>
+<div id="tools">
+    <a href="/contact/admin" class="btn">back to admin</a>
+    <a href="/contact/delete/{{ msg.id }}" class="btn">Delete this message</a>
+    {% if msg.unread == 0 %}
+        <a href="#" class="btn">Mark as unread</a>
+    {% else %}
+        <a href="#" class="btn">Mark as read</a>
+    {% endif %}
+    <form action="/contact/bademail" method="post">
+      <input type="hidden" name="formkey" value="{{ formkey }}" />
+      <input type="hidden" name="email" value="{{ msg.email }}" />
+      <input type="hidden" name="message" value="{{ msg.id }}" />
+      <input type="submit" value="Report Email {{ msg.email }} and delete message" name="submit" />
+    </form>
+</div>
+
+<div id="theMessage">
+    <div id="fromEmail">
+        From: <span id="address">{{ msg.email }} </span>
+    </div>
+    <div id="sentDate">
+        Sent: <span id="sentat">{{ msg.created }} </span>
+    </div>
+    <div id="messageContent">{{ msg.message|raw }}</div>
+</div>
 
 {% endblock %}

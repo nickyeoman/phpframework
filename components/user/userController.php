@@ -178,7 +178,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 
 	public function logout() {
 
-		//TODO: Logout message
+		$this->setFlash('notice', "You have been logged out.");
 		$this->session->destroySession();
 		$this->redirect('index', 'index');
 
@@ -448,7 +448,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 			$this->redirect('user', 'admin');
 		}
 
-	} // end block user
+	} // end delete user
 
 	public function myprofile() {
 		if ( $this->session->loggedin() ) {
