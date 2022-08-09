@@ -71,7 +71,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 	/**
 	* /user/registration
 	**/
-	public function registration(){
+	public function registration() {
 
     // If the user is logged in we don't need to proceed
 		if ( $this->session->loggedin() )
@@ -332,41 +332,94 @@ class userController extends Nickyeoman\Framework\BaseController {
         }
 
         $this->twig('reset', $this->data); // display view
-				$this->session->writeSession();
 
     }
 		//End Function reset
 
-	function admin() {
+	// Manage your users
+	public function admin() {
 
 		if ( ! $this->session->loggedin('You need to login to edit users.') )
-      $this->redirect('user', 'login');
+      		$this->redirect('user', 'login');
 
-    if ( !$this->session->inGroup('admin', 'You need Admin permissions to edit users.') )
-      $this->redirect('user', 'login');
+    	if ( !$this->session->inGroup('admin', 'You need Admin permissions to edit users.') )
+      		$this->redirect('user', 'login');
 
-	  //Grab pages
-	  $result = $this->db->findall('users','id,username,email,blocked,admin');
+		//Grab pages
+		$result = $this->db->findall('users','id,username,email,blocked,admin');
 
-	  if ( !empty( $result ) ) {
-	    foreach ($result as $key => $value){
-	      //$value['tags'] = explode(',',$value['tags']);
-	      $this->data['users'][$key] = $value;
-	    }
-	  }
+		if ( !empty( $result ) ) {
 
-	  $this->data['page']['slug'] = "user-admin";
-	  $this->twig('admin', $this->data);
-		$this->session->writeSession();
+	    	foreach ($result as $key => $value){
+	      	
+				//$value['tags'] = explode(',',$value['tags']);
+	      		$this->data['users'][$key] = $value;
+
+	    	} //endforeach
+
+	  	} //endif
+
+		$this->data['page']['slug'] = "user-admin"; // instead of "admin" (for css pageid)
+		$this->twig('admin', $this->data);
 
 	} //end admin
+
+	public function block($params) {
+
+		if ( ! $this->session->loggedin('You need to login to edit users.') )
+      		$this->redirect('user', 'login');
+
+    	if ( !$this->session->inGroup('admin', 'You need Admin permissions to edit users.') )
+      		$this->redirect('user', 'login');
+
+		if ( !empty($params))
+			$userid = $params[0];
+
+		if ( empty($userid) || !is_numeric($userid) ) {
+
+			$this->session->addFlash('error', "User id not correct");
+			$this->redirect('user', 'admin');
+
+		}
+		
+		// Check user exists
+		$result = $this->db->findone('users','id',$userid);
+
+		if ( empty($result ) ) {
+			
+			$this->session->addFlash('error', "User does not exist");
+			$this->redirect('user', 'admin');
+
+		} else {
+
+			if ( $result['blocked'] ) {
+				//unblock
+				$this->session->addFlash('notice: user Unblocked', "blockuser");
+				$blocked = 0;
+			} else {
+				//block
+				$this->session->addFlash('notice: user blocked', "blockuser");
+				$blocked = 1;
+			}
+
+			$update = array(
+				'blocked' => $blocked
+				,'id' => $result['id']
+			);
+			
+			$this->db->update('users',$update,'id');
+			
+			$this->redirect('user', 'admin');
+		}
+
+	} // end block user
 
 	public function myprofile() {
 		if ( $this->session->loggedin() ) {
 
 			$this->session->addflash("You need to login to edit your profile.",'error');
-	    $this->session->writeSession();
-	    $this->redirect('user', 'login');
+	    	$this->session->writeSession();
+	    	$this->redirect('user', 'login');
 
 		}
 
@@ -448,5 +501,98 @@ class userController extends Nickyeoman\Framework\BaseController {
 
 
 	} // end save profile
+
+	public function migrate() {
+
+		if ( ! $this->session->loggedin('You need to login to edit users.') )
+      		$this->redirect('user', 'login');
+
+    	if ( !$this->session->inGroup('admin', 'You need Admin permissions to edit users.') )
+      		$this->redirect('user', 'login');
+
+		$schem = array(
+			array(
+				'name' => 'username'
+				,'type' => 'varchar'
+				,'size' => '30'
+				,'null' => 'No'
+			)
+			,array(
+				'name' => 'password'
+				,'type' => 'varchar'
+				,'size' => '70'
+				,'null' => 'No'
+			)
+			,array(
+				'name' => 'email'
+				,'type' => 'varchar'
+				,'size' => '255'
+				,'null' => 'No'
+			)
+			,array(
+				'name' => 'validate'
+				,'type' => 'varchar'
+				,'size' => '32'
+				,'null' => 'Yes'
+				,'default' => 'NULL'
+			)
+			,array(
+				'name' => 'confirmationToken'
+				,'type' => 'varchar'
+				,'size' => '255'
+				,'null' => 'Yes'
+				,'default' => 'NULL'
+			)
+			,array(
+				'name' => 'reset'
+				,'type' => 'varchar'
+				,'size' => '32'
+				,'null' => 'Yes'
+				,'default' => 'NULL'
+			)
+			,array(
+				'name' => 'birthdate'
+				,'type' => 'DATETIME'
+				,'null' => 'No'
+				,'default' => 'CURRENT_TIMESTAMP'
+			)
+			,array(
+				'name' => 'created'
+				,'type' => 'DATETIME'
+				,'null' => 'No'
+				,'default' => 'CURRENT_TIMESTAMP'
+			)
+			,array(
+				'name' => 'updated'
+				,'type' => 'DATETIME'
+				,'null' => 'Yes'
+				,'default' => 'CURRENT_TIMESTAMP'
+			)
+			,array(
+				'name' => 'confirmed'
+				,'type' => 'tinyint'
+				,'size' => '1'
+				,'null' => 'No'
+				,'default' => '0'
+			)
+			,array(
+				'name' => 'blocked'
+				,'type' => 'tinyint'
+				,'size' => '1'
+				,'null' => 'No'
+				,'default' => '0'
+			)
+			,array(
+				'name' => 'admin'
+				,'type' => 'varchar'
+				,'size' => '255'
+				,'null' => 'Yes'
+				,'default' => 'NULL'
+				,'comment' => 'CSV'
+			)
+		);
+		$this->db->migrate('user',$schem);
+		echo '<p><a href="/user/admin">back to admin</a></p>';
+	}
 
 } //End Class
