@@ -1,4 +1,5 @@
 #!/bin/bash
+# TODO: https://getcomposer.org/doc/articles/vendor-binaries.md
 
 ## Check sudo
 #check if root

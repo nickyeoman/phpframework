@@ -7,53 +7,66 @@ You can always search the code to find where these variables are used:
 grep -iIrn "DOTENVNAME" *
 ```
 
-Details per variable:
+## Global Variables
+### DEBUG
 
-## DEBUG
-DEFAULT: DEBUG="production" (not active)
-DEBUG="display" activates the [Tracy debugger](https://tracy.nette.org/en/).
-Set to "display" to show.
-Default is removed and hidden,  you may also set any string other than "display" to hide.
+*DEFAULT:* DEBUG="production" (not active)
 
-## CONTROLLERPATH
+Default means all debug data is not displayed. 
+
+*display:* DEBUG="display" activates the [Tracy debugger](https://tracy.nette.org/en/).
+
+### CONTROLLERPATH
+
 DEFAULT: CONTROLLERPATH="controllers"
-The default directory to look for app controllers.
-relative from the root of the project directory (where the dotenv file is located).
-do not add pre or post slashes.
 
-## VIEWPATH
+This is the default directory to look for app controllers.
+
+The path is relative from the root of the project directory (The root directory is where the dotenv file is located).
+
+Do not add pre or post slashes.
+
+### VIEWPATH
+
 DEFAULT: VIEWPATH="views"
+
 Same as CONTROLLERPATH but for views.
 define the path from the root directory of the project.
 do not add pre or post slashes.
 
-## TWIGCACHE
+### TWIGCACHE
+
 DEFAULT: TWIGCACHE="tmp"
 The path twig uses to cache.
 From the root project directory.
 do not add pre or post slashes.
 
-## SALT
+### LOADERTMPDIR
+
+This is the tmp directory.
+LOADERTMPDIR="tmp"
+
+### SALT
+
 I generate my SALT with pwgen -cnsB1v 32
 
-## BASEURL
+### BASEURL
 Requires last slash.
 If left blank? (how do we allow for anything?)
 ---
 
-LOADERTMPDIR="tmp"
+### LOGGING
 
-## LOGGING
-
+DEFAULT=off
 tells the cms where to log.
 mysql is currently the only option
 
-## USECMS
+### USECMS
 
 The framework has a build in CMS.
 
+## Docker
 
-# Docker
 USEDOCKER="docker"
 DOCKERVOL="local"
 DOCKERNAME="YOURNAME"
@@ -62,8 +75,9 @@ DOCKERVER="latest"
 DOCKERPORT="8000"
 DOCKERNET="DOCKER_NETWORK_NAME_FOR_PROXY"
 DOCKERDB="none"
+DOCKERPHPMYADMIN=8002
 
-# Database
+## Database
 DBHOST="127.0.0.1"
 DBPORT="3301"
 DBUSER=""
@@ -72,7 +86,7 @@ DB=""
 
 If you are not using a database, make sure that the DBUSER is null or empty.
 
-# Email
+## SMTP
 MAIL_MAILER="smtp"
 MAIL_HOST=""
 MAIL_PORT="587"
@@ -82,7 +96,11 @@ MAIL_ENCRYPTION="tls"
 MAIL_FROM_ADDRESS=""
 MAIL_FROM_NAME=""
 
+## IMAP
+IMAP_SERVER=imap.gmail.com:993/imap/ssl}INBOX
+IMAP_USER=example@gmail.com
+IMAP_PASSWORD=examplePasswordToAccount
 
-### ENV Variables
+# Debugging dotenv
 
-ENV Variables: https://github.com/vlucas/phpdotenv
+Framework environment variables are pulled in using [phpdotenv]( https://github.com/vlucas/phpdotenv)

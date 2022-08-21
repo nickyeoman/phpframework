@@ -18,7 +18,7 @@ The default template already looks for main.css
 
 Then you can modify your project as you normally would for sass.
 
-[Lear more about nickyeoman/sassLibrary](https://github.com/nickyeoman/sassLibrary)
+[Learn more about nickyeoman/sassLibrary](https://github.com/nickyeoman/sassLibrary)
 
 ### Development SASS
 
