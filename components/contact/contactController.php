@@ -3,8 +3,7 @@ class contactController extends Nickyeoman\Framework\BaseController {
 
   /**
    * Public Contact Us form
-   *
-   */
+   **/
   public function index() {
 
     // set variables
@@ -17,6 +16,8 @@ class contactController extends Nickyeoman\Framework\BaseController {
 
     if ( $this->post['submitted'] ) {
 
+      // sendEmail clarifies if we are going to save to the db and send and email
+      // false will stop the process and reshow the page
       $sendEmail = true;
 
       // Check Spam words
@@ -70,29 +71,28 @@ class contactController extends Nickyeoman\Framework\BaseController {
 
   public function admin() {
 
-    if ( ! $this->session->loggedin() ) {
+    if ( ! $this->session->loggedin('You need to login to edit messages.') )
+   		$this->redirect('user', 'login');
 
-      $this->session->addflash("You need to login to edit messages.",'error');
-      $this->writeSession();
+    if ( !$this->session->inGroup('admin', 'You need to be an admin to view messages..') )
       $this->redirect('user', 'login');
 
-    } elseif ( !$this->session->inGroup('admin') ) {
+    //Variables
+    $this->data['pageid'] = "contact-admin";
+    $this->data['contactMessages'] = array();
 
-      $this->session->addflash('You need Admin permissions to edit pages.','error');
-      $this->writeSession();
-      $this->redirect('user', 'login');
-
-    }
-    //Grab pages
-      $result = $this->db->findall('contactForm', 'id,email,message,created,unread');
-
-      $this->data['contactMessages'] = array();
+    //Grab pages from db
+    $result = $this->db->findall('contactForm', 'id,email,message,created,unread');
+    
+    //Set if not null
+    if ( is_null($result) ) {
       foreach ($result as $key => $value){
         $this->data['contactMessages'][$key] = $value;
       }
-
-      $this->data['pageid'] = "contact-admin";
+    }
+    
     $this->twig('admin', $this->data);
+
   }
 
   public function view($parms = null) {
@@ -121,6 +121,9 @@ class contactController extends Nickyeoman\Framework\BaseController {
 
   } // end view page
 
+  /**
+   * Deletes a message /contact/delete/[msgid]
+   */
   public function delete($params) {
 
 		if ( ! $this->session->loggedin('You need to login to delete messages.') )
@@ -139,7 +142,7 @@ class contactController extends Nickyeoman\Framework\BaseController {
 
 		}
 
-		// Check user exists
+		// Check message exists
 		$result = $this->db->findone('contactForm','id',$msgid);
 
 		if ( empty($result ) ) {
@@ -155,7 +158,7 @@ class contactController extends Nickyeoman\Framework\BaseController {
 			$this->redirect('contact', 'admin');
 		}
 
-	} // end delete user
+	} // end delete msg
 
   public function bademail($params) {
 
@@ -182,6 +185,9 @@ class contactController extends Nickyeoman\Framework\BaseController {
 
   }
 
+  /**
+   * Make sure your db is the way you want it
+   */
   public function migrate() {
 
 		if ( ! $this->session->loggedin('You need to login to edit messages.') )
@@ -235,5 +241,6 @@ class contactController extends Nickyeoman\Framework\BaseController {
 
 		echo '<p><a href="/user/admin">back to admin</a></p>';
 	}
+  // end migrate
 
-}
+} // end class

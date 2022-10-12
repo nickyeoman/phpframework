@@ -74,7 +74,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 	public function registration() {
 
     // If the user is logged in we don't need to proceed
-		if ( $this->session->loggedin() )
+	if ( $this->session->loggedin() )
       $this->redirect('user', 'index');
 
     //check Form Was submitted is enabled
@@ -82,8 +82,8 @@ class userController extends Nickyeoman\Framework\BaseController {
 
 			$user = new Nickyeoman\helpers\userHelper();
 
-			//check session matches
-      if ( $_POST['formkey'] == $this->session->getKey('formkey') ) {
+		//check session matches
+    	if ( $_POST['formkey'] == $this->session->getKey('formkey') ) {
 
 				//clean the data (true = good, false = bad)
 				if ( ! $user->checkUsername() ) {
