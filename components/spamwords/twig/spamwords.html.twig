@@ -1,0 +1,36 @@
+{% set title = 'spamwords Page' %}
+{% extends "layout/master.html.twig" %}
+
+{% block content %}
+  <h2>Spam words</h2>
+
+  <div class="formContainer">
+
+    {% if spamwordadded is not empty %}
+      <div class="notice">{{ spamwordadded }}</div>
+    {% endif %}
+
+    <form action="/spamwords/index" method="post">
+      <input type="hidden" name="formkey" value="{{ formkey }}" />
+
+      <input type="text" placeholder="SPAM phrase" name="spamword" value="{{ spamword }}" required>
+      <input type="submit" value="Add Phrase" name="submit" />
+    </form>
+  </div>
+
+  <h2>The list</h2>
+  <table>
+    <tr>
+      <th>phrase</th>
+      <th>action</th>
+    </tr>
+
+    {% for row in spamWords %}
+      <tr>
+        <td>{{ row.phrase }}</td>
+        <td><a href="/spamwords/delete/{{ row.id }}">delete</a></td>
+      </tr>
+    {% endfor %}
+  </table>
+
+{% endblock %}

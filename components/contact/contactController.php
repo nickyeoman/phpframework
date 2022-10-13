@@ -21,9 +21,23 @@ class contactController extends Nickyeoman\Framework\BaseController {
       $sendEmail = true;
 
       // Check Spam words
+      $results    = $this->db->findall('spamwords', 'phrase');
+      $checktext  = ' ' . strtolower( $this->post['message'] );
+      $theword    = '';
+      
+      foreach ($results as $v) {
+        if ( stripos($checktext, $v['phrase'] ) ) {
+          $sendEmail = false;
+          $theword = $v['phrase'];
+        }
+        
+      }
+      if ( !$sendEmail )
+        $this->adderror("Your message contains spammy words ($theword)", 'error' );
+      // End check spamwords
 
 
-      // Check Email against db
+      // Check Email adress against db
       $result = $this->db->findone('badEmails','email',$this->post['email']);
       if ( !empty($result) ) {
         $this->adderror("Your email address has been flagged", 'error' );
@@ -85,7 +99,7 @@ class contactController extends Nickyeoman\Framework\BaseController {
     $result = $this->db->findall('contactForm', 'id,email,message,created,unread');
     
     //Set if not null
-    if ( is_null($result) ) {
+    if ( !is_null($result) ) {
       foreach ($result as $key => $value){
         $this->data['contactMessages'][$key] = $value;
       }
