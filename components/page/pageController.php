@@ -91,7 +91,9 @@ EOSQL;
   }
   //end admin
 
-  // Edit a page
+  /** 
+   * Edit a page
+   **/
   function edit($params = null) {
 
     if ( ! $this->session->loggedin('You need to login to edit pages.') )

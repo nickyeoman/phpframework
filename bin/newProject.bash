@@ -64,16 +64,6 @@ touch sass/variables.sass
 echo "Setting up sample .env in root directory. Please edit .env file for your needs."
 cp vendor/nickyeoman/phpframework/env.sample .env
 
-echo "Setting up sample phinx config file in root directory. Please edit phinx.php for your needs."
-cp vendor/nickyeoman/phpframework/phinx.php.sample phinx.php
-
-################################################################################
-# database migrations
-################################################################################
-
-echo "Move user migrations to migrations folder"
-cp vendor/nickyeoman/phpframework/migrations/20220000000003_logs_database_creation.php migrations/20220000000003_logs_database_creation.php
-
 ################################################################################
 # Docker
 ################################################################################
@@ -84,6 +74,7 @@ cp vendor/nickyeoman/phpframework/docker/Dockerfile Dockerfile
 ################################################################################
 # Creating the first controller
 ################################################################################
+
 bash vendor/nickyeoman/phpframework/bin/newController.bash index
 
 ################################################################################

@@ -238,7 +238,9 @@ class BaseController {
   }
   //end markdownFile
 
-  // A little bit of logging
+  /**
+   * Log to the database
+   */
   public function log($level = 'DEBUG', $title = 'Called log', $location = 'Base Controller', $content = "NULL") {
     if ($_ENV['LOGGING'] == 'mysql') {
 

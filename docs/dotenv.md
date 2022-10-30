@@ -60,10 +60,11 @@ If left blank? (how do we allow for anything?)
 DEFAULT=off
 tells the cms where to log.
 mysql is currently the only option
+function log in BaseController.
 
 ### USECMS
 
-The framework has a build in CMS.
+The framework has a build in CMS components. If this is false the router will not load them.
 
 ## Docker
 

@@ -22,7 +22,7 @@ $router = new Router();
 // Require framework (autoload controllers)
 $loader = new Nette\Loaders\RobotLoader; // https://doc.nette.org/en/3.1/robotloader
 $loader->addDirectory( $_ENV['realpath'] . "/" . $_ENV['CONTROLLERPATH'] );
-$loader->setTempDirectory( $_ENV['realpath'] . "/" . $_ENV['LOADERTMPDIR'] ); // use 'temp' directory for cache
+$loader->setTempDirectory( $_ENV['realpath'] . "/" . $_ENV['LOADERTMPDIR'] ); // use 'tmp' directory for cache
 $loader->register(); // Run the RobotLoader
 
 //Load the child controller

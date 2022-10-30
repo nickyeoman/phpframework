@@ -104,9 +104,13 @@ class SessionManager {
     session_destroy();
     unset($this->session);
     $this->newSession();
+    return true;
 
   }
 
+  /**
+   * Flash is an array in sessions that gets read and cleared after each page load.
+   */
   public function addflash($string = "Error, no message",$name = null) {
 
     if ( empty($string) )
@@ -129,6 +133,9 @@ class SessionManager {
 
   }
 
+  /**
+   * How many flash messages are there?
+   */
   public function flashcount($what = 'all'){
 
     if ( $what = 'all' )
@@ -138,7 +145,9 @@ class SessionManager {
 
   }
 
-  // returns the vaule of a session key
+  /**
+   * Get the value of a session key
+   */
   public function getKey($key = '') {
 
     if ( array_key_exists( $key, $this->session ) )
@@ -148,7 +157,9 @@ class SessionManager {
 
   }
 
-  // returns the vaule of a session key
+  /**
+   * Set data to the session
+   */
   public function setKey( $key = null, $value = null ) {
 
     if ( !empty($key) && !empty($value) )
@@ -160,12 +171,20 @@ class SessionManager {
 
   }
 
+  /**
+   * Debugging function
+   */
   public function dump($title = "session dump requested") {
 
     bdump($this->session, $title);
 
   }
 
+  /**
+   * Session Loggedin
+   * Checks the session for loggedin status
+   * If false updates the session and returns false
+   */
   public function loggedin($flashmsg = '', $writeS = false) {
 
     if ( $this->session['loggedin'] ) {

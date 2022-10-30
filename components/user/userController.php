@@ -8,7 +8,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 
 		if ( ! $this->session->loggedin("You need to login to access dashboard.") )
 			$this->redirect('user', 'login');
-
+	  
 		$this->data['username'] = $this->session->getKey('username');
 
 		$this->twig('index', $this->data);
@@ -176,9 +176,13 @@ class userController extends Nickyeoman\Framework\BaseController {
 	}
 	// End validate action (page)
 
+	/**
+	 * Log out
+	 * Destroys the framework and php session objects
+	 */
 	public function logout() {
 
-		$this->setFlash('notice', "You have been logged out.");
+		$this->session->addFlash("You have been logged out.", 'notice');
 		$this->session->destroySession();
 		$this->redirect('index', 'index');
 
@@ -414,6 +418,9 @@ class userController extends Nickyeoman\Framework\BaseController {
 
 	} // end block user
 
+	/**
+	 * Delete a user
+	 */
 	public function delete($params) {
 
 		if ( ! $this->session->loggedin('You need to login to edit users.') )
