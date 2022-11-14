@@ -105,31 +105,6 @@ class spamwordsController extends Nickyeoman\Framework\BaseController {
 		);
 		$this->db->migrate('spamwords',$schem);
 
-        $sql = <<<EOSQL
-        INSERT INTO `spamwords` (`id`, `phrase`) VALUES
-        (1, 'viagra'),
-        (2, 'cialis'),
-        (3, 'fuck'),
-        (4, 'boobs'),
-        (5, 'tits'),
-        (6, 'tadalafil'),
-        (6, 'phenergan'),
-        (8, 'prednisone'),
-        (9, 'tizanidine'),
-        (10, 'avana'),
-        (11, 'ppc'),
-        (12, 'sildenafil'),
-        (13, 'prescription'),
-        (14, 'doxycycline'),
-        (15, 'backlinks'),
-        (16, 'cipro'),
-        (17, 'modafinil'),
-        (18, 'metformin'),
-        (19, 'trazodone');
-EOSQL;
-
-        $this->db->query($sql);
-
 		echo '<p><a href="/user/admin">back to admin</a></p>';
 
 	}
