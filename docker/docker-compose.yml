@@ -18,28 +18,12 @@ services:
     restart: always
     container_name: "${DBHOST}"
     environment:
-      MYSQL_ROOT_PASSWORD: ${SALT}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_PASSWORD: ${DBPASSWORD}
       MYSQL_DATABASE: ${DB}
       MYSQL_USER: ${DBUSER}
     volumes:
       - "db:/var/lib/mysql"
-
-  # Strapi
-  strapi:
-    container_name: "${DOCKERNAME}-strapi"
-    image: strapi/strapi
-    restart: always
-    environment:
-      DATABASE_CLIENT: 'mysql'
-      DATABASE_SSL: 'false'
-      DATABASE_NAME: ${DB}
-      DATABASE_HOST: ${DBHOST}
-      DATABASE_PORT: ${DBPORT}
-      DATABASE_USERNAME: ${DBUSER}
-      DATABASE_PASSWORD: ${DBPASSWORD}
-    ports:
-      - "1337:1337"
 
   # App
   app:
