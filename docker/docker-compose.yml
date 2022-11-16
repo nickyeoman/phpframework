@@ -35,3 +35,15 @@ services:
       - "./:/website"
     ports:
       - "${DOCKERPORT}:80"
+
+# Dev
+  # phpmyadmin:
+  #   container_name: "${DOCKERNAME}-phpmyadmin"
+  #   ports: 
+  #     - "${DOCKERPHPMYADMIN}:80"
+  #   environment:
+  #     UPLOAD_LIMIT: '200M'
+  #     PMA_USER: "${DBUSER}"
+  #     PMA_PASSWORD: "${DBPASSWORD}"
+  #     PMA_HOST: "${DBHOST}"
+  #   image: phpmyadmin/phpmyadmin:latest

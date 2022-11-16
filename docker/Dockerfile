@@ -1,4 +1,4 @@
-FROM php:8.1.7-apache
+FROM php:8.1.12-apache
 LABEL maintainer="Nick Yeoman <c@nickyeoman.com>"
 
 WORKDIR /website
