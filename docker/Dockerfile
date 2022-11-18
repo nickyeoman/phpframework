@@ -17,6 +17,10 @@ RUN docker-php-ext-configure imap --with-kerberos --with-imap-ssl
 RUN docker-php-ext-install imap
 # END IMAP #
 
+# symfony intl requirement
+RUN docker-php-ext-configure intl 
+RUN docker-php-ext-install intl
+
 # Remove Apt list for space
 RUN rm -r /var/lib/apt/lists/*
 
