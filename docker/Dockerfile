@@ -18,6 +18,7 @@ RUN docker-php-ext-install imap
 # END IMAP #
 
 # symfony intl requirement
+RUN apt-get install -y libicu-dev
 RUN docker-php-ext-configure intl 
 RUN docker-php-ext-install intl
 
