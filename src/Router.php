@@ -12,14 +12,19 @@ class Router {
   // Variables *****************************************************************
   // uri in array format [controller,method,param1,parm2] from /controller/method/param1/param2
   private $uri         = array();
+
   // The controller to call (index is default)
   public $controller   = '';
+
   // Controller Class (just appends 'Controller')
   public $controllerClass = "";
+
   // The method to call (index is default, override as fallback)
   public $action       = '';
+
   // parameters on URL (not includeing post/get)
   public $params       = array();
+  
   // content of contoller file (for method checking)
   private $filecontent = '';
 

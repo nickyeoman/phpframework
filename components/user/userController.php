@@ -6,12 +6,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 	// This is the dashboard
 	public function index(){
 
-		if ( ! $this->session->loggedin("You need to login to access dashboard.") )
-			$this->redirect('user', 'login');
-	  
-		$this->data['username'] = $this->session->getKey('username');
-
-		$this->twig('index', $this->data);
+		$this->redirect('admin', 'index');
 
 	} // end function index
 
