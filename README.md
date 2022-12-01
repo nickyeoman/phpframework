@@ -7,9 +7,9 @@
 
 ## Things you need to know
 
-1. Always run bin scripts from the project root directory.
+1. Always run bin scripts from the project root directory (composer.json, .env also live here).
 
-## Two line Install
+## Easy Install
 
 Just change "YOUR_PROJECT_NAME" to whatever you want.
 
@@ -19,14 +19,14 @@ bash nyphp YOUR_PROJECT_NAME
 rm nyphp
 ```
 Now you should change your [dotenv](https://github.com/nickyeoman/phpframework/blob/main/docs/dotenv.md) file;
-then you should run [startServer](https://github.com/nickyeoman/phpframework/blob/main/docs/startserver.md).
+
+Then run ```sudo docker-compose up -d```.
 
 Your development server is configured, use [sass](https://github.com/nickyeoman/phpframework/blob/main/docs/sass.md) to modify the look.
 
 ## Framework Documentation
 
 * [dotenv](https://github.com/nickyeoman/phpframework/tree/main/docs)
-* [startServer](https://github.com/nickyeoman/phpframework/blob/main/docs/startserver.md)
 * [sass](https://github.com/nickyeoman/phpframework/blob/main/docs/sass.md)
 * [tracy](https://github.com/nickyeoman/phpframework/blob/main/docs/tracy.md)
 * [database](https://github.com/nickyeoman/phpframework/blob/main/docs/database.md)

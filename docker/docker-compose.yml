@@ -11,39 +11,46 @@ networks:
 
 services:
 
+  ########################################
   # Database
+  ########################################
   db:
     #https://hub.docker.com/_/mariadb
     image: mariadb:10.7.1
     restart: always
     container_name: "${DBHOST}"
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${SALT}
       MYSQL_PASSWORD: ${DBPASSWORD}
       MYSQL_DATABASE: ${DB}
       MYSQL_USER: ${DBUSER}
     volumes:
       - "db:/var/lib/mysql"
 
+  ########################################
   # App
+  ########################################
   app:
     build: .
     container_name: "${DOCKERNAME}"
-    #image: "${DOCKERIMAGE}:${DOCKERVER}"
+    image: "${DOCKERIMAGE}:${DOCKERVER}"
     restart: always
     volumes:
       - "./:/website"
     ports:
       - "${DOCKERPORT}:80"
 
-# Dev
+  ########################################
+  # PHPMyAdmin (Development)
+  ########################################
   # phpmyadmin:
-  #   container_name: "${DOCKERNAME}-phpmyadmin"
-  #   ports: 
-  #     - "${DOCKERPHPMYADMIN}:80"
-  #   environment:
-  #     UPLOAD_LIMIT: '200M'
-  #     PMA_USER: "${DBUSER}"
-  #     PMA_PASSWORD: "${DBPASSWORD}"
-  #     PMA_HOST: "${DBHOST}"
-  #   image: phpmyadmin/phpmyadmin:latest
+  #    container_name: "${DOCKERNAME}-phpmyadmin"
+  #    ports: 
+  #      - "${DOCKERPHPMYADMIN}:80"
+  #    environment:
+  #      UPLOAD_LIMIT: '200M'
+  #      PMA_USER: "${DBUSER}"
+  #      PMA_PASSWORD: "${DBPASSWORD}"
+  #      PMA_HOST: "${DBHOST}"
+  #    image: phpmyadmin/phpmyadmin:latest
+

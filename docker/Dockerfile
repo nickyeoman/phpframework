@@ -1,14 +1,20 @@
-FROM php:8.1.12-apache
+FROM php:8.1.13-apache
 LABEL maintainer="Nick Yeoman <c@nickyeoman.com>"
+# How to build: docker build -t ${DOCKERIMAGE}:${DOCKERVER} .
+# https://hub.docker.com/_/php
 
 WORKDIR /website
 
 ENV APACHE_DOCUMENT_ROOT /website/public/
 
+########################################################################################################################################
 # APT
+########################################################################################################################################
 RUN apt-get update
 
+########################################################################################################################################
 # IMAP features #
+########################################################################################################################################
 RUN apt-get install -y libc-client-dev libkrb5-dev libssl-dev;
 
 # https://stackoverflow.com/questions/49854767/docker-php7-2-fpm-cant-install-imap-module
@@ -17,15 +23,21 @@ RUN docker-php-ext-configure imap --with-kerberos --with-imap-ssl
 RUN docker-php-ext-install imap
 # END IMAP #
 
+########################################################################################################################################
 # symfony intl requirement
+########################################################################################################################################
 RUN apt-get install -y libicu-dev
 RUN docker-php-ext-configure intl 
 RUN docker-php-ext-install intl
 
+########################################################################################################################################
 # Remove Apt list for space
+########################################################################################################################################
 RUN rm -r /var/lib/apt/lists/*
 
+########################################################################################################################################
 # Apache settings
+########################################################################################################################################
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 

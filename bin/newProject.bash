@@ -40,16 +40,6 @@ echo "Adding Apache htaccess"
 cp vendor/nickyeoman/phpframework/public/htaccess public/.htaccess
 
 ################################################################################
-# Twig
-################################################################################
-
-echo "Creating scaffolding Twig templates in views directory"
-cp vendor/nickyeoman/phpframework/twig/head.html.twig views/modules/head.html.twig
-cp vendor/nickyeoman/phpframework/twig/master.html.twig views/layout/master.html.twig
-cp vendor/nickyeoman/phpframework/twig/footer.html.twig views/modules/footer.html.twig
-cp vendor/nickyeoman/phpframework/twig/nav.html.twig views/modules/nav.html.twig
-
-################################################################################
 # SASS
 ################################################################################
 
@@ -68,8 +58,9 @@ cp vendor/nickyeoman/phpframework/env.sample .env
 # Docker
 ################################################################################
 
-echo "Creating a sample Dockerfile incase you would like to use docker with this project"
+echo "Creating a docker files"
 cp vendor/nickyeoman/phpframework/docker/Dockerfile Dockerfile
+cp vendor/nickyeoman/phpframework/docker/docker-compose.yml docker-compose.yml
 
 ################################################################################
 # Creating the first controller
@@ -85,4 +76,4 @@ echo "*** End New Project Script ***"
 
 echo "FURTHER INSTRUCTIONS: "
 echo "To start a local server, edit .env file then run:"
-echo "bash vendor/nickyeoman/phpframework/bin/startServer.bash"
+echo "sudo docker-compose up -d"
