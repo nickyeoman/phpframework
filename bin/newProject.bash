@@ -27,7 +27,7 @@ fi
 echo "Creating directories: controllers tmp public views scripts"
 mkdir -p controllers tmp migrations sass scripts helpers
 mkdir -p public/css public/js public/images
-mkdir -p views/modules views/layout views/user
+mkdir -p views
 
 ################################################################################
 # Public Folder
@@ -46,6 +46,7 @@ cp vendor/nickyeoman/phpframework/public/htaccess public/.htaccess
 echo "Creating SASS directory for css"
 cp vendor/nickyeoman/phpframework/sass/project.sass sass/.
 touch sass/variables.sass
+sass sass/project.sass public/css/main.css
 
 ################################################################################
 # Configuration
@@ -58,7 +59,7 @@ cp vendor/nickyeoman/phpframework/env.sample .env
 # Docker
 ################################################################################
 
-echo "Creating a docker files"
+echo "Creating docker files"
 cp vendor/nickyeoman/phpframework/docker/Dockerfile Dockerfile
 cp vendor/nickyeoman/phpframework/docker/docker-compose.yml docker-compose.yml
 

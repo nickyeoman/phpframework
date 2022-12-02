@@ -18,7 +18,7 @@ EOF
 # Create view
 cat << EOF > views/${ControllerName}.html.twig
   {% set title = '${ControllerName} Page' %}
-  {% extends "layout/master.html.twig" %}
+  {% extends "@nytwig/master.html.twig" %}
 
   {% block content %}
   <p>Sample ${ControllerName} Page Content.</p>
