@@ -23,6 +23,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 		if ( $this->post['submitted'] ) {
 
 			$user = new Nickyeoman\helpers\userHelper();
+
 			//Process the form
 			if ( $user->login() ) {
 
@@ -41,7 +42,8 @@ class userController extends Nickyeoman\Framework\BaseController {
 
 					foreach( $user->errors as $k => $v ) {
 
-						$this->adderror($string = $v, "$k error" );
+						//$this->adderror($string = $v, "$k error" );
+						array_push($this->data['error'], "$k $v");
 
 					}
 					//end foreach
@@ -86,7 +88,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 					$this->error = true;  // TODO: not sure this is needed just a count(data-error). this appears elsewhere
 
 					//For the view
-					$this->data['error'] .= $user->errors['username'];
+					array_push($this->data['error'], $user->errors['username']);
 
 				}
 
@@ -95,7 +97,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 
 					$this->error = true;
 					//For the view
-					$this->data['error'] .= $user->errors['email'];
+					array_push($this->data['error'], $user->errors['email']);
 
 				}
 
@@ -104,7 +106,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 
 					$this->error = true;
 					//For the view
-					$this->data['error'] .= $user->errors['password'];
+					array_push($this->data['error'], $user->errors['password']);
 
 				}
 
@@ -137,7 +139,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 
     //Display view
     $this->twig('registration', $this->data);
-		$this->session->writeSession();
+	$this->session->writeSession();
 
 	}
 	//end register action (page)
@@ -629,8 +631,8 @@ class userController extends Nickyeoman\Framework\BaseController {
 				,'comment' => 'CSV'
 			)
 		);
-		$this->db->migrate('user',$schem);
-		echo '<p><a href="/user/admin">back to admin</a></p>';
+		$this->db->migrate('users',$schem);
+		echo '<p><a href="/admin/index">back to admin</a></p>';
 	}
 
 } //End Class

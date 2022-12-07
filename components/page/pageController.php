@@ -273,5 +273,113 @@ EOSQL;
     $this->twig('adminComments', $this->data);
   }
 
+  public function migrate() {
+
+		if ( ! $this->session->loggedin('You need to login to edit users.') )
+      		$this->redirect('user', 'login');
+
+    	if ( !$this->session->inGroup('admin', 'You need Admin permissions to edit users.') )
+      		$this->redirect('user', 'login');
+
+		$schem = array(
+			array(
+				'name' => 'title'
+				,'type' => 'varchar'
+				,'size' => '255'
+				,'null' => 'No'
+			)
+			,array(
+				'name' => 'heading'
+				,'type' => 'varchar'
+				,'size' => '255'
+				,'null' => 'No'
+			)
+			,array(
+				'name' => 'description'
+				,'type' => 'varchar'
+				,'size' => '255'
+				,'null' => 'No'
+			)
+			,array(
+				'name' => 'keywords'
+				,'type' => 'varchar'
+				,'size' => '255'
+				,'null' => 'No'
+			)
+			,array(
+				'name' => 'author'
+				,'type' => 'varchar'
+				,'size' => '255'
+				,'null' => 'No'
+			)
+			,array(
+				'name' => 'slug'
+				,'type' => 'varchar'
+				,'size' => '255'
+				,'null' => 'No'
+			)
+      ,array(
+				'name' => 'path'
+				,'type' => 'varchar'
+				,'size' => '255'
+				,'null' => 'Yes'
+        ,'default' => 'NULL'
+			)
+      ,array(
+				'name' => 'tags'
+				,'type' => 'varchar'
+				,'size' => '255'
+				,'null' => 'Yes'
+			)
+      ,array(
+				'name' => 'intro'
+				,'type' => 'text'
+				,'null' => 'Yes'
+			)
+      ,array(
+				'name' => 'body'
+				,'type' => 'text'
+				,'null' => 'Yes'
+			)
+      ,array(
+				'name' => 'notes'
+				,'type' => 'text'
+				,'null' => 'Yes'
+			)
+      ,array(
+				'name' => 'created'
+				,'type' => 'datetime'
+				,'null' => 'No'
+			)
+      ,array(
+				'name' => 'updated'
+				,'type' => 'datetime'
+				,'null' => 'Yes'
+			)
+      ,array(
+				'name' => 'draft'
+				,'type' => 'tinyint'
+        ,'size' => '1'
+				,'null' => 'Yes'
+			)
+      ,array(
+				'name' => 'changefreq'
+				,'type' => 'varchar'
+				,'null' => 'No'
+        ,'size' => '7'
+			)
+      ,array(
+				'name' => 'priority'
+				,'type' => 'decimal'
+        ,'size' => '10,0'
+				,'null' => 'No'
+        ,'default' => '1'
+			)
+			
+		);
+		$this->db->migrate('pages',$schem);
+		echo '<p><a href="/admin/index">back to admin</a></p>';
+	}
+
 }
 //end class

@@ -50,6 +50,7 @@ class BaseController {
       'uri'     => rtrim(ltrim($_SERVER['REQUEST_URI'], "\/"), "\/")
       ,'pageid' => str_replace("/", "-", rtrim(ltrim($_SERVER['REQUEST_URI'], "\/"), "\/"))
       ,'agent'  => $_SERVER['HTTP_USER_AGENT']
+      ,'error'  => array()
     ];
 
     if ( empty($_SERVER['HTTP_X_REAL_IP']) )
