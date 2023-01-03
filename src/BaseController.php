@@ -1,5 +1,6 @@
 <?php
 namespace Nickyeoman\Framework;
+
 USE \Nickyeoman\Dbhelper;
 USE Nickyeoman\Framework\SessionManager as Session;
 

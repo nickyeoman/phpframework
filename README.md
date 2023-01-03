@@ -7,8 +7,12 @@
 
 ## Things you need to know
 
-1. Always run bin scripts from the project root directory (composer.json, .env also live here).
+1. Always run scripts from the project root directory (composer.json, .env also live here).
 
+## Requirements
+
+* ubuntu php-cli (sudo nala install php-curl php-xml php-mysql)
+* [Install Composer](https://www.nickyeoman.com/page/install-composer-on-ubuntu) 
 ## Easy Install
 
 Just change "YOUR_PROJECT_NAME" to whatever you want.

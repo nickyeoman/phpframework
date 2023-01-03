@@ -5,6 +5,7 @@ ControllerName=$1;
 # Create child controller
 cat << EOF > controllers/${ControllerName}.php
 <?php
+   namespace Nickyeoman\Framework\Controller;
    class ${ControllerName}Controller extends Nickyeoman\Framework\BaseController {
 
      function index() {
