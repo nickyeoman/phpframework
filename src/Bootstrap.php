@@ -1,9 +1,9 @@
 <?php
 // Nick Yeoman's php Framework
-require_once $_ENV['project_path'] . '/vendor/autoload.php'; // Composer
+require_once $_ENV['BASEPATH'] . '/vendor/autoload.php'; // Composer
 
 // Grab Env Variables from file using dotenv https://github.com/vlucas/phpdotenv
-$dotenv = Dotenv\Dotenv::createImmutable($_ENV['realpath']);
+$dotenv = Dotenv\Dotenv::createImmutable($_ENV['BASEPATH']);
 $dotenv->load();
 
 // Check we are in debug mode "display" will show bar no matter what
@@ -19,10 +19,9 @@ $router = new Router();
 
 // Require framework (autoload controllers)
 $loader = new Nette\Loaders\RobotLoader; // https://doc.nette.org/en/3.1/robotloader
-$loader->addDirectory( $_ENV['realpath'] . "/" . $_ENV['CONTROLLERPATH'] );
-$loader->setTempDirectory( $_ENV['realpath'] . "/" . $_ENV['LOADERTMPDIR'] ); // use 'tmp' directory for cache
+$loader->addDirectory( $_ENV['BASEPATH'] . "/" . $_ENV['CONTROLLERPATH'] );
+$loader->setTempDirectory( $_ENV['BASEPATH'] . "/" . $_ENV['LOADERTMPDIR'] ); // use 'tmp' directory for cache
 $loader->register(); // Run the RobotLoader
 
 //Load the child controller
 call_user_func_array( array(new $router->controllerClass(), $router->action), [$router->params] );
- */

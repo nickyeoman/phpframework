@@ -1,13 +1,12 @@
 <?php
 namespace Nickyeoman\Framework;
-
 USE \Nickyeoman\Dbhelper;
 USE Nickyeoman\Framework\SessionManager as Session;
 
 // load helpers
 $loader = new \Nette\Loaders\RobotLoader; // https://doc.nette.org/en/3.1/robotloader
-$loader->addDirectory( $_ENV['realpath'] . "/" . $_ENV['HELPERPATH'] ); //helpers
-$loader->setTempDirectory( $_ENV['realpath'] . "/" . $_ENV['LOADERTMPDIR'] ); // use 'temp' directory for cache
+$loader->addDirectory( $_ENV['BASEPATH'] . "/" . $_ENV['HELPERPATH'] ); //helpers
+$loader->setTempDirectory( $_ENV['BASEPATH'] . "/" . $_ENV['LOADERTMPDIR'] ); // use 'temp' directory for cache
 $loader->register(); // Run the RobotLoader
 
 class BaseController {
@@ -51,7 +50,6 @@ class BaseController {
       'uri'     => rtrim(ltrim($_SERVER['REQUEST_URI'], "\/"), "\/")
       ,'pageid' => str_replace("/", "-", rtrim(ltrim($_SERVER['REQUEST_URI'], "\/"), "\/"))
       ,'agent'  => $_SERVER['HTTP_USER_AGENT']
-      ,'error'  => array()
     ];
 
     if ( empty($_SERVER['HTTP_X_REAL_IP']) )
@@ -121,21 +119,21 @@ class BaseController {
   public function twig($viewname = 'index', $vars = array() ) {
 
       //TWIG
-      $loader = new \Twig\Loader\FilesystemLoader($_ENV['realpath'] . '/' . $_ENV['VIEWPATH']);
-      $loader->addPath($_ENV['realpath'] . '/vendor/nickyeoman/nytwig/src', 'nytwig');
+      $loader = new \Twig\Loader\FilesystemLoader($_ENV['BASEPATH'] . '/' . $_ENV['VIEWPATH']);
+      $loader->addPath($_ENV['BASEPATH'] . '/vendor/nickyeoman/nytwig/src', 'nytwig');
 
       //load component view
       if ( str_contains($_ENV['CONTROLLERPATH'], 'vendor') ) {
 
         $arr = explode('/' , $_ENV['CONTROLLERPATH']);
         $component = $arr[4];
-        $loader->prependPath($_ENV['realpath'] . "/vendor/nickyeoman/phpframework/components/$component/twig");
+        $loader->prependPath($_ENV['BASEPATH'] . "/vendor/nickyeoman/phpframework/components/$component/twig");
         
       }
       // end if load component view
 
       $this->twig = new \Twig\Environment($loader, [
-          'cache' => $_ENV['realpath'] . '/' .$_ENV['TWIGCACHE'],
+          'cache' => $_ENV['BASEPATH'] . '/' .$_ENV['TWIGCACHE'],
           'debug' => true,
       ]);
 

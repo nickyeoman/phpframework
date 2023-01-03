@@ -93,7 +93,7 @@ class Router {
       $controller = strtolower($this->uri[0]);
 
       // Controller filename
-      $filename = $_ENV['realpath'] . '/' . $_ENV['CONTROLLERPATH'] . '/' . $controller . '.php';
+      $filename = $_ENV['BASEPATH'] . '/' . $_ENV['CONTROLLERPATH'] . '/' . $controller . '.php';
 
       if ( file_exists( $filename ) ) {
 
@@ -103,7 +103,7 @@ class Router {
 
       } else {
 
-        $filename = $_ENV['realpath'] . '/vendor/nickyeoman/phpframework/components/' . $controller . '/' . $controller . 'Controller.php';
+        $filename = $_ENV['BASEPATH'] . '/vendor/nickyeoman/phpframework/components/' . $controller . '/' . $controller . 'Controller.php';
 
         /**
         * You can override this in env to disable all
