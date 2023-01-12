@@ -3,7 +3,7 @@ namespace Nickyeoman\Framework;
 
 /**
 * Router Class
-* v2.3
+* v3.0
 * URL: https://github.com/nickyeoman/phpframework/blob/main/docs/router.md
 **/
 
@@ -13,10 +13,11 @@ class Router {
   // uri in array format [controller,method,param1,parm2] from /controller/method/param1/param2
   private $uri         = array();
 
-  // The controller to call (index is default)
+  // The controller to call 
+  // TODO: (index is default, but should it be error?)
   public $controller   = '';
 
-  // Controller Class (just appends 'Controller')
+  // Controller Class (object)
   public $controllerClass = "";
 
   // The method to call (index is default, override as fallback)
@@ -32,7 +33,7 @@ class Router {
 
   public function __construct() {
 
-    //creates $this->uri array
+    // creates $this->uri array
     $this->_makeUri();
 
     // will set this->controller
@@ -46,14 +47,12 @@ class Router {
     unset($this->filecontent);
     unset($this->uri);
 
-    $this->controllerClass = $this->controller . 'Controller';
-
   }
 
   //Grab the URI and make it a usable array
   private function _makeUri() {
 
-    //remove get (will grab parameters using GET)
+    //remove get
     $builduri = strtok($_SERVER['REQUEST_URI'], '?');
 
     //put into array
@@ -71,13 +70,12 @@ class Router {
   // Set the controller
   private function _setController() {
 
-    /**
-    * set controller
-    **/
+    // default
     if ( empty( $this->uri[0] ) ) {
 
       // we got nothing (just slash)
       $this->controller = 'index';
+      $this->controllerClass = "Nickyeoman\Framework\Controller\\" . $this->controller;
       $this->action = 'index';
       $this->params = array();
 
@@ -86,43 +84,42 @@ class Router {
       //TODO: make some sort of check file for special paths like this
       $this->controller = 'sitemap';
       $this->action = 'sitemap';
-      $_ENV['CONTROLLERPATH'] = "vendor/nickyeoman/phpframework/components/$this->controller/";
+      $this->controllerClass = "Nickyeoman\Framework\Components\sitemap\sitemapController"; // Change to framework compoenents
 
     } else {
 
-      $controller = strtolower($this->uri[0]);
+      $this->controller = strtolower($this->uri[0]);
+      $this->controllerClass = "Nickyeoman\Framework\Controller\\" . $this->controller;
 
       // Controller filename
-      $filename = $_ENV['BASEPATH'] . '/' . $_ENV['CONTROLLERPATH'] . '/' . $controller . '.php';
+      $filename = $_ENV['BASEPATH'] . '/' . $_ENV['CONTROLLERPATH'] . '/' . $this->controller . '.php';
 
       if ( file_exists( $filename ) ) {
 
         $this->filecontent = file_get_contents($filename); //set variable
-        $this->controller = strtolower($this->uri[0]);
         array_shift($this->uri);
 
       } else {
 
-        $filename = $_ENV['BASEPATH'] . '/vendor/nickyeoman/phpframework/components/' . $controller . '/' . $controller . 'Controller.php';
-
+        $filename = $_ENV['BASEPATH'] . '/vendor/nickyeoman/phpframework/src/Components/' . $this->controller . '/' . $this->controller . 'Controller.php';
+        
         /**
         * You can override this in env to disable all
         * or just create controller of same name for specific components
         **/
-        if ( file_exists( $filename ) && $_ENV['USECMS'] != "no" ) {
-
-          $_ENV['CONTROLLERPATH'] = "vendor/nickyeoman/phpframework/components/$controller/";
+        if ( file_exists( $filename ) && $_ENV['USECMS'] == "yes" ) {
+    
           $this->filecontent = file_get_contents($filename); //set variable
-          $this->controller = $controller;
+          $this->controllerClass = "Nickyeoman\Framework\Components\\" . $this->controller . '\\' . $this->controller . 'Controller'; // Change to framework compoenents
           array_shift($this->uri);
 
         } else {
-
+  
           //404
           $this->controller = 'error';
           $this->action = '_404';
           $this->params = array();
-          $_ENV['CONTROLLERPATH'] = "vendor/nickyeoman/phpframework/components/$this->controller/"; //TODO: can't override this
+          $this->controllerClass = "Nickyeoman\Framework\Components\\" . $this->controller . '\\' . $this->controller . 'Controller'; // Change to framework compoenents
 
         }
         // end cms file exists

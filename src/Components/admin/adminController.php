@@ -1,5 +1,7 @@
 <?php
-class adminController extends Nickyeoman\Framework\BaseController {
+namespace Nickyeoman\Framework\Components\admin;
+
+class adminController extends \Nickyeoman\Framework\BaseController {
 
 	public bool $error = false;
 
@@ -11,7 +13,7 @@ class adminController extends Nickyeoman\Framework\BaseController {
 	  
 		$this->data['username'] = $this->session->getKey('username');
 
-		$this->twig('index', $this->data);
+		$this->twig('index', $this->data, 'admin');
 
 	} // end function index
 

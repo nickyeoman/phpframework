@@ -1,7 +1,8 @@
 <?php
+namespace Nickyeoman\Framework\Components\logs;
 
 //TODO: the syntax on this page is a mess
-class logsController extends Nickyeoman\Framework\BaseController {
+class logsController extends \Nickyeoman\Framework\BaseController {
 
   public function index() {
 
@@ -28,7 +29,7 @@ EOSQL;
     }
 
     $this->data['pageid'] = "page-admin";
-    $this->twig('notfound', $this->data);
+    $this->twig('notfound', $this->data, 'logs');
 
   }
 
@@ -89,4 +90,4 @@ EOSQL;
    }
 
 
-   }
+}

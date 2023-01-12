@@ -34,7 +34,6 @@ Your development server is configured, use [sass](https://github.com/nickyeoman/
 * [sass](https://github.com/nickyeoman/phpframework/blob/main/docs/sass.md)
 * [tracy](https://github.com/nickyeoman/phpframework/blob/main/docs/tracy.md)
 * [database](https://github.com/nickyeoman/phpframework/blob/main/docs/database.md)
-* [robotloader](https://github.com/nickyeoman/phpframework/blob/main/docs/robotloader.md)
 * [twig](https://github.com/nickyeoman/phpframework/blob/main/docs/twig.md)
 * [users](https://github.com/nickyeoman/phpframework/blob/main/docs/users.md)
 

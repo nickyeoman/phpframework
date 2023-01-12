@@ -1,4 +1,4 @@
-FROM php:8.1.13-apache
+FROM php:8.2.1-apache
 LABEL maintainer="Nick Yeoman <c@nickyeoman.com>"
 # How to build: docker build -t ${DOCKERIMAGE}:${DOCKERVER} .
 # https://hub.docker.com/_/php

@@ -1,5 +1,7 @@
 <?php
-class contactController extends Nickyeoman\Framework\BaseController {
+namespace Nickyeoman\Framework\Components\contact;
+
+class contactController extends \Nickyeoman\Framework\BaseController {
 
   /**
    * Public Contact Us form
@@ -105,7 +107,7 @@ class contactController extends Nickyeoman\Framework\BaseController {
       }
     }
     
-    $this->twig('admin', $this->data);
+    $this->twig('admin', $this->data, 'contact');
 
   }
 
@@ -131,7 +133,7 @@ class contactController extends Nickyeoman\Framework\BaseController {
 
     }
 
-    $this->twig('view', $this->data);
+    $this->twig('view', $this->data, 'contact');
 
   } // end view page
 

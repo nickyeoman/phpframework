@@ -1,5 +1,7 @@
 <?php
-class pageController extends Nickyeoman\Framework\BaseController {
+namespace Nickyeoman\Framework\Components\page;
+
+class pageController extends \Nickyeoman\Framework\BaseController {
 
   // There is no index page, this will catch
   function override( $params = array() ) {
@@ -52,7 +54,7 @@ EOSQL;
     $this->data['page'] = $pagedata;
 
     $this->session->writeSession();
-    $this->twig('page', $this->data);
+    $this->twig('page', $this->data, 'page');
 
   }
   // end override
@@ -86,7 +88,7 @@ EOSQL;
 
     $this->data['pageid'] = "page-admin";
     $this->session->writeSession();
-    $this->twig('admin', $this->data);
+    $this->twig('admin', $this->data, 'page');
 
   }
   //end admin
@@ -122,7 +124,7 @@ EOSQL;
 
     $this->data['info'] = $this->db->findone('pages', 'id', $pid);
     $this->data['pageid'] = "page-edit";
-    $this->twig('edit', $this->data);
+    $this->twig('edit', $this->data, 'page');
 
   }
   // end function edit
@@ -161,7 +163,7 @@ EOSQL;
     $this->data['mode'] = 'new';
     $this->data['pageid'] = "page-edit";
     $this->session->writeSession();
-    $this->twig('edit', $this->data);
+    $this->twig('edit', $this->data, 'page');
 
   }
   //end new
@@ -191,7 +193,7 @@ EOSQL;
     }
 
     $this->data['pageid'] = "page-admin";
-    $this->twig('admin', $this->data);
+    $this->twig('admin', $this->data, 'page');
   }
 
   public function createcomment() {
@@ -270,7 +272,7 @@ EOSQL;
     $this->data['comments'] = $this->db->query($SQL);
 
     $this->data['pageid'] = "comments-admin";
-    $this->twig('adminComments', $this->data);
+    $this->twig('adminComments', $this->data, 'page');
   }
 
   public function migrate() {

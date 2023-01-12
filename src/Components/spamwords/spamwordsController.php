@@ -1,5 +1,7 @@
 <?php
-class spamwordsController extends Nickyeoman\Framework\BaseController {
+namespace Nickyeoman\Framework\Components\spamwords;
+
+class spamwordsController extends \Nickyeoman\Framework\BaseController {
 
   function index() {
 

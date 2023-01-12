@@ -43,7 +43,6 @@ cp vendor/nickyeoman/phpframework/public/htaccess public/.htaccess
 
 echo "Creating SASS directory for css"
 cp vendor/nickyeoman/phpframework/sass/project.sass sass/.
-touch sass/variables.sass
 
 # TODO: Check that sass is installed (above)
 sass sass/project.sass public/css/main.css

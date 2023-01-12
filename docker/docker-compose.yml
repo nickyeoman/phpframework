@@ -54,3 +54,11 @@ services:
   #      PMA_HOST: "${DBHOST}"
   #    image: phpmyadmin/phpmyadmin:latest
 
+  ########################################
+  # Mailhog (Development)
+  ########################################
+  # mailhog:
+  #   image: 'mailhog/mailhog:latest'
+  #   container_name: "${DOCKERNAME}-mailhog"
+  #   ports:
+  #     - "8025:8025"

@@ -1,5 +1,7 @@
 <?php
- class searchController extends Nickyeoman\Framework\BaseController {
+namespace Nickyeoman\Framework\Components\search;
+
+ class searchController extends \Nickyeoman\Framework\BaseController {
 
    function index($params = null) {
 
@@ -40,7 +42,7 @@ EOSQL;
      }
 
      $this->data['menuActive'] = 'search';
-     $this->twig('search', $this->data);
+     $this->twig('search', $this->data, 'search');
 
    }
  }

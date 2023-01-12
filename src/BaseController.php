@@ -116,18 +116,16 @@ class BaseController {
   // END redirect
 
   //Call Twig as a view
-  public function twig($viewname = 'index', $vars = array() ) {
+  public function twig($viewname = 'index', $vars = array(), $component = null ) {
 
       //TWIG
       $loader = new \Twig\Loader\FilesystemLoader($_ENV['BASEPATH'] . '/' . $_ENV['VIEWPATH']);
       $loader->addPath($_ENV['BASEPATH'] . '/vendor/nickyeoman/nytwig/src', 'nytwig');
 
       //load component view
-      if ( str_contains($_ENV['CONTROLLERPATH'], 'vendor') ) {
+      if ( $component != null ) {
 
-        $arr = explode('/' , $_ENV['CONTROLLERPATH']);
-        $component = $arr[4];
-        $loader->prependPath($_ENV['BASEPATH'] . "/vendor/nickyeoman/phpframework/components/$component/twig");
+        $loader->prependPath($_ENV['BASEPATH'] . "/vendor/nickyeoman/phpframework/src/Components/$component/twig");
         
       }
       // end if load component view

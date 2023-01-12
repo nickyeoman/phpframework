@@ -1,5 +1,7 @@
 <?php
-class sitemapController extends Nickyeoman\Framework\BaseController {
+namespace Nickyeoman\Framework\Components\sitemap;
+
+class sitemapController extends \Nickyeoman\Framework\BaseController {
 
   public function index() {
 
@@ -21,23 +23,27 @@ class sitemapController extends Nickyeoman\Framework\BaseController {
     echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
 
     // Loop through the pages
-    foreach( $thepages as $v) {
+    if ( ! empty($thepages) ) {
+      foreach( $thepages as $v) {
 
-      $date = new DateTime($v['updated']);
-      $date = $date->format('Y-m-d');
+        $date = new DateTime($v['updated']);
+        $date = $date->format('Y-m-d');
 
-      echo "<url>";
+        echo "<url>";
 
-      if ( empty($v['path']) )
-        echo "<loc>" . $_ENV['BASEURL'] . '/page/' . $v['slug'] . "</loc>";
-      else
-        echo "<loc>" . $_ENV['BASEURL'] . $v['path'] . "</loc>";
+        if ( empty($v['path']) )
+          echo "<loc>" . $_ENV['BASEURL'] . '/page/' . $v['slug'] . "</loc>";
+        else
+          echo "<loc>" . $_ENV['BASEURL'] . $v['path'] . "</loc>";
 
-      echo "<lastmod>" . $date . "</lastmod>";
-      echo "<changefreq>" . $v['changefreq'] . "</changefreq>";
-      echo "<priority>" . $v['priority'] . "</priority>";
-      echo "</url>";
+        echo "<lastmod>" . $date . "</lastmod>";
+        echo "<changefreq>" . $v['changefreq'] . "</changefreq>";
+        echo "<priority>" . $v['priority'] . "</priority>";
+        echo "</url>";
 
+      }
+    } else {
+      echo "no pages added yet";
     }
 
     echo "</urlset>";

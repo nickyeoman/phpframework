@@ -1,5 +1,7 @@
 <?php
-class userController extends Nickyeoman\Framework\BaseController {
+namespace Nickyeoman\Framework\Components\user;
+
+class userController extends \Nickyeoman\Framework\BaseController {
 
 	public bool $error = false;
 
@@ -60,7 +62,7 @@ class userController extends Nickyeoman\Framework\BaseController {
 		// end POST SUBMITTED
 
 		$this->data['page']['slug'] = 'user-login';
-		$this->twig('login', $this->data);
+		$this->twig('login', $this->data, 'user');
 
 	}
 	//END Login
