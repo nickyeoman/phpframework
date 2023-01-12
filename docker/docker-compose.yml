@@ -61,4 +61,5 @@ services:
   #   image: 'mailhog/mailhog:latest'
   #   container_name: "${DOCKERNAME}-mailhog"
   #   ports:
+  #     - "1025:1025"
   #     - "8025:8025"

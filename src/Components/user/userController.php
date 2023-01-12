@@ -24,8 +24,8 @@ class userController extends \Nickyeoman\Framework\BaseController {
 		// Check if form Submitted
 		if ( $this->post['submitted'] ) {
 
-			$user = new Nickyeoman\helpers\userHelper();
-
+			$user = new \Nickyeoman\Framework\Components\user\userHelper();
+			
 			//Process the form
 			if ( $user->login() ) {
 
@@ -39,13 +39,12 @@ class userController extends \Nickyeoman\Framework\BaseController {
 			} else {
 
 				//prep errors, login failed
-
+				//dump($user->errors);die();
 				if ( !empty($user->errors) ) {
 
 					foreach( $user->errors as $k => $v ) {
 
-						//$this->adderror($string = $v, "$k error" );
-						array_push($this->data['error'], "$k $v");
+						$this->adderror($v, $k);
 
 					}
 					//end foreach
@@ -79,7 +78,7 @@ class userController extends \Nickyeoman\Framework\BaseController {
     //check Form Was submitted is enabled
     if ( ! empty( $_POST['formkey'] ) ){
 
-			$user = new Nickyeoman\helpers\userHelper();
+		$user = new \Nickyeoman\Framework\Components\user\userHelper();
 
 		//check session matches
     	if ( $_POST['formkey'] == $this->session->getKey('formkey') ) {
@@ -100,7 +99,6 @@ class userController extends \Nickyeoman\Framework\BaseController {
 					$this->error = true;
 					//For the view
 					array_push($this->data['error'], $user->errors['email']);
-
 				}
 
 				// check password address
@@ -140,7 +138,7 @@ class userController extends \Nickyeoman\Framework\BaseController {
     }
 
     //Display view
-    $this->twig('registration', $this->data);
+    $this->twig('registration', $this->data,'user');
 	$this->session->writeSession();
 
 	}
@@ -151,7 +149,7 @@ class userController extends \Nickyeoman\Framework\BaseController {
 		if ( isset( $_GET['valid'] ) ) { //TODO: change this to param
 
 			//A validation key exists, we better check it
-			$user = new Nickyeoman\helpers\userHelper();
+			$user = new \Nickyeoman\Framework\Components\user\userHelper();
 
 			// TODO: Check user isn't already valid.
 
@@ -170,7 +168,7 @@ class userController extends \Nickyeoman\Framework\BaseController {
 		//end check key
 
 		// display view
-		$this->twig('validate', $this->data);
+		$this->twig('validate', $this->data, 'user');
 
 	}
 	// End validate action (page)
@@ -253,7 +251,7 @@ class userController extends \Nickyeoman\Framework\BaseController {
 
                 $this->error = true;
                 //For the view
-                $this->data['error'] = $user->errors['valid'];
+                array_push($this->data['error'] , $user->errors['valid']);
 
             } else {
 
@@ -495,7 +493,7 @@ class userController extends \Nickyeoman\Framework\BaseController {
 			if ( ! $user->checkUsername() ) {
 
 				//For the view
-				$this->data['error'] .= $user->errors['username'];
+				array_push($this->data['error'] , $user->errors['username']);
 
 			} else {
 

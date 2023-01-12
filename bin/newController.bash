@@ -6,7 +6,7 @@ ControllerName=$1;
 cat << EOF > controllers/${ControllerName}.php
 <?php
    namespace Nickyeoman\Framework\Controller;
-   class ${ControllerName}Controller extends Nickyeoman\Framework\BaseController {
+   class ${ControllerName}Controller extends \Nickyeoman\Framework\BaseController {
 
      function index() {
 
