@@ -3,7 +3,10 @@
 echo "*** Starting New Project Script ***"
 
 # TODO: check if script has already been run
-# TODO: check if $1 exits
+
+# check that $1 folder does not exit
+[ -d "$1" ] && echo "Folder $1 already exists" && exit 1
+
 
 composer -v > /dev/null 2>&1
 COMPOSER=$?
@@ -16,6 +19,11 @@ else
   mkdir $1
   cd $1
   composer require nickyeoman/phpframework
+
+  # Add controllers dir
+  php vendor/nickyeoman/phpframework/bin/composer-psr4-controllers.php
+  composer dump-autoload -o
+
   echo "Composer has installed nickyeoman/phpframework to $1"
 fi
 
@@ -77,3 +85,8 @@ echo "*** End New Project Script ***"
 echo "FURTHER INSTRUCTIONS: "
 echo "To start a local server, edit .env file then run:"
 echo "sudo docker-compose up -d"
+
+
+    "autoload": {
+        "psr-4": { "Nickyeoman\\Framework\\Controller\\": "controllers/" }
+    }
