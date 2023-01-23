@@ -1,24 +1,34 @@
 <?php
 namespace Nickyeoman\Framework\Components\search;
 
+USE Nickyeoman\Framework\SessionManager;
+USE Nickyeoman\Framework\ViewData;
+USE Nickyeoman\Framework\RequestManager;
+USE \Nickyeoman\Dbhelper\Dbhelp as DB;
+
  class searchController extends \Nickyeoman\Framework\BaseController {
 
    function index($params = null) {
 
+    $s = new SessionManager();
+		$v = new ViewData($s);
+		$r = new RequestManager($s, $v);
+
      $searchRequest = null;
-     $this->data['searchCount'] = null;
-     $this->data['searchTerm'] = null;
+     $v->data['searchCount'] = null;
+     $v->data['searchTerm'] = null;
 
      if ( !empty($params[0]) )
        $searchRequest = $params[0];
 
-     if ( !empty($this->post['search']) )
-       $searchRequest = $this->post['search'];
+     if ( !empty($r->get('search') ) )
+       $searchRequest = $r->get('search');
 
      if ( !empty($searchRequest) ) {
        //clean search request
        $searchRequest = trim(strip_tags($searchRequest));
-       $searchRequest = mysqli_real_escape_string($this->db->con, $searchRequest);
+       $DB = new DB();
+       $searchRequest = mysqli_real_escape_string($DB->con, $searchRequest);
 
        // do the search
        $sql = <<<EOSQL
@@ -30,19 +40,19 @@ namespace Nickyeoman\Framework\Components\search;
         AND (`keywords` LIKE '%$searchRequest%' OR 'body' LIKE '$searchRequest' )
         AND `tags` LIKE '%blog%' ;
 EOSQL;
-          $results = $this->db->query($sql);
-          $this->data['searchResults'] = $results;
-          $this->data['searchTerm'] = $searchRequest;
+          $results = $DB->query($sql);
+          $v->data['searchResults'] = $results;
+          $v->data['searchTerm'] = $searchRequest;
 
-          if (empty($this->data['searchResults']) )
-            $this->data['searchCount'] = 0;
+          if (empty($v->data['searchResults']) )
+            $v->data['searchCount'] = 0;
           else
-            $this->data['searchCount'] = count($this->data['searchResults']);
+            $v->data['searchCount'] = count($v->data['searchResults']);
 
      }
 
-     $this->data['menuActive'] = 'search';
-     $this->twig('search', $this->data, 'search');
+     $v->data['menuActive'] = 'search';
+     $this->twig('search', $v->data, 'search');
 
    }
  }

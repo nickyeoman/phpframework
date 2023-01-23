@@ -13,5 +13,6 @@ if ( $_ENV['DEBUG'] == 'display' )
 // Route
 USE Nickyeoman\Framework\Router as Router;
 $router = new Router();
+
 $theController = new $router->controllerClass();
 call_user_func_array( array($theController, $router->action), [$router->params] );

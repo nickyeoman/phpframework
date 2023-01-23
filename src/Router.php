@@ -29,6 +29,11 @@ class Router {
   // content of contoller file (for method checking)
   private $filecontent = '';
 
+  // Debugging
+  private $debug = false;
+  private $debuglog = array();
+
+
   // Fuctions ******************************************************************
 
   public function __construct() {
@@ -54,6 +59,10 @@ class Router {
 
     //remove get
     $builduri = strtok($_SERVER['REQUEST_URI'], '?');
+    if ($this->debug) {
+      array_push($this->debuglog, "builduri");
+      dump($builduri);
+    }
 
     //put into array
     $uriarr = explode("/", $builduri);
@@ -117,7 +126,7 @@ class Router {
   
           //404
           $this->controller = 'error';
-          $this->action = '_404';
+          $this->action = 'index';
           $this->params = array();
           $this->controllerClass = "Nickyeoman\Framework\Components\\" . $this->controller . '\\' . $this->controller . 'Controller'; // Change to framework compoenents
 
@@ -160,20 +169,17 @@ class Router {
       } else {
 
         $this->controller = 'error';
-        $this->action = '_404';
+        $this->action = 'index';
         $_ENV['CONTROLLERPATH'] = "vendor/nickyeoman/phpframework/components/$this->controller/"; //TODO: can't override this
 
-        bdump('Error: the override exists but no parameter given');
       }
 
     } else { // action is not index or empty
 
       //404
       $this->controller = 'error';
-      $this->action = '_404';
-      $_ENV['CONTROLLERPATH'] = "vendor/nickyeoman/phpframework/components/$this->controller/"; //TODO: can't override this
-
-      bdump("Error: The Method ($action) doesn't exist in the Controller file ($filename)", 'Router Error');
+      $this->action = 'index';
+      $_ENV['CONTROLLERPATH'] = "vendor/nickyeoman/phpframework/components/error/"; //TODO: can't override this
 
     }
     //end check file

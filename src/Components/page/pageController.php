@@ -1,18 +1,32 @@
 <?php
 namespace Nickyeoman\Framework\Components\page;
 
+USE Nickyeoman\Framework\SessionManager;
+USE Nickyeoman\Framework\ViewData;
+USE Nickyeoman\Framework\RequestManager;
+USE \Nickyeoman\Dbhelper\Dbhelp as DB;
+USE Nickyeoman\Framework\Components\page\pageHelper as pageHelp;
+
+
 class pageController extends \Nickyeoman\Framework\BaseController {
 
   // There is no index page, this will catch
   function override( $params = array() ) {
 
+    $s = new SessionManager();
+		$v = new ViewData($s);
+		$r = new RequestManager($s, $v);
+
     //TODO: 404 if empty
     $slug = $params[0];
-    $pagedata = $this->db->findone('pages', 'slug', $slug);
+
+    $DB = new DB();
+    $pagedata = $DB->findone('pages', 'slug', $slug);
 
     if ( empty($pagedata)) {
+      // TODO: test this
       header('HTTP/1.1 404 Not Found');
-      $this->twig('404', $this->data);
+      $this->twig('404', $v->data, 'error');
       die();
     }
 
@@ -31,12 +45,12 @@ class pageController extends \Nickyeoman\Framework\BaseController {
       $pagedata['taglinks'] .= ' <a class="taglinks" href="/blog/tag/' . $value . '/1">' . $value . '</a>';
     }
 
-    if ( $this->session->loggedin() )
-      $this->data['userid'] = $this->session->getKey('userid');
+    if ( $s->loggedin() )
+      $v->set('userid', $s->getKey('userid'));
 
     // Comments
     $pageid = $pagedata['id']; // Used in multiple places
-    $this->session->setKey('pageid', $pageid); //remember in session
+    $s->setKey('pageid', $pageid); //remember in session
     $SQL = <<<EOSQL
 SELECT
 	c.body, u.username, c.date
@@ -50,11 +64,12 @@ WHERE
 	c.pageid = $pageid
 EOSQL;
 
-    $this->data['comments'] = $this->db->query($SQL);
-    $this->data['page'] = $pagedata;
+    $v->data['comments'] = $DB->query($SQL);
+    $DB->close();
+    $v->data['page'] = $pagedata;
 
-    $this->session->writeSession();
-    $this->twig('page', $this->data, 'page');
+    $s->writeSession();
+    $this->twig('page', $v->data, 'page');
 
   }
   // end override
@@ -62,33 +77,38 @@ EOSQL;
   // List pages to edit
   function admin() {
 
-    if ( ! $this->session->loggedin() ) {
+    $s = new SessionManager();
+		$v = new ViewData($s);
 
-      $this->session->addflash("You need to login to edit pages.",'notice');
-      $this->session->writeSession();
-      $this->redirect('user', 'login');
+    if ( ! $s->loggedin() ) {
 
-    } elseif ( !$this->session->inGroup('admin') ) {
+      $s->addflash("You need to login to edit pages.",'notice');
+      $s->writeSession();
+      $this->redirect('admin', 'index');
 
-      $this->session->addflash("You need Admin permissions to edit pages.",'notice');
-      $this->session->writeSession();
+    } elseif ( !$s->isAdmin() ) {
+
+      $s->addflash("You need Admin permissions to edit pages.",'notice');
+      $s->writeSession(); 
       $this->redirect('user', 'login');
 
     }
 
     //Grab pages
-    $result = $this->db->findall('pages','id,title,slug,tags,draft');
+    $DB = new DB();
+    $result = $DB->findall('pages','id,title,slug,draft');
 
     if ( !empty( $result ) ) {
       foreach ($result as $key => $value){
         $value['tags'] = explode(',',$value['tags']);
-        $this->data['pages'][$key] = $value;
+        $v->data['pages'][$key] = $value;
       }
     }
 
-    $this->data['pageid'] = "page-admin";
-    $this->session->writeSession();
-    $this->twig('admin', $this->data, 'page');
+    $v->set('pageid', "page-admin");
+    $v->set('adminbar', true);
+    $s->writeSession();
+    $this->twig('admin', $v->data, 'page');
 
   }
   //end admin
@@ -98,19 +118,28 @@ EOSQL;
    **/
   function edit($params = null) {
 
-    if ( ! $this->session->loggedin('You need to login to edit pages.') )
+    $s = new SessionManager();
+		$v = new ViewData($s);
+		$r = new RequestManager($s, $v);
+    $DB = new DB();
+    
+    if ( ! $s->loggedin('You need to login to edit pages.') )
+      $this->redirect('admin', 'index');
+
+    if ( !$s->isAdmin() ) {
+      $s->addflash('You need to be an admin to view messages..','error');
       $this->redirect('user', 'login');
+    }
 
-    if ( !$this->session->inGroup('admin', 'You need Admin permissions to edit pages.') )
-      $this->redirect('user', 'login');
+    if ( $r->submitted ) {
 
-    if ( $this->post['submitted'] ) {
-      $page = new Nickyeoman\helpers\pageHelper($this->post);
+      $page = new pageHelp($r->post);
+      
+      
+      $id = $DB->update('pages', $page->page , 'id' );
 
-      $id = $this->db->update('pages', $page->page , 'id' );
-
-      $this->session->addflash('Saved Page.','notice');
-      $this->session->writeSession();
+      $s->addflash('Saved Page.','notice');
+      $s->writeSession();
       $this->redirect('page', 'admin');
 
     }
@@ -122,62 +151,73 @@ EOSQL;
       //TODO: clean it up, trim, lower
     }
 
-    $this->data['info'] = $this->db->findone('pages', 'id', $pid);
-    $this->data['pageid'] = "page-edit";
-    $this->twig('edit', $this->data, 'page');
+    $v->data['info'] = $DB->findone('pages', 'id', $pid);
+    $v->data['pageid'] = "page-edit";
+    $this->twig('edit', $v->data, 'page');
 
   }
   // end function edit
 
   public function new(){
-    if ( ! $this->session->loggedin() ) {
 
-      $this->session->addflash('You need to login to edit pages.','notice');
-      $this->redirect('user', 'login');
+    $s = new SessionManager();
+		$v = new ViewData($s);
+		$r = new RequestManager($s, $v);
+
+    if ( ! $s->loggedin() ) {
+
+      $s->addflash('You need to login to edit pages.','notice');
+      $this->redirect('login', 'index');
 
     }
 
-    if ( $this->post['submitted'] ) {
-      $page = new Nickyeoman\helpers\pageHelper($this->post);
+    if ( $r->submitted ) {
+      
+      $page = new pageHelp($r->post);
 
       if( empty($page->error) ) {
-
-        $id = $this->db->create('pages', $page->page);
+        $DB = new DB();
+        $DB->create('pages', $page->page);
+        $DB->close();
 
       } else {
         dump($page->error);die("there are page errors");
       }
 
-      $this->session->addflash('Saved Page.','notice');
+      $s->addflash('Saved Page.','notice');
       $this->redirect('page', 'admin');
 
     }
     //end submitted
 
-    $this->data['info'] = array(
+    $v->data['info'] = array(
     'title' => 'New Title',
     'slug'  => 'slug',
     'intro' => 'Placeholder Text',
     'body'  => 'Placeholder Text'
     );
-    $this->data['mode'] = 'new';
-    $this->data['pageid'] = "page-edit";
-    $this->session->writeSession();
-    $this->twig('edit', $this->data, 'page');
+    $v->data['mode'] = 'new';
+    $v->data['pageid'] = "page-edit";
+    $s->writeSession();
+    $this->twig('edit', $v->data, 'page');
 
   }
   //end new
 
   public function tagadmin($params = null) {
 
-    if ( ! $this->session->loggedin() ) {
+    $s = new SessionManager();
+		$v = new ViewData($s);
+		$r = new RequestManager($s, $v);
 
-      $this->session->addflash("You need to login to edit tags.",'notice');
+    if ( ! $s->loggedin() ) {
+
+      $s->addflash("You need to login to edit tags.",'notice');
       $this->redirect('user', 'login');
 
-    } elseif ( !$this->session->inGroup('admin') ) {
+    } elseif ( !$s->inGroup('admin') ) {
 
-      $this->session->addflash("You need Admin permissions to edit tags.",'notice');
+      $s->addflash("You need Admin permissions to edit tags.",'notice');
       $this->redirect('user', 'login');
 
     }
@@ -186,28 +226,35 @@ EOSQL;
     if ( empty( $tag ) )
       die("no tag supplied, TODO: 404");
 
-    $result = $this->db->findall('pages', '*', "`tags` LIKE '%$tag%'");
+    $DB = new DB();      
+    $result = $DB->findall('pages', '*', "`tags` LIKE '%$tag%'");
     foreach ($result as $key => $value){
       $value['tags'] = explode(',',$value['tags']);
       $this->data['pages'][$key] = $value;
     }
+    $DB->close();
 
-    $this->data['pageid'] = "page-admin";
+    $v->set('adminbar', true);
+    $v->set('pageid', "page-admin");
     $this->twig('admin', $this->data, 'page');
   }
 
   public function createcomment() {
 
+    $s = new SessionManager();
+		$v = new ViewData($s);
+		$r = new RequestManager($s, $v);
+
     // Check if logged in
-    if ( ! $this->session->loggedin('You need to login to leave a comment.') )
+    if ( ! $s->loggedin('You need to login to leave a comment.') )
       $this->redirect('user', 'login');
 
-    if ( empty( $this->session->getKey('pageid') ))
-      $this->session->addflash("Error: missing pageid.",'error');
+    if ( empty( $s->getKey('pageid') ))
+      $s->addflash("Error: missing pageid.",'error');
 
-    if ( empty( $this->post['comment'] )) {
+    if ( empty( $r->get('comment') )) {
 
-      $this->session->addflash("You need content in the comment",'error');
+      $s->addflash("You need content in the comment",'error');
 
     } else {
 
@@ -219,20 +266,22 @@ EOSQL;
       $badwords = $this->valid->checkSpam($this->post['comment'], $_ENV['SPAMWORDS']);
 
       if ( !empty($badwords) )
-        $this->session->addflash("You can't use these words: $badwords",'error');
+        $s->addflash("You can't use these words: $badwords",'error');
 
     }
 
-    if ( $this->session->flashcount('error') < 1 ) {
+    if ( $s->flashcount('error') < 1 ) {
 
       $comment = array(
-        'pageid'  => $this->session->getKey('pageid')
-        ,'userid' => $this->session->getKey('id')
-        ,'body'   => $this->post['comment']
+        'pageid'  => $s->getKey('pageid')
+        ,'userid' => $s->getKey('id')
+        ,'body'   => $r->get('comment')
       );
 
+      $DB = new DB();
       $id = $this->db->create('comments', $comment);
-      $this->session->addflash("Saved Comment.",'notice');
+      $DB->close();
+      $s->addflash("Saved Comment.",'notice');
 
     }
 
@@ -242,16 +291,21 @@ EOSQL;
 
   public function admincomment($params = null) {
 
-    if ( ! $this->session->loggedin('You need to login to admin comments.') )
+    $s = new SessionManager();
+		$v = new ViewData($s);
+		$r = new RequestManager($s, $v);
+    $DB = new DB();
+
+    if ( ! $s->loggedin('You need to login to admin comments.') )
       $this->redirect('user', 'login');
 
-    if ( !$this->session->inGroup('admin', 'You need admin permissions;') )
+    if ( !$s->inGroup('admin', 'You need admin permissions;') )
       $this->redirect('user', 'login');
 
     // Remove a comment
     if ( !empty($params) ) {
       if ( $params[0] == 'delete' && $params[1] >= 0 ) {
-        $this->db->delete('comments', "`id` = $params[1]");
+        $DB->delete('comments', "`id` = $params[1]");
         $this->adderror("Removed comment $params[1]", 'notice');
       }
     }
@@ -269,119 +323,11 @@ ON
   c.userid = u.id
 EOSQL;
 
-    $this->data['comments'] = $this->db->query($SQL);
+    $v->data['comments'] = $DB->query($SQL);
 
-    $this->data['pageid'] = "comments-admin";
-    $this->twig('adminComments', $this->data, 'page');
+    $v->data['pageid'] = "comments-admin";
+    $v->set('adminbar', true);
+    $this->twig('adminComments', $v->data, 'page');
   }
 
-  public function migrate() {
-
-		if ( ! $this->session->loggedin('You need to login to edit users.') )
-      		$this->redirect('user', 'login');
-
-    	if ( !$this->session->inGroup('admin', 'You need Admin permissions to edit users.') )
-      		$this->redirect('user', 'login');
-
-		$schem = array(
-			array(
-				'name' => 'title'
-				,'type' => 'varchar'
-				,'size' => '255'
-				,'null' => 'No'
-			)
-			,array(
-				'name' => 'heading'
-				,'type' => 'varchar'
-				,'size' => '255'
-				,'null' => 'No'
-			)
-			,array(
-				'name' => 'description'
-				,'type' => 'varchar'
-				,'size' => '255'
-				,'null' => 'No'
-			)
-			,array(
-				'name' => 'keywords'
-				,'type' => 'varchar'
-				,'size' => '255'
-				,'null' => 'No'
-			)
-			,array(
-				'name' => 'author'
-				,'type' => 'varchar'
-				,'size' => '255'
-				,'null' => 'No'
-			)
-			,array(
-				'name' => 'slug'
-				,'type' => 'varchar'
-				,'size' => '255'
-				,'null' => 'No'
-			)
-      ,array(
-				'name' => 'path'
-				,'type' => 'varchar'
-				,'size' => '255'
-				,'null' => 'Yes'
-        ,'default' => 'NULL'
-			)
-      ,array(
-				'name' => 'tags'
-				,'type' => 'varchar'
-				,'size' => '255'
-				,'null' => 'Yes'
-			)
-      ,array(
-				'name' => 'intro'
-				,'type' => 'text'
-				,'null' => 'Yes'
-			)
-      ,array(
-				'name' => 'body'
-				,'type' => 'text'
-				,'null' => 'Yes'
-			)
-      ,array(
-				'name' => 'notes'
-				,'type' => 'text'
-				,'null' => 'Yes'
-			)
-      ,array(
-				'name' => 'created'
-				,'type' => 'datetime'
-				,'null' => 'No'
-			)
-      ,array(
-				'name' => 'updated'
-				,'type' => 'datetime'
-				,'null' => 'Yes'
-			)
-      ,array(
-				'name' => 'draft'
-				,'type' => 'tinyint'
-        ,'size' => '1'
-				,'null' => 'Yes'
-			)
-      ,array(
-				'name' => 'changefreq'
-				,'type' => 'varchar'
-				,'null' => 'No'
-        ,'size' => '7'
-			)
-      ,array(
-				'name' => 'priority'
-				,'type' => 'decimal'
-        ,'size' => '10,0'
-				,'null' => 'No'
-        ,'default' => '1'
-			)
-			
-		);
-		$this->db->migrate('pages',$schem);
-		echo '<p><a href="/admin/index">back to admin</a></p>';
-	}
-
-}
-//end class
+} //end class

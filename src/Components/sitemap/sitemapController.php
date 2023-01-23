@@ -1,6 +1,8 @@
 <?php
 namespace Nickyeoman\Framework\Components\sitemap;
 
+USE \Nickyeoman\Dbhelper\Dbhelp as DB;
+
 class sitemapController extends \Nickyeoman\Framework\BaseController {
 
   public function index() {
@@ -16,7 +18,8 @@ class sitemapController extends \Nickyeoman\Framework\BaseController {
     header('Content-Type: text/xml');
 
     //Get the pages (priority of zero will remove it from the sitemap, drafts are not shown)
-    $thepages = $this->db->findall('pages', 'draft, slug, updated, changefreq, priority, path', 'priority > 0 AND draft < 1', 'updated');
+    $DB = new DB();
+    $thepages = $DB->findall('pages', 'draft, slug, updated, changefreq, priority, path', 'priority > 0 AND draft < 1', 'updated');
 
     // Start the view
     echo '<?xml version="1.0" encoding="UTF-8"?>';

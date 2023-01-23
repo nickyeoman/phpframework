@@ -1,94 +1,17 @@
 <?php
 namespace Nickyeoman\Framework;
-USE \Nickyeoman\Dbhelper;
-USE Nickyeoman\Framework\SessionManager as Session;
-
-// load helpers
-$loader = new \Nette\Loaders\RobotLoader; // https://doc.nette.org/en/3.1/robotloader
-$loader->addDirectory( $_ENV['BASEPATH'] . "/" . $_ENV['HELPERPATH'] ); //helpers
-$loader->setTempDirectory( $_ENV['BASEPATH'] . "/" . $_ENV['LOADERTMPDIR'] ); // use 'temp' directory for cache
-$loader->register(); // Run the RobotLoader
 
 class BaseController {
 
   public $db = null; //class
-  public $session = null; //class
-  public $post = array('submitted' => false);
-  public $data = array('error' => array(), 'notice' => null);
 
   /*
-  * Base controller manages Sessions, Get, Post and Database
+  * Base controller
   */
   public function __construct() {
-
-    // sessions
-    $this->session = new Session();
-
-    $this->populateData();
-
-    // Store the database object to a variable in this object
-    if ( ! empty( $_ENV['DBUSER'] ) )
-      $this->db = new \Nickyeoman\Dbhelper\Dbhelp(
-        $_ENV['DBHOST']
-        , $_ENV['DBUSER']
-        , $_ENV['DBPASSWORD']
-        , $_ENV['DB']
-        , $_ENV['DBPORT']
-      );
-
-    // POST
-    $this->setPost();
-
+    //nothing here now
   }
   // End construct
-
-  // sets the data array for view
-  public function populateData() {
-
-    // Set all the Global view variables
-    $this->data = [
-      'uri'     => rtrim(ltrim($_SERVER['REQUEST_URI'], "\/"), "\/")
-      ,'pageid' => str_replace("/", "-", rtrim(ltrim($_SERVER['REQUEST_URI'], "\/"), "\/"))
-      ,'agent'  => $_SERVER['HTTP_USER_AGENT']
-    ];
-
-    if ( empty($_SERVER['HTTP_X_REAL_IP']) )
-      $this->data['ip'] = $_SERVER['REMOTE_ADDR'];
-    else
-      $this->data['ip'] = $_SERVER['HTTP_X_REAL_IP'];
-
-      // Session Data for the view
-      $this->data = array_merge($this->data, [
-        'formkey'   => $this->session->getKey('formkey')
-        ,'loggedin' => $this->session->getKey('loggedin')
-      ]);
-
-      // Session flash data for the view
-      if ( !empty($this->session->session['flash']) ){
-        foreach ( $this->session->session['flash'] as $key => $value ) {
-
-          if ( is_array($value) ) {
-            foreach( $value as $k => $v ) {
-              if ( !empty($v) )
-                $this->adderror($v, $key );
-            }
-          } else {
-            if ( !empty($value) )
-              $this->adderror($value, $key );
-          }
-
-        }
-        $this->session->clearflash();
-
-      }
-
-      //permissions
-      if ( $this->session->inGroup('admin') )
-        $this->data['admin'] = 'admin';
-
-      bdump($this->data,"View Data");
-
-  }
 
   /**
   * Redirect to the correct controller and action (page)
@@ -106,8 +29,6 @@ class BaseController {
       $action = '';
     else
       $action = "/$action";
-
-    $this->session->writeSession();
 
     // php redirect
     exit(header("Location: $controller$action"));
@@ -138,38 +59,9 @@ class BaseController {
       $this->twig->addExtension(new \Twig\Extension\DebugExtension());
 
       echo $this->twig->render("$viewname.html.twig", $vars);
-      $this->session->writeSession();
-      $this->db->close();
 
   }
   // End twig
-
-  /**
-  * Add an error
-  * Errors are an array stored to a session
-  * Returns the count of errors
-  **/
-  public function adderror($string = "No Information Supplied", $name = null ) {
-
-    if ( !isset($this->data['messages']) )
-      $this->data['messages'] = array();
-
-    array_push($this->data['messages'], array($name => $string));
-
-    return true;
-
-  }
-  // End adderror
-
-  // count errors
-  public function counterrors() {
-
-    $count = count($this->data['error']);
-    if ( empty($count) )
-      $count = 0;
-    return( $count );
-
-  }
 
   /**
   * A wrapper for the nette SMTP
@@ -274,35 +166,6 @@ class BaseController {
     // end mysql
   }
   // end function log
-
-  // Gets the POST and puts it in post
-  private function setPost() {
-
-    if ( ! empty( $_POST['formkey'] ) ){
-
-      //check session matches
-      if ( $_POST['formkey'] == $this->session->getKey('formkey') ) {
-
-        $this->post['submitted'] = true;
-
-        foreach( $_POST as $key => $value){
-          //clean variable TODO: might not want this all the time (html)
-          $prep = trim(strip_tags($value));
-          $this->post[$key] = htmlentities($prep, ENT_QUOTES);
-        }
-
-      } else {
-
-        //error no form key.
-        $this->adderror( 'There was a problem with the session, try again', 'error' );
-
-      }
-
-    }
-    //end if
-    bdump($this->post, 'BC set post');
-  }
-  // end setPost()
 
 }
 // end BaseController

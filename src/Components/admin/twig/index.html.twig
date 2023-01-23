@@ -2,26 +2,12 @@
 {% extends "@nytwig/master.html.twig" %}
 
 {% block content %}
+<p>Welcome {{ username }}</p>
 
 <h2>User Controls</h2>
 <ul>
   <li><a href="/user/myprofile">My Profile</a></li>
 </ul>
-
-{% if admin == 'admin' %}
-<h2>Admin Controls</h2>
-<p>You are logged in.</p>
-<p>
-<ul>
-  <li><a href="/page/admin">Pages</a></li>
-  <li><a href="/page/admincomment">Edit Comments</a></li>
-  <li><a href="/contact/admin">Messages</a></li>
-  <li><a href="/logs">Logs</a></li>
-  <li><a href="/user/admin">Users</a></li>
-  <li><a href="/spamwords">Spam Words</a></li>
-</ul>
-{% endif %}
-
 
 {% if username == "nick" %}
 <h2>Nick's Dashboard</h2>

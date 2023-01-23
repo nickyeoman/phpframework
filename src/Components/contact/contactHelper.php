@@ -1,5 +1,5 @@
 <?php
-namespace Nickyeoman\helpers;
+namespace Nickyeoman\Framework\Components\contact;
 USE \Nickyeoman\Validation;
 
 class contactHelper {

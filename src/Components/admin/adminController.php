@@ -1,6 +1,9 @@
 <?php
 namespace Nickyeoman\Framework\Components\admin;
 
+USE Nickyeoman\Framework\SessionManager;
+USE Nickyeoman\Framework\ViewData;
+
 class adminController extends \Nickyeoman\Framework\BaseController {
 
 	public bool $error = false;
@@ -8,12 +11,16 @@ class adminController extends \Nickyeoman\Framework\BaseController {
 	// This is the dashboard
 	public function index(){
 
-		if ( ! $this->session->loggedin("You need to login to access dashboard.") )
+		$s = new SessionManager();
+		$v = new ViewData($s);
+
+		if ( ! $s->loggedin("You need to login to access dashboard.") )
 			$this->redirect('user', 'login');
 	  
-		$this->data['username'] = $this->session->getKey('username');
-
-		$this->twig('index', $this->data, 'admin');
+		$v->set('username', $s->data['user']['username'] );
+		$v->set('adminbar', true);
+		
+		$this->twig('index', $v->data, 'admin');
 
 	} // end function index
 

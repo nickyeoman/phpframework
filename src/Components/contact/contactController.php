@@ -1,139 +1,170 @@
 <?php
 namespace Nickyeoman\Framework\Components\contact;
 
+USE Nickyeoman\Framework\SessionManager;
+USE Nickyeoman\Framework\ViewData;
+USE Nickyeoman\Framework\RequestManager;
+USE \Nickyeoman\Dbhelper\Dbhelp as DB;
+USE Nickyeoman\Framework\Components\contact\contactHelper as contacthelp;
+
 class contactController extends \Nickyeoman\Framework\BaseController {
 
   /**
-   * Public Contact Us form
+   * Public Contact form
    **/
   public function index() {
 
-    // set variables
-    $this->data['menuActive'] = 'contact'; //active menu
-    $this->data['showform'] = true; // show form by default (hide if entered)
-    $this->data['pageid'] = "contactform"; // for the css
+    $s = new SessionManager();
+		
+    $v = new ViewData($s);
+    $v->set('menuActive', 'contact');
+    $v->set('showform',true);
+    $v->set('pageid', "contactform");
 
-    //debug
-    bdump($this->post, 'Post Data From Framework');
+    $r = new RequestManager($s, $v);
 
-    if ( $this->post['submitted'] ) {
+    if ( $r->submitted ) {
 
       // sendEmail clarifies if we are going to save to the db and send and email
       // false will stop the process and reshow the page
       $sendEmail = true;
 
+      $DB = new DB();
+
       // Check Spam words
-      $results    = $this->db->findall('spamwords', 'phrase');
-      $checktext  = ' ' . strtolower( $this->post['message'] );
+      $results    = $DB->findall('spamwords', 'phrase');
+      $checktext  = ' ' . strtolower( $r->get('message') );
       $theword    = '';
       
-      foreach ($results as $v) {
-        if ( stripos($checktext, $v['phrase'] ) ) {
+      foreach ($results as $val) {
+        if ( stripos($checktext, $val['phrase'] ) ) {
           $sendEmail = false;
-          $theword = $v['phrase'];
+          $theword = $val['phrase'];
         }
         
       }
       if ( !$sendEmail )
-        $this->adderror("Your message contains spammy words ($theword)", 'error' );
+        $v->adderror("Your message contains spammy words ($theword)" );
       // End check spamwords
 
 
       // Check Email adress against db
-      $result = $this->db->findone('badEmails','email',$this->post['email']);
+      $result = $DB->findone('badEmails','email',$r->get('email'));
       if ( !empty($result) ) {
-        $this->adderror("Your email address has been flagged", 'error' );
+        $v->adderror("Your email address has been flagged" );
         $sendEmail = false;
       }
 
       //load helper
-      $ch = new Nickyeoman\helpers\contactHelper($this->post);
+      $ch = new contacthelp($r->post);
       if ( $ch->checkerrors() || !$sendEmail ) {
 
-        foreach ( $ch->error as $k => $v)
-          $numerr = $this->adderror($v, $k );
+        foreach ( $ch->error as $val)
+          $v->adderror($val);
 
       } else {
 
         // Save to Database
         $insertData = array(
-          'email'      => $this->post['email'],
-          'message'    => $this->post['message']
+          'email'      => $r->get('email'),
+          'message'    => $r->get('message')
         );
 
       // Insert/create database
-      $id = $this->db->create("contactForm", $insertData );
+      $id = $DB->create("contactForm", $insertData );
+      $DB->close();
 
       // Error check the database
       if ( empty( $id ) )
-        $this->adderror("There was a problem sending the message.", 'db' );
+        $v->adderror("There was a problem sending the message." );
       else
-        $this->data['showform'] = false;
+        $v->set('showform', false);
 
       // Send am email
+      // TODO: this shouldn't be public
       $this->sendEmail(
-        'nick.yeoman@gmail.com'
-        ,'New Message At NickYeoman.com'
-        ,"Here is your message: " . $this->post['message']
+        $_ENV['MAIL_FROM_ADDRESS']
+        ,'New Message on ' . $_ENV['MAIL_FROM_NAME']
+        ,"Here is your message: " . $r->get('message')
       );
 
       } // end if errors
 
     } //end if submitted
 
-    $this->twig('contact', $this->data);
+    $this->twig('contact', $v->data, 'contact');   
 
   }
 
   public function admin() {
 
-    if ( ! $this->session->loggedin('You need to login to edit messages.') )
-   		$this->redirect('user', 'login');
-
-    if ( !$this->session->inGroup('admin', 'You need to be an admin to view messages..') )
-      $this->redirect('user', 'login');
-
-    //Variables
-    $this->data['pageid'] = "contact-admin";
-    $this->data['contactMessages'] = array();
-
-    //Grab pages from db
-    $result = $this->db->findall('contactForm', 'id,email,message,created,unread');
+    $s = new SessionManager();
     
+    // redirects
+    if ( ! $s->loggedin('You need to login to edit messages.') )
+   		$this->redirect('login', 'index');
+
+    if ( ! $s->isAdmin() ) {
+      $s->addflash('You need to be an admin to view messages..','error');
+      $this->redirect('admin', 'index');
+    }
+
+    // view data
+    $v = new ViewData($s);
+    $v->set('pageid', "contact-admin");
+    $v->data['contactMessages'] = array();
+      
+    //Grab pages from db
+    $DB = new DB();
+    $result = $DB->findall('contactForm', 'id,email,message,created,unread');
+    $DB->close();
+
     //Set if not null
     if ( !is_null($result) ) {
       foreach ($result as $key => $value){
-        $this->data['contactMessages'][$key] = $value;
+        $v->data['contactMessages'][$key] = $value;
       }
     }
     
-    $this->twig('admin', $this->data, 'contact');
+    $v->set('adminbar', true);
+    $this->twig('admin', $v->data, 'contact');
 
   }
 
   public function view($parms = null) {
 
-    if ( ! $this->session->loggedin('You need to login to edit messages.') )
-   		$this->redirect('user', 'login');
+    $s = new SessionManager();
+    
+    // redirects
+    if ( ! $s->loggedin('You need to login to edit messages.') )
+   		$this->redirect('login', 'index');
 
-    if ( !$this->session->inGroup('admin', 'You need to be an admin to view messages..') )
-      $this->redirect('user', 'login');
+    if ( ! $s->isAdmin() ) {
+      $s->addflash('You need to be an admin to view messages..','error');
+      $this->redirect('admin', 'index');
+    }
 
-    // variables
-    $this->data['pageid'] = "viewMessage"; // for the css
     $pid = $parms[0];
 
-    if ( empty($msgid) || !is_numeric($msgid) ) {
-      //Grab pages
-      $this->data['msg'] = $this->db->findone('contactForm', 'id', $pid);
+    // view data
+    $v = new ViewData($s);
+    $v->set('pageid', "viewMessage");
+    $v->data['contactMessages'] = array();
+
+    if ( ! empty($pid) && is_numeric($pid) ) {
+      $DB = new DB();
+      $msg = $DB->findone('contactForm', 'id', $pid);
+      $DB->close();
+      $v->set('msg', $msg);
     } else {
 
-      $this->session->addFlash("Message id not correct or no longer exists", 'error');
+      $s->addflash("Message id not correct or no longer exists", 'error');
       $this->redirect('contact', 'admin');
 
     }
 
-    $this->twig('view', $this->data, 'contact');
+    $v->set('adminbar', true);
+    $this->twig('view', $v->data, 'contact');
 
   } // end view page
 
@@ -142,35 +173,42 @@ class contactController extends \Nickyeoman\Framework\BaseController {
    */
   public function delete($params) {
 
-		if ( ! $this->session->loggedin('You need to login to delete messages.') )
-      		$this->redirect('user', 'login');
+		$s = new SessionManager();
+    
+    // redirects
+    if ( ! $s->loggedin('You need to login to edit messages.') )
+   		$this->redirect('login', 'index');
 
-    if ( !$this->session->inGroup('admin', 'You need Admin permissions to delete messages.') )
-        $this->redirect('user', 'login');
+    if ( ! $s->isAdmin() ) {
+      $s->addflash('You need to be an admin to view messages..','error');
+      $this->redirect('admin', 'index');
+    }
 
 		if ( !empty($params))
 			$msgid = $params[0];
 
 		if ( empty($msgid) || !is_numeric($msgid) ) {
 
-			$this->session->addFlash("Message id not correct", 'error');
+			$s->addFlash("Message id not correct", 'error');
 			$this->redirect('contact', 'admin');
 
 		}
 
 		// Check message exists
-		$result = $this->db->findone('contactForm','id',$msgid);
+    $DB = new DB();
+		$result = $DB->findone('contactForm','id',$msgid);
 
 		if ( empty($result ) ) {
 
-			$this->session->addFlash("Message does not exist", 'error');
+			$s->addFlash("Message does not exist", 'error');
+      $DB->close();
 			$this->redirect('contact', 'admin');
 
 		} else {
 
-			$this->db->delete('contactForm',"id = $msgid");
-			$this->session->addFlash('Notice: user removed (deleted)', "notice");
-
+			$DB->delete('contactForm',"id = $msgid");
+			$s->addFlash('Notice: user removed (deleted)', "notice");
+      $DB->close();
 			$this->redirect('contact', 'admin');
 		}
 
@@ -178,85 +216,38 @@ class contactController extends \Nickyeoman\Framework\BaseController {
 
   public function bademail($params) {
 
-    if ( ! $this->session->loggedin('You need to login to report Emails.') )
-      		$this->redirect('user', 'login');
+    $s = new SessionManager();
+    
+    // redirects
+    if ( ! $s->loggedin('You need to login to edit messages.') )
+   		$this->redirect('login', 'index');
 
-    if ( !$this->session->inGroup('admin', 'You need Admin permissions to report emails.') )
-        $this->redirect('user', 'login');
+    if ( ! $s->isAdmin() ) {
+      $s->addflash('You need to be an admin to view messages..','error');
+      $this->redirect('admin', 'index');
+    }
 
-    if ( $this->post['submitted'] ) {
+    $v = new ViewData($s); // need for Request, TODO: shouldn't need this
+    $r = new RequestManager($s, $v);
 
-      $this->db->create('badEmails', ['email' => $this->post['email'] ] );
-      $this->db->delete('contactForm',"`email` = '{$this->post['email']}'");
+    if ( $r->submitted ) {
 
-      $this->session->addFlash("Email Added, message removed", 'notice');
+      $DB = new DB();
+
+      $DB->create('badEmails', ['email' => $r->get('email') ] );
+      $where = '`email` = ' . $r->get('email');
+      $DB->delete('contactForm',$where);
+
+      $s->addFlash("Email Added, message removed", 'notice');
       $this->redirect('contact','admin');
 
     } else {
 
-      $this->session->addFlash("Post to save bad emails.", 'error');
+      $s->addFlash("Post to save bad emails.", 'error');
       $this->redirect('contact','admin');
 
     }
 
   }
-
-  /**
-   * Make sure your db is the way you want it
-   */
-  public function migrate() {
-
-		if ( ! $this->session->loggedin('You need to login to edit messages.') )
-      $this->redirect('user', 'login');
-
-    if ( !$this->session->inGroup('admin', 'You need Admin permissions to edit messages.') )
-      $this->redirect('user', 'login');
-
-    // Contact form table
-		$schem = array(
-			array(
-				'name' => 'email'
-				,'type' => 'varchar'
-				,'size' => '255'
-				,'null' => 'No'
-			)
-			,array(
-				'name' => 'message'
-				,'type' => 'TEXT'
-				,'null' => 'Yes'
-        ,'default' => 'NULL'
-			)
-			,array(
-				'name' => 'created'
-				,'type' => 'DATETIME'
-				,'null' => 'No'
-				,'default' => 'CURRENT_TIMESTAMP'
-			)
-			,array(
-				'name' => 'unread'
-				,'type' => 'tinyint'
-				,'size' => '1'
-				,'null' => 'No'
-				,'default' => '1'
-        ,'comment' => 'Unread is true by default'
-			)
-		);
-		$this->db->migrate('contactForm',$schem);
-
-    // Bad Email Address Table
-    $badEmailTable = array(
-			array(
-				'name' => 'email'
-				,'type' => 'varchar'
-				,'size' => '255'
-				,'null' => 'No'
-        ,'unique' => 'Yes'
-			)
-		);
-		$this->db->migrate('badEmails',$badEmailTable);
-
-		echo '<p><a href="/user/admin">back to admin</a></p>';
-	}
-  // end migrate
 
 } // end class

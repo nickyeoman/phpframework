@@ -1,0 +1,30 @@
+{% set title = 'Login to your account' %}
+{% extends "@nytwig/master.html.twig" %}
+
+{% block content %}
+{# content #}
+<h2>{{ title }}</h2>
+
+<div class="formContainer">
+  <form action="/login/index" method="post">
+    <input type="hidden" name="formkey" value="{{ formkey }}" />
+    
+    <div class="formGroup">
+      <label for="login"><b>Your Username or Email</b></label>
+      <input type="text" placeholder="Enter Username" name="login" value="{{ login }}" required />
+    </div>
+
+    <div class="formGroup">
+      <label for="password"><b>Password</b></label>
+      <input type="password" placeholder="Enter Password" name="password" required />
+    </div>
+
+    <div class="formGroup">
+      <button type="submit">Login</button>
+    </div>
+  </form>
+</div>
+
+<p>Don't have an account? <a href="/user/registration">Sign Up</a></p>
+
+{% endblock %}

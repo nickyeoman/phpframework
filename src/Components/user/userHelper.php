@@ -1,5 +1,5 @@
 <?php
-namespace Nickyeoman\helpers;
+namespace Nickyeoman\Framework\Components\user;
 USE \Nickyeoman\Validation;
 
 class userHelper {

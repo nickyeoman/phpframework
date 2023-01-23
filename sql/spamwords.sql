@@ -1,0 +1,4 @@
+CREATE TABLE `spamwords` (
+  `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `phrase` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

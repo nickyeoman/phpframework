@@ -1,5 +1,6 @@
 <?php
-namespace Nickyeoman\helpers;
+namespace Nickyeoman\Framework\Components\page;
+
 USE \Nickyeoman\Validation;
 
 class pageHelper {
@@ -9,7 +10,6 @@ class pageHelper {
     'id'      => '',
     'title'   => '',
     'slug'    => '',
-    'tags'    => '',
     'intro'   => '',
     'body'    => '',
     'heading' => '',
@@ -36,7 +36,6 @@ class pageHelper {
     $this->set_title();
     $this->set_heading();
     $this->set_slug();
-    $this->set_tags();
     $this->set_intro();
     $this->set_body();
     $this->set_description();

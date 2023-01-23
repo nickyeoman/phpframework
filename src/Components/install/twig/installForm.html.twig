@@ -1,0 +1,56 @@
+{% set title = 'Installer' %}
+{% extends "@nytwig/master.html.twig" %}
+
+{% block content %}
+<h2>{{title}}</h2>
+
+{% if showForm %}
+<p>Install the database and create an admin user.</p>
+
+<div class="formContainer">
+    <form action="/install/post" method="post">
+    <input type="hidden" name="formkey" value="{{ formkey }}" />
+
+    <div class="formGroup">
+        <label for="secret"><b>SECRET_KEY</b></label>
+        <input type="text" placeholder="Secret Key" name="secret" value="{{ post.secret }}" required>
+    </div>
+
+    <div class="formGroup">
+        <label for="email"><b>Admin Email</b></label>
+        {% if badEmail is not empty %}
+        <div class="error">{{ badEmail }}</div>
+        {% endif %}
+        <input type="text" placeholder="Enter Email" name="email" value="{{ post.email }}" required>
+    </div>
+
+    <div class="formGroup">
+        <label for="username"><b>Admin Username</b></label>
+        {% if badUsername is not empty %}
+        <div class="error">{{ badUsername }}</div>
+        {% endif %}
+        <input type="text" placeholder="Enter A Username" name="username" value="{{ post.username }}" required>
+    </div>
+
+    <div class="formGroup">
+        <label for="password"><b>Admin Password</b></label>
+        {% if badPassword is not empty %}
+        <div class="error">{{ badPassword }}</div>
+        {% endif %}
+        <input type="password" placeholder="Enter Password" name="password" required>
+
+        <label for="password-confirm"><b>Admin Password Confirm</b></label>
+        <input type="password" placeholder="Confirm Password" name="password-confirm" required>
+    </div>
+
+    <div class="formGroup">
+        <button type="submit">Install Database</button>
+    </div>
+    </form>
+</div>
+{% else %}
+<p>Database installed, created admin user: <strong>{{ post.username }}</strong></p>
+<p>You can now login to the <a href="/admin">admin</a>.</p>
+{% endif %}
+
+{% endblock %}

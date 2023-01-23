@@ -1,6 +1,12 @@
 <?php
 namespace Nickyeoman\Framework\Components\user;
 
+USE Nickyeoman\Framework\SessionManager;
+USE Nickyeoman\Framework\ViewData;
+USE Nickyeoman\Framework\RequestManager;
+USE \Nickyeoman\Validation\Validate;
+USE \Nickyeoman\Dbhelper\Dbhelp as DB;
+
 class userController extends \Nickyeoman\Framework\BaseController {
 
 	public bool $error = false;
@@ -13,140 +19,96 @@ class userController extends \Nickyeoman\Framework\BaseController {
 	} // end function index
 
 	/**
-	* Login Form
-	**/
-	public function login() {
-
-		// If the user is logged in we don't need to proceed
-		if ( $this->session->loggedin() )
-			$this->redirect('user', 'index');
-
-		// Check if form Submitted
-		if ( $this->post['submitted'] ) {
-
-			$user = new \Nickyeoman\Framework\Components\user\userHelper();
-			
-			//Process the form
-			if ( $user->login() ) {
-
-				foreach ($user->userTraits as $k => $v) {
-					$this->session->setKey($k,$v);
-				}
-
-				$this->log('notice','LOGIN Success', 'Controller/user.php/login()' );
-				$this->redirect('user', 'index');
-
-			} else {
-
-				//prep errors, login failed
-				//dump($user->errors);die();
-				if ( !empty($user->errors) ) {
-
-					foreach( $user->errors as $k => $v ) {
-
-						$this->adderror($v, $k);
-
-					}
-					//end foreach
-
-					$this->log('notice','LOGIN Fail', 'Controller/user.php/login()' );
-
-				}
-				//endif
-
-			}
-			//end else
-
-		}
-		// end POST SUBMITTED
-
-		$this->data['page']['slug'] = 'user-login';
-		$this->twig('login', $this->data, 'user');
-
-	}
-	//END Login
-
-	/**
 	* /user/registration
 	**/
 	public function registration() {
 
-    // If the user is logged in we don't need to proceed
-	if ( $this->session->loggedin() )
-      $this->redirect('user', 'index');
+		$s = new SessionManager();
+		$v = new ViewData($s);
+		$r = new RequestManager($s, $v);
 
-    //check Form Was submitted is enabled
-    if ( ! empty( $_POST['formkey'] ) ){
+		// If the user is logged in we don't need to proceed
+		if ( $s->loggedin() )
+		$this->redirect('admin', 'index');
 
-		$user = new \Nickyeoman\Framework\Components\user\userHelper();
+		//check Form Was submitted is enabled
+		if ( ! empty( $r->get('formkey') ) ){
+
+		
 
 		//check session matches
-    	if ( $_POST['formkey'] == $this->session->getKey('formkey') ) {
+    	if ( $r->submitted ) {
 
-				//clean the data (true = good, false = bad)
-				if ( ! $user->checkUsername() ) {
+			$user = new \Nickyeoman\Framework\Components\user\userHelper();
 
-					$this->error = true;  // TODO: not sure this is needed just a count(data-error). this appears elsewhere
+			//clean the data (true = good, false = bad)
+			if ( ! $user->checkUsername() ) {
 
-					//For the view
-					array_push($this->data['error'], $user->errors['username']);
+				$this->error = true;  // TODO: not sure this is needed just a count(data-error). this appears elsewhere
 
-				}
+				//For the view
+				array_push($v->data['error'], $user->errors['username']);
 
-				// check email address
-				if ( ! $user->checkEmail(false) ){
+			}
 
-					$this->error = true;
-					//For the view
-					array_push($this->data['error'], $user->errors['email']);
-				}
+			// check email address
+			if ( ! $user->checkEmail(false) ){
 
-				// check password address
-				if ( ! $user->checkPassword() ){
+				$this->error = true;
+				//For the view
+				array_push($v->data['error'], $user->errors['email']);
+			}
 
-					$this->error = true;
-					//For the view
-					array_push($this->data['error'], $user->errors['password']);
+			// check password address
+			if ( ! $user->checkPassword() ){
 
-				}
+				$this->error = true;
+				//For the view
+				array_push($v->data['error'], $user->errors['password']);
 
-				//No Errors, then save
-				if (! $this->error) {
+			}
 
-					//write to database
-					$user->newuser();
-					$userTraits = json_encode($user->userTraits);
-					$this->log('INFO', 'Created User', 'userController register', $userTraits);
+			//No Errors, then save
+			if (! $this->error) {
 
-					// Send registration Email
-					$user->sendRegistrationEmail();
+				//write to database
+				$user->newuser();
+				$userTraits = json_encode($user->userTraits);
+				$this->log('INFO', 'Created User', 'userController register', $userTraits);
 
-					//redirect to verify page
-					$this->redirect('user', 'validate');
+				// Send registration Email
+				$user->sendRegistrationEmail();
 
-				} else {
+				//redirect to verify page
+				$this->redirect('user', 'validate');
 
-					$this->data['post']['email'] = $_POST['email'];
-					$this->data['post']['username'] = $_POST['username'];
+			} else {
 
-				}
+				$v->data['post']['email'] = $_POST['email'];
+				$v->data['post']['username'] = $_POST['username'];
 
-      } else {
-        //TODO: cross site scripting, log this
-      }
+			}
+
+		} else {
+			//TODO: cross site scripting, log this
+		}
 
     }
 
     //Display view
-    $this->twig('registration', $this->data,'user');
-	$this->session->writeSession();
+    $this->twig('registration', $v->data,'user');
+	$s->writeSession();
 
 	}
 	//end register action (page)
 
 	public function validate(){
 
-		if ( isset( $_GET['valid'] ) ) { //TODO: change this to param
+		$s = new SessionManager();
+		$v = new ViewData($s);
+		$r = new RequestManager($s, $v);
+
+		if ( $r->get('valid') ) { //TODO: change this to param
 
 			//A validation key exists, we better check it
 			$user = new \Nickyeoman\Framework\Components\user\userHelper();
@@ -154,13 +116,13 @@ class userController extends \Nickyeoman\Framework\BaseController {
 			// TODO: Check user isn't already valid.
 
 			// Check if the key is valid
-			if ( ! $user->checkValidationKey($_GET['valid']) ) {
+			if ( ! $user->checkValidationKey($r->get('valid')) ) {
 
 				$this->error = true;
 
 			} else {
 
-				$this->data['notice'] = 'Your Email Address is now validated,  you can login';
+				$v->data['notice'] = 'Your Email Address is now validated,  you can login';
 
 			}
 
@@ -168,76 +130,65 @@ class userController extends \Nickyeoman\Framework\BaseController {
 		//end check key
 
 		// display view
-		$this->twig('validate', $this->data, 'user');
+		$this->twig('validate', $v->data, 'user');
 
 	}
 	// End validate action (page)
-
-	/**
-	 * Log out
-	 * Destroys the framework and php session objects
-	 */
-	public function logout() {
-
-		$this->session->addFlash("You have been logged out.", 'notice');
-		$this->session->destroySession();
-		$this->redirect('index', 'index');
-
-	}
 
     /**
      *  Forgot Password Controller
      */
 	public function forgot() {
 
+		$s = new SessionManager();
+		$v = new ViewData($s);
+		$r = new RequestManager($s, $v);
+
 		// If the user is logged in we don't need to proceed
-		if ( $this->session->loggedin() )
+		if ( $s->loggedin() )
 		    $this->redirect('user', 'index');
 
 		$user = new Nickyeoman\helpers\userHelper();
 
-		$this->data['formkey'] = $this->session->getKey('formkey');       // Form cross site protection
-
 		//check Form Was submitted is enabled
-		if ( ! empty( $_POST['formkey'] ) ) {
+		if ( $r->submitted) {			
 
-			//check session matches
-			if ( $_POST['formkey'] == $this->session->getKey('formkey') ) {
+			// check email address (and exists in the database)
+			// TODO: if validation key is present
+			if ( ! $user->checkEmail(true) ){
 
-				// check email address (and exists in the database)
-				// TODO: if validation key is present
-				if ( ! $user->checkEmail(true) ){
+				$this->error = true;
+				$this->data['badLogin'] = $user->errors['email'];  //For the view
 
-					$this->error = true;
-					$this->data['badLogin'] = $user->errors['email'];  //For the view
+			} //END IF
 
-				} //END IF
+			//No Errors, then save
+			if ( ! $this->error ) {
 
-				//No Errors, then save
-				if ( ! $this->error ) {
-
-					$user->passwordReset(); // Send registration Email
-					$this->data['notice'] = "Email Sent for verification";
-
-				} else {
-
-					$this->data['post']['email'] = $_POST['email'];
-					$this->data['badLogin'] = "There was an error.";
-
-				}
+				$user->passwordReset(); // Send registration Email
+				$this->data['notice'] = "Email Sent for verification";
 
 			} else {
-				//TODO: cross site scripting, log this
+
+				$this->data['post']['email'] = $_POST['email'];
+				$this->data['badLogin'] = "There was an error.";
+
 			}
 
+		} else {
+			//TODO: cross site scripting, log this
 		}
 
 		//Display view
-		$this->twig('login', $this->data);
-		$this->session->writeSession();
+		$this->twig('login', $v->data);
+		$s->writeSession();
 	}
 
 	public function reset() {
+
+		$s = new SessionManager();
+		$v = new ViewData($s);
+		$r = new RequestManager($s, $v);
 
         if ( isset( $_GET['valid'] ) ) {
 
@@ -256,10 +207,10 @@ class userController extends \Nickyeoman\Framework\BaseController {
             } else {
 
                 $this->valid = new \Nickyeoman\Validation\Validate();
-                $this->data['goodValid'] = 'Please reset your password below';
-                $this->data['resetkey'] = $this->valid->clean( $_GET['valid'] );
-                $this->data['formkey'] = $this->session['formkey'];
-                $this->data['email'] = $this->valid->clean( $_GET['email'] );
+                $v->data['goodValid'] = 'Please reset your password below';
+                $v->data['resetkey'] = $this->valid->clean( $_GET['valid'] );
+                $v->data['formkey'] = $s->get('formkey');
+                $v->data['email'] = $this->valid->clean( $_GET['email'] );
 
             }
 
@@ -272,7 +223,7 @@ class userController extends \Nickyeoman\Framework\BaseController {
             bdump($_POST, 'Post Data');
 
             // Check form key matches session
-            if ( $_POST['formkey'] == $this->session->getKey('formkey') ) {
+            if ( $_POST['formkey'] == $s->getKey('formkey') ) {
 
                 if ( ! empty( $_POST['resetkey'] ) ) {
 
@@ -284,14 +235,14 @@ class userController extends \Nickyeoman\Framework\BaseController {
                     if ( ! $user->checkResetKey($_POST['resetkey'] ) ) {
                         bdump('','CheckResetKey Failed');
                         $this->error = true;
-                        $this->data['badValid'] = $user->errors['valid'];  //For the view
+                        $v->data['badValid'] = $user->errors['valid'];  //For the view
                     }
                     //reset key is good
 
                     //Check email
                     if ( ! $user->checkEmail( true ) ) {
                         $this->error = true;
-                        $this->data['badValid'] = $user->errors['valid'];  //For the view
+                        $v->data['badValid'] = $user->errors['valid'];  //For the view
                     }
                     //email is good
 
@@ -299,7 +250,7 @@ class userController extends \Nickyeoman\Framework\BaseController {
                     if ( ! $user->checkPassword() ){
 
                         $this->error = true;
-                        $this->data['badPassword'] = $user->errors['password'];  //For the view
+                        $v->data['badPassword'] = $user->errors['password'];  //For the view
 
                     }
                     //password is good
@@ -308,10 +259,10 @@ class userController extends \Nickyeoman\Framework\BaseController {
 
                         $user->resetUserPassword(); //write to database
 
-                        $this->setFlash('notice', "Password Change Successful, please login.");
-                        $this->session->writeSession();
+                        $s->setFlash('notice', "Password Change Successful, please login.");
+                        $s->writeSession();
 
-                        $this->redirect('user', 'login');  //redirect to login page
+                        $this->redirect('admin', 'index');  //redirect to login page
 
                     }
                     // If all was good, data was written to database
@@ -319,87 +270,64 @@ class userController extends \Nickyeoman\Framework\BaseController {
                 } else { // There is a problem with the login key
 
                     $this->error = true;
-                    $this->data['badValid'] = "Bad Reset Key (001)";  //For the view
+                    $v->data['badValid'] = "Bad Reset Key (001)";  //For the view
 
                 }
 
             } else { //There is a problem with the session formkey
 
                 $this->error = true;
-                $this->data['badValid'] = "Bad Reset Key (002)"; //For the view
+                $v->data['badValid'] = "Bad Reset Key (002)"; //For the view
 
             }
 
         }
 
-        $this->twig('reset', $this->data); // display view
+        $this->twig('reset', $v->data); // display view
 
     }
 		//End Function reset
 
-	// Manage your users
-	public function admin() {
-
-		if ( ! $this->session->loggedin('You need to login to edit users.') )
-      		$this->redirect('user', 'login');
-
-    	if ( !$this->session->inGroup('admin', 'You need Admin permissions to edit users.') )
-      		$this->redirect('user', 'login');
-
-		//Grab pages
-		$result = $this->db->findall('users','id,username,email,blocked,admin');
-
-		if ( !empty( $result ) ) {
-
-	    	foreach ($result as $key => $value){
-
-				//$value['tags'] = explode(',',$value['tags']);
-	      		$this->data['users'][$key] = $value;
-
-	    	} //endforeach
-
-	  	} //endif
-
-		$this->data['page']['slug'] = "user-admin"; // instead of "admin" (for css pageid)
-		$this->twig('admin', $this->data);
-
-	} //end admin
-
 	public function block($params) {
 
-		if ( ! $this->session->loggedin('You need to login to edit users.') )
-      		$this->redirect('user', 'login');
+		$s = new SessionManager();
+		$v = new ViewData($s);
+		$r = new RequestManager($s, $v);
 
-    	if ( !$this->session->inGroup('admin', 'You need Admin permissions to edit users.') )
-      		$this->redirect('user', 'login');
+		if ( ! $s->loggedin('You need to login to edit users.') )
+      		$this->redirect('admin', 'index');
+
+    	if ( !$s->inGroup('admin', 'You need Admin permissions to edit users.') )
+      		$this->redirect('admin', 'index');
 
 		if ( !empty($params))
 			$userid = $params[0];
 
 		if ( empty($userid) || !is_numeric($userid) ) {
 
-			$this->session->addFlash('error', "User id not correct");
+			$s->addFlash('error', "User id not correct");
 			$this->redirect('user', 'admin');
 
 		}
 
+		$DB = new DB();
 		// Check user exists
-		$result = $this->db->findone('users','id',$userid);
+		$result = $DB->findone('users','id',$userid);
 
 		if ( empty($result ) ) {
 
-			$this->session->addFlash('error', "User does not exist");
+			$s->addFlash('error', "User does not exist");
 			$this->redirect('user', 'admin');
 
 		} else {
 
 			if ( $result['blocked'] ) {
 				//unblock
-				$this->session->addFlash('notice: user Unblocked', "blockuser");
+				$s->addFlash('notice: user Unblocked', "blockuser");
 				$blocked = 0;
 			} else {
 				//block
-				$this->session->addFlash('notice: user blocked', "blockuser");
+				$s->addFlash('notice: user blocked', "blockuser");
 				$blocked = 1;
 			}
 
@@ -408,7 +336,8 @@ class userController extends \Nickyeoman\Framework\BaseController {
 				,'id' => $result['id']
 			);
 
-			$this->db->update('users',$update,'id');
+			$DB->update('users',$update,'id');
+			$DB->close();
 
 			$this->redirect('user', 'admin');
 		}
@@ -420,34 +349,40 @@ class userController extends \Nickyeoman\Framework\BaseController {
 	 */
 	public function delete($params) {
 
-		if ( ! $this->session->loggedin('You need to login to edit users.') )
-      		$this->redirect('user', 'login');
+		$s = new SessionManager();
+		$v = new ViewData($s);
+		$r = new RequestManager($s, $v);
 
-    	if ( !$this->session->inGroup('admin', 'You need Admin permissions to edit users.') )
-      		$this->redirect('user', 'login');
+		if ( ! $s->loggedin('You need to login to edit users.') )
+      		$this->redirect('admin', 'index');
+
+    	if ( !$s->inGroup('admin', 'You need Admin permissions to edit users.') )
+      		$this->redirect('admin', 'index');
 
 		if ( !empty($params))
 			$userid = $params[0];
 
 		if ( empty($userid) || !is_numeric($userid) ) {
 
-			$this->session->addFlash("User id not correct", 'error');
+			$s->addFlash("User id not correct", 'error');
 			$this->redirect('user', 'admin');
 
 		}
 
+		$DB = new DB();
+
 		// Check user exists
-		$result = $this->db->findone('users','id',$userid);
+		$result = $DB->findone('users','id',$userid);
 
 		if ( empty($result ) ) {
 
-			$this->session->addFlash("User does not exist", 'error');
+			$s->addFlash("User does not exist", 'error');
 			$this->redirect('user', 'admin');
 
 		} else {
 
-			$this->db->delete('users',"id = $userid");
-			$this->session->addFlash('Notice: user removed (deleted)', "notice");
+			$DB->delete('users',"id = $userid");
+			$s->addFlash('Notice: user removed (deleted)', "notice");
 
 			$this->redirect('user', 'admin');
 		}
@@ -455,16 +390,16 @@ class userController extends \Nickyeoman\Framework\BaseController {
 	} // end delete user
 
 	public function myprofile() {
-		if ( $this->session->loggedin() ) {
+		if ( $s->loggedin() ) {
 
-			$this->session->addflash("You need to login to edit your profile.",'error');
-	    	$this->session->writeSession();
-	    	$this->redirect('user', 'login');
+			$s->addflash("You need to login to edit your profile.",'error');
+	    	$s->writeSession();
+	    	$this->redirect('admin', 'index');
 
 		}
 
 		// based on session id
-		$result = $this->db->findone('users', 'id', $this->session->getKey('userid'));
+		$result = $DB->findone('users', 'id', $s->getKey('userid'));
 
 		$this->data['userdata'] = array(
 			'username' => $result['username']
@@ -472,13 +407,17 @@ class userController extends \Nickyeoman\Framework\BaseController {
 			,'created' => $result['created']
 		);
 
-		$this->data['page']['slug'] = "myprofile";
+		$v->data['page']['slug'] = "myprofile";
 
-	  $this->twig('myprofile', $this->data);
-		$this->session->writeSession();
+	  $this->twig('myprofile', $v->data);
+		$s->writeSession();
 	} //end my profile
 
 	public function saveprofile() {
+
+		$s = new SessionManager();
+		$v = new ViewData($s);
+		$r = new RequestManager($s, $v);
 
 		$userdb = array();
 
@@ -487,7 +426,7 @@ class userController extends \Nickyeoman\Framework\BaseController {
 			$user = new Nickyeoman\helpers\userHelper();
 
 		// Change username
-		if ( !empty($this->post['username']) && $this->post['username'] != $this->session->getKey('userid') ) {
+		if ( !empty($this->post['username']) && $this->post['username'] != $s->getKey('userid') ) {
 
 			// make sure username is valid (this includes a db check)
 			if ( ! $user->checkUsername() ) {
@@ -498,10 +437,10 @@ class userController extends \Nickyeoman\Framework\BaseController {
 			} else {
 
 				$username = strtolower(trim( $this->post['username']));
-				$userdb['id'] = $this->session->getKey('userid');
+				$userdb['id'] = $s->getKey('userid');
 				$userdb['username'] = $username;
 				// update session data
-				$this->session->setKey($username);
+				$s->setKey($username);
 
 			}
 
@@ -518,7 +457,7 @@ class userController extends \Nickyeoman\Framework\BaseController {
 			} else {
 
 				$userdb['password'] = $user->userTraits['password'];
-				$userdb['id'] = $this->session->getKey('userid');
+				$userdb['id'] = $s->getKey('userid');
 
 			}
 
@@ -526,113 +465,20 @@ class userController extends \Nickyeoman\Framework\BaseController {
 
 		// update database
 		if ( !empty($userdb) ) {
-
-			$id = $this->db->update("users", $userdb, 'id' );
-
+			$DB = new DB();
+			$id = $DB->update("users", $userdb, 'id' );
+			$DB->close();
 			// TODO: you need to create the array handler like adderror in the base controller
-			$this->data['notice'] = "Profile Updated";
+			$v->data['notice'] = "Profile Updated";
 
-			$this->writeSession();
+			$s->writeSession();
 		}
 
-		//dump($this->post);dump($this->session);dump($this->data);dump($userdb);
+		//dump($this->post);dump($s->);dump($this->data);dump($userdb);
 		//die();
 		$this->redirect('user', 'myprofile');
 
 
 	} // end save profile
-
-	public function migrate() {
-
-		if ( ! $this->session->loggedin('You need to login to edit users.') )
-      		$this->redirect('user', 'login');
-
-    	if ( !$this->session->inGroup('admin', 'You need Admin permissions to edit users.') )
-      		$this->redirect('user', 'login');
-
-		$schem = array(
-			array(
-				'name' => 'username'
-				,'type' => 'varchar'
-				,'size' => '30'
-				,'null' => 'No'
-			)
-			,array(
-				'name' => 'password'
-				,'type' => 'varchar'
-				,'size' => '70'
-				,'null' => 'No'
-			)
-			,array(
-				'name' => 'email'
-				,'type' => 'varchar'
-				,'size' => '255'
-				,'null' => 'No'
-			)
-			,array(
-				'name' => 'validate'
-				,'type' => 'varchar'
-				,'size' => '32'
-				,'null' => 'Yes'
-				,'default' => 'NULL'
-			)
-			,array(
-				'name' => 'confirmationToken'
-				,'type' => 'varchar'
-				,'size' => '255'
-				,'null' => 'Yes'
-				,'default' => 'NULL'
-			)
-			,array(
-				'name' => 'reset'
-				,'type' => 'varchar'
-				,'size' => '32'
-				,'null' => 'Yes'
-				,'default' => 'NULL'
-			)
-			,array(
-				'name' => 'birthdate'
-				,'type' => 'DATETIME'
-				,'null' => 'No'
-				,'default' => 'CURRENT_TIMESTAMP'
-			)
-			,array(
-				'name' => 'created'
-				,'type' => 'DATETIME'
-				,'null' => 'No'
-				,'default' => 'CURRENT_TIMESTAMP'
-			)
-			,array(
-				'name' => 'updated'
-				,'type' => 'DATETIME'
-				,'null' => 'Yes'
-				,'default' => 'CURRENT_TIMESTAMP'
-			)
-			,array(
-				'name' => 'confirmed'
-				,'type' => 'tinyint'
-				,'size' => '1'
-				,'null' => 'No'
-				,'default' => '0'
-			)
-			,array(
-				'name' => 'blocked'
-				,'type' => 'tinyint'
-				,'size' => '1'
-				,'null' => 'No'
-				,'default' => '0'
-			)
-			,array(
-				'name' => 'admin'
-				,'type' => 'varchar'
-				,'size' => '255'
-				,'null' => 'Yes'
-				,'default' => 'NULL'
-				,'comment' => 'CSV'
-			)
-		);
-		$this->db->migrate('users',$schem);
-		echo '<p><a href="/admin/index">back to admin</a></p>';
-	}
 
 } //End Class
