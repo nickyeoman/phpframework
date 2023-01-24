@@ -29,7 +29,7 @@ class sitemapController extends \Nickyeoman\Framework\BaseController {
     if ( ! empty($thepages) ) {
       foreach( $thepages as $v) {
 
-        $date = new DateTime($v['updated']);
+        $date = new \DateTime($v['updated']);
         $date = $date->format('Y-m-d');
 
         echo "<url>";

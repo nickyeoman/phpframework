@@ -1,6 +1,4 @@
-<?php
-namespace Nickyeoman\Framework;
-session_start();
+<?php namespace Nickyeoman\Framework;
 /**
 * Session Class
 * v1.2

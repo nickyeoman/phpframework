@@ -1,5 +1,4 @@
-<?php
-namespace Nickyeoman\Framework;
+<?php namespace Nickyeoman\Framework;
 
 /**
 * Router Class
@@ -30,13 +29,14 @@ class Router {
   private $filecontent = '';
 
   // Debugging
-  private $debug = false;
-  private $debuglog = array();
-
-
+  private $debugEnabled = false;
+  private $debug_log = array();
+  
   // Fuctions ******************************************************************
 
   public function __construct() {
+
+    $this->debug(false);
 
     // creates $this->uri array
     $this->_makeUri();
@@ -52,6 +52,22 @@ class Router {
     unset($this->filecontent);
     unset($this->uri);
 
+    $this->showDebug();
+
+  }
+
+  // Debugging ******************************************************************
+  public function debug($bool = true ) {
+
+    $this->debugEnabled = $bool;
+    array_push($this->debug_log,'# Enabled Debug Mode for Router');
+    
+  }
+
+  public function showDebug() {
+    if ($this->debugEnabled)
+      dump($this->debug_log);
+
   }
 
   //Grab the URI and make it a usable array
@@ -59,10 +75,6 @@ class Router {
 
     //remove get
     $builduri = strtok($_SERVER['REQUEST_URI'], '?');
-    if ($this->debug) {
-      array_push($this->debuglog, "builduri");
-      dump($builduri);
-    }
 
     //put into array
     $uriarr = explode("/", $builduri);
@@ -72,6 +84,15 @@ class Router {
 
     //make array available
     $this->uri = $uriarr;
+
+    if ($this->debugEnabled) {
+      array_push($this->debug_log,'startbuilduri');
+      array_push($this->debug_log,$builduri);
+      array_push($this->debug_log,'uri return array');
+      array_push($this->debug_log,$uriarr);
+    }
+
+    return $uriarr;
 
   }
   // end makeuri()
@@ -88,12 +109,24 @@ class Router {
       $this->action = 'index';
       $this->params = array();
 
+      if ($this->debugEnabled) {
+        array_push($this->debug_log,'controller if uri empty');
+        array_push($this->debug_log,$this->action);
+        array_push($this->debug_log,'controller:');
+        array_push($this->debug_log,$this->controller);
+        array_push($this->debug_log,$this->controllerClass);
+      }
+
     } else if ($this->uri[0] == "sitemap.xml") {
 
       //TODO: make some sort of check file for special paths like this
       $this->controller = 'sitemap';
       $this->action = 'sitemap';
       $this->controllerClass = "Nickyeoman\Framework\Components\sitemap\sitemapController"; // Change to framework compoenents
+
+      if ($this->debugEnabled) {
+        array_push($this->debug_log,'sitemap hit');
+      }
 
     } else {
 
@@ -122,6 +155,13 @@ class Router {
           $this->controllerClass = "Nickyeoman\Framework\Components\\" . $this->controller . '\\' . $this->controller . 'Controller'; // Change to framework compoenents
           array_shift($this->uri);
 
+          if ($this->debugEnabled) {
+            array_push($this->debug_log,'cms controller file exists');
+            array_push($this->debug_log,'controller:');
+            array_push($this->debug_log,$this->uri);
+            array_push($this->debug_log,$this->controllerClass);
+          }
+
         } else {
   
           //404
@@ -129,6 +169,14 @@ class Router {
           $this->action = 'index';
           $this->params = array();
           $this->controllerClass = "Nickyeoman\Framework\Components\\" . $this->controller . '\\' . $this->controller . 'Controller'; // Change to framework compoenents
+
+          if ($this->debugEnabled) {
+            array_push($this->debug_log,'controller hit 404');
+            array_push($this->debug_log,$action);
+            array_push($this->debug_log,'controller:');
+            array_push($this->debug_log,$this->controller);
+            array_push($this->debug_log,$this->controllerClass);
+          }
 
         }
         // end cms file exists
@@ -151,6 +199,11 @@ class Router {
     else
       $this->action = strtolower($this->uri[0]);
 
+    if ($this->debugEnabled) {
+      array_push($this->debug_log,'method begin');
+      array_push($this->debug_log,$this->action);
+    }
+
     // check the file to see if the function exists
     if ( strpos( $this->filecontent, "function $this->action" ) !== false ) {
 
@@ -158,6 +211,11 @@ class Router {
         array_shift($this->uri);
         if ( !empty($this->uri) )
           $this->params = $this->uri;
+
+        if ($this->debugEnabled) {
+          array_push($this->debug_log,'method exists, fix params');
+          array_push($this->debug_log,$this->params);
+        }
 
     } elseif ( strpos( $this->filecontent, "function override" ) !== false ) {
 
@@ -171,6 +229,11 @@ class Router {
         $this->controller = 'error';
         $this->action = 'index';
         $_ENV['CONTROLLERPATH'] = "vendor/nickyeoman/phpframework/components/$this->controller/"; //TODO: can't override this
+        if ($this->debugEnabled) {
+          array_push($this->debug_log,'method error, using override, with no params');
+          array_push($this->debug_log,$this->controller);
+          array_push($this->debug_log,$this->params);
+        }
 
       }
 
@@ -180,6 +243,9 @@ class Router {
       $this->controller = 'error';
       $this->action = 'index';
       $_ENV['CONTROLLERPATH'] = "vendor/nickyeoman/phpframework/components/error/"; //TODO: can't override this
+      if ($this->debugEnabled) {
+        array_push($this->debug_log,'method error, no override, cant find anything');
+      }
 
     }
     //end check file

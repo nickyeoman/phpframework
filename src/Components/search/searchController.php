@@ -1,10 +1,9 @@
-<?php
-namespace Nickyeoman\Framework\Components\search;
+<?php namespace Nickyeoman\Framework\Components\search;
 
-USE Nickyeoman\Framework\SessionManager;
+USE Nickyeoman\Dbhelper\Dbhelp as DB;
 USE Nickyeoman\Framework\ViewData;
 USE Nickyeoman\Framework\RequestManager;
-USE \Nickyeoman\Dbhelper\Dbhelp as DB;
+USE Nickyeoman\Framework\SessionManager;
 
  class searchController extends \Nickyeoman\Framework\BaseController {
 
@@ -41,7 +40,11 @@ USE \Nickyeoman\Dbhelper\Dbhelp as DB;
         AND `tags` LIKE '%blog%' ;
 EOSQL;
           $results = $DB->query($sql);
-          $v->data['searchResults'] = $results;
+          while( $fetched = $results->fetch_array(MYSQLI_ASSOC) ) {
+            $rows[] = $fetched;
+          }
+          
+          $v->data['searchResults'] = $rows;
           $v->data['searchTerm'] = $searchRequest;
 
           if (empty($v->data['searchResults']) )
