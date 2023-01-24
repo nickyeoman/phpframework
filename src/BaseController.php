@@ -1,6 +1,10 @@
 <?php
 namespace Nickyeoman\Framework;
 
+USE \Nickyeoman\Dbhelper\Dbhelp as DB;
+USE Nickyeoman\Framework\SessionManager;
+USE Nickyeoman\Framework\ViewData;
+
 class BaseController {
 
   public $db = null; //class
@@ -133,6 +137,10 @@ class BaseController {
    * Log to the database
    */
   public function log($level = 'DEBUG', $title = 'Called log', $location = 'Base Controller', $content = "NULL") {
+
+    $s = new SessionManager();
+		$v = new ViewData($s);
+
     if ($_ENV['LOGGING'] == 'mysql') {
 
       //prepare post
@@ -148,9 +156,9 @@ class BaseController {
         'title'     => $title,
         'content'   => $content,
         'location'  => $location, //location of code
-        'ip'        => $this->data['ip'],
-        'url'       => $this->data['uri'],
-        'session'   => json_encode($this->session),
+        'ip'        => $v->data['ip'],
+        'url'       => $v->data['uri'],
+        'session'   => json_encode($s->data),
         'post'      => $post,
         'time'      => 'NOW()'
       );
@@ -161,7 +169,9 @@ class BaseController {
         }
       }
 
-      $this->db->create('logs', $log);
+      $DB = new DB();
+      $DB->create('logs', $log);
+      $DB->close;
     }
     // end mysql
   }
