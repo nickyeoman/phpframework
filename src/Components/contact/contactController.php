@@ -1,253 +1,405 @@
 <?php
-namespace Nickyeoman\Framework\Components\contact;
+namespace Nickyeoman\Dbhelper;
 
-USE Nickyeoman\Framework\SessionManager;
-USE Nickyeoman\Framework\ViewData;
-USE Nickyeoman\Framework\RequestManager;
-USE \Nickyeoman\Dbhelper\Dbhelp as DB;
-USE Nickyeoman\Framework\Components\contact\contactHelper as contacthelp;
+/**
+* MySQL helper
+* v2.2.3
+* URL: https://github.com/nickyeoman/php-mysql-helper
+**/
 
-class contactController extends \Nickyeoman\Framework\BaseController {
+class Dbhelp {
 
-  /**
-   * Public Contact form
-   **/
-  public function index() {
+  public $con = null; // connection
+  public $debug = false; // Show debugging info?
+  public $sql = array(); //Last Run Query
 
-    $s = new SessionManager();
-		
-    $v = new ViewData($s);
-    $v->set('menuActive', 'contact');
-    $v->set('showform',true);
-    $v->set('pageid', "contactform");
+  function __construct($host = 'localhost', $username = 'root', $password = null, $db = null, $port = '3306', $debug = false) {
 
-    $r = new RequestManager($s, $v);
+    // Check for dotenv variables and use those
+    if ( !empty($_ENV['DBHOST']) )
+      $host = $_ENV['DBHOST'];
+    
+    if ( !empty($_ENV['DBUSER']) )
+      $username = $_ENV['DBUSER'];
 
-    if ( $r->submitted ) {
+    if ( !empty($_ENV['DBPASSWORD']) )
+      $password = $_ENV['DBPASSWORD'];
 
-      // sendEmail clarifies if we are going to save to the db and send and email
-      // false will stop the process and reshow the page
-      $sendEmail = true;
-
-      $DB = new DB();
-
-      // Check Spam words
-      $results    = $DB->findall('spamwords', 'phrase');
-      $checktext  = ' ' . strtolower( $r->get('message') );
-      $theword    = '';
+    if ( !empty($_ENV['DB']) )
+      $db = $_ENV['DB'];
       
-      foreach ($results as $val) {
-        if ( stripos($checktext, $val['phrase'] ) ) {
-          $sendEmail = false;
-          $theword = $val['phrase'];
-        }
-        
+    if ( !empty($_ENV['DBPORT']) )
+      $port = $_ENV['DBPORT'];
+
+    // Create connection
+    $this->con = new \mysqli($host, $username, $password, $db, $port);
+
+    if ( $this->con->connect_error && $this->debug ) {
+
+      echo "<h1>mysql connection error</h1>";
+      print_r([$host, $username, $password, $db, $port]);
+      die("<pre>Connection failed: " . $this->con->connect_error . "</pre>");
+
+    } elseif ( $this->con->connect_error && !$this->debug ) {
+
+      die("<pre>Connection failed: " . $this->con->connect_error . "</pre>");
+
+    }
+  }
+  //end construct function
+
+  // Return the number of rows of a table based on a where
+  public function count($table = null, $where = null) {
+
+    if ( empty($table) )
+      die("Error, no table supplied");
+
+    $query = "SELECT COUNT(*) AS count FROM `$table`";
+
+    if (!empty($where)){
+      $query = $query . " WHERE $where";
+    }
+
+    // debugging
+    $this->sql[] = $query;
+
+    $result = $this->con->query($query);
+
+    if ( !empty($result) ) {
+
+        $arr = $result->fetch_array(MYSQLI_ASSOC);
+        $return = $arr['count'];
+
+    } else {
+
+      $return = 0;
+
+    }
+
+    return $return;
+
+  }
+  // end count function
+
+  public function findall($table = null, $select = '*', $where = null, $order = null, $limit = null){
+
+    if ( empty($table) )
+      die("Error, no table supplied");
+
+    $query = "SELECT $select FROM `$table`";
+
+    if (!empty($where)){
+      $query = $query . " WHERE $where";
+    }
+
+    if (!empty($order)){
+      $query = $query . " ORDER BY $order";
+    }
+
+    if (!empty($limit)){
+      $query = $query . " LIMIT $limit";
+    }
+
+    // debugging
+    $this->sql[] = $query;
+
+    // Execute query
+    $result = $this->con->query($query);
+
+    if ( !empty($result) ) {
+
+      while( $fetched = $result->fetch_array(MYSQLI_ASSOC) ) {
+        $rows[] = $fetched;
       }
-      if ( !$sendEmail )
-        $v->adderror("Your message contains spammy words ($theword)" );
-      // End check spamwords
+      //end while
+
+      if ( !empty($rows) )
+        return $rows;
+
+    } else {
+
+      return null;
+
+    }
+    //end if
 
 
-      // Check Email adress against db
-      $result = $DB->findone('badEmails','email',$r->get('email'));
-      if ( !empty($result) ) {
-        $v->adderror("Your email address has been flagged" );
-        $sendEmail = false;
-      }
+    if ( empty($rows))
+      return null;
+    else
+      return $rows;
 
-      //load helper
-      $ch = new contacthelp($r->post);
-      if ( $ch->checkerrors() || !$sendEmail ) {
+  }
+  //end findall
 
-        foreach ( $ch->error as $val)
-          $v->adderror($val);
+  public function findone($table = null, $col = null, $match = null){
 
+    if ( empty($table) )
+      die("Error, no table supplied");
+
+    if ( empty($col) )
+      die("Error, no column supplied");
+
+    if ( empty($match) )
+      die("Error, nickyeoman:php-mysql-helper - no match (third param) supplied");
+
+    $arrwithone = $this->findall($table, '*', "`$col` LIKE '$match'", null, "1");
+    if ( !empty($arrwithone[0]) )
+      return($arrwithone[0]); //just one array
+    else
+      return(null);
+
+  }
+  //end findone
+
+  public function close() {
+    $this->con->close();
+  }
+  //end close
+
+
+  //id is col name to update
+  public function update($table, $array, $id) {
+
+    if (empty($table))
+      die("no table supplied");
+
+    $where = "$id = '$array[$id]'";
+
+    $set = '';
+
+    //array to string
+    foreach ($array as $key => $value) {
+
+      if ( $key == $id )
+        continue;
+
+      if ( $value == 'NOW()' ) {
+        $cleanValue = 'NOW()';
+        $set .= "`$key` = $cleanValue,";
       } else {
 
-        // Save to Database
-        $insertData = array(
-          'email'      => $r->get('email'),
-          'message'    => $r->get('message')
-        );
+        if ( !empty($value) )
+          $cleanValue = mysqli_real_escape_string($this->con, $value);
+        else if ( $value == 0 )
+          $cleanValue = '0';
+        else
+          $cleanValue = '';
 
-      // Insert/create database
-      $id = $DB->create("contactForm", $insertData );
-      $DB->close();
+        $set .= "`$key` = '$cleanValue',";
 
-      // Error check the database
-      if ( empty( $id ) )
-        $v->adderror("There was a problem sending the message." );
-      else
-        $v->set('showform', false);
+      }
 
-      // Send am email
-      // TODO: this shouldn't be public
-      $this->sendEmail(
-        $_ENV['MAIL_FROM_ADDRESS']
-        ,'New Message on ' . $_ENV['MAIL_FROM_NAME']
-        ,"Here is your message: " . $r->get('message')
-      );
-
-      } // end if errors
-
-    } //end if submitted
-
-    $this->twig('contact', $v->data, 'contact');   
-
-  }
-
-  public function admin() {
-
-    $s = new SessionManager();
-    
-    // redirects
-    if ( ! $s->loggedin('You need to login to edit messages.') )
-   		$this->redirect('login', 'index');
-
-    if ( ! $s->isAdmin() ) {
-      $s->addflash('You need to be an admin to view messages..','error');
-      $this->redirect('admin', 'index');
     }
 
-    // view data
-    $v = new ViewData($s);
-    $v->set('pageid', "contact-admin");
-    $v->data['contactMessages'] = array();
-      
-    //Grab pages from db
-    $DB = new DB();
-    $result = $DB->findall('contactForm', 'id,email,message,created,unread');
-    $DB->close();
+    //remove final comma
+    $set = rtrim($set, ',');
 
-    //Set if not null
-    if ( !is_null($result) ) {
-      foreach ($result as $key => $value){
-        $v->data['contactMessages'][$key] = $value;
+    $sql = <<<EOSQL
+      UPDATE `$table`
+      SET $set
+
+      WHERE $where
+      ;
+EOSQL;
+
+    //debug
+    //dump($sql);die();
+
+    if ( $this->con->query($sql) === TRUE ) {
+      return $this->con->insert_id;
+    } else {
+      die("Error: " . $sql . "<br>" . $this->con->error);
+    } //end if
+
+  }
+  // end function update
+
+  public function create($table, $array, $insert = "INSERT INTO") {
+
+    if ( empty($table) )
+      die("no table supplied");
+
+    if ( empty($array) )
+      die("no insert array supplied");
+
+    //Check if user wants to insert or update
+    if ($insert != "UPDATE") {
+      $insert = "INSERT INTO";
+    }
+
+    $columns  = array();
+    $data     = array();
+
+    foreach ( $array as $key => $value) {
+
+      $columns[] = "`" . $key . "`";
+
+      if ( $value == 'NOW()' )
+        $data[] = 'NOW()';
+      elseif ($value != "")
+        $data[] = "'" . $value . "'";
+      else
+        $data[] = "NULL";
+
+      //TODO: ensure no commas are in the values
+    }
+
+    $cols = implode(",",$columns);
+    $values = implode(",",$data);
+
+  $sql = <<<EOSQL
+    $insert `$table`
+    ($cols)
+    VALUES
+    ($values)
+EOSQL;
+
+  if ($this->con->query($sql) === TRUE)
+    return $this->con->insert_id;
+  else
+    die("Error: " . $sql . "<br>" . $this->con->error);
+
+ }
+ //end create
+
+ public function delete($table, $where) {
+   if (empty($table))
+     die("no table supplied");
+
+   $query = "DELETE FROM `$table` WHERE $where";
+
+   if ($this->con->query($query) === TRUE) {
+     return true;
+   } else {
+     die("Error: " . $query . "<br>" . $this->con->error);
+   }
+ }
+
+ public function query($query = '') {
+
+  if (empty($query))
+    return false;
+  else {
+
+    $result = $this->con->query($query);
+
+    if ( !empty($result) ) {
+
+      if ( is_array($result) ) {
+        while( $fetched = $result->fetch_array(MYSQLI_ASSOC) ) {
+          $rows[] = $fetched;
+        } //end while
+
+        if ( !empty($rows) )
+          return $rows;
+      } else {
+        return $result;
+      }
+   }
+
+ }
+}
+
+// Checks if a table exists
+public function tableExists($table = '') {
+
+  if (empty($table))
+    return false;
+
+  $sql = 'SELECT count(TABLE_NAME) as `value` FROM TABLES WHERE TABLE_NAME = "' . $table . '"';
+
+  $tabletest = new \mysqli($_ENV['DBHOST'], $_ENV['DBUSER'], $_ENV['DBPASSWORD'], 'information_schema', $_ENV['DBPORT']);
+  
+  $result = $tabletest->query($sql); 
+  
+  $arr = $result->fetch_array(MYSQLI_ASSOC);
+  $tabletest->close();
+
+  if ( $arr['value'] )
+    return true;
+  else
+    return false;
+
+}
+
+/**
+ * Migration helper
+ *
+ */
+public function migrate($table , $sch = array() ) {
+
+  echo "<h1>Migrate table: $table</h1><ul>";
+
+  // make sure table exists
+  $query = "CREATE TABLE IF NOT EXISTS `$table` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    PRIMARY KEY (`id`)
+  ) AUTO_INCREMENT=1;";
+
+  if ($this->con->query($query) === TRUE) {
+    echo "<li>Table created: $table</li>";
+  } else {
+    die("Error: Create table didn't work: " . $query . "<br>" . $this->con->error);
+  }
+
+  // make sure columns are there
+  foreach ( $sch as $col) {
+    //dump($col);
+
+    $column = $col['name'];
+    $coltype = $col['type'];
+    $coltype = ( !empty($col['size'])) ? "${coltype}(${col['size']})" : "$coltype";
+    $coldefault = ( !empty($col['default'])) ? "DEFAULT ${col['default']}" : NULL;
+    $colnull = ( $col['null'] == "No")  ? "NOT NULL" : NULL;
+    $colcomment = ( !empty($col['comment'])) ? "COMMENT '${col['comment']}'" : NULL;
+
+    // drop column
+    if ($col['type'] == 'drop' ) {
+
+      $query = "ALTER TABLE `$table` DROP COLUMN IF EXISTS `$column`;";
+
+      if ($this->con->query($query) === TRUE) {
+        echo "<li>Dropped $column</li>";
+      } else {
+        die("Error: Create table didn't work: " . $query . "<br>" . $this->con->error);
+      }
+
+      break;
+
+    }
+
+    $query = "ALTER TABLE `$table` CHANGE IF EXISTS `$column` $column $coltype $colnull $coldefault $colcomment;";
+    if ($this->con->query($query) === TRUE) {
+      echo "<li>Changed column $column</li>";
+    } else {
+      die("Error: Create table didn't work: " . $query . "<br>" . $this->con->error);
+    }
+
+    $query = "ALTER TABLE `$table` ADD COLUMN IF NOT EXISTS `$column` $coltype $colnull $coldefault $colcomment;";
+    if ($this->con->query($query) === TRUE) {
+      echo "<li>Added column $column</li>";
+    } else {
+      die("Error: Create table didn't work: " . $query . "<br>" . $this->con->error);
+    }
+
+    // If Unique
+    if ( !empty($col['unique']) ){
+      if ( $col['unique'] == "Yes" ) {
+        $query = "ALTER TABLE `$table` ADD UNIQUE(`${col['name']}`);";
+        if ($this->con->query($query) === TRUE) {
+          echo "<li>Made unique $column</li>";
+        } else {
+          die("Error: Create table didn't work: " . $query . "<br>" . $this->con->error);
+        }
       }
     }
-    
-    $v->set('adminbar', true);
-    $this->twig('admin', $v->data, 'contact');
 
   }
+  echo "</ul>";
 
-  public function view($parms = null) {
+}
 
-    $s = new SessionManager();
-    
-    // redirects
-    if ( ! $s->loggedin('You need to login to edit messages.') )
-   		$this->redirect('login', 'index');
 
-    if ( ! $s->isAdmin() ) {
-      $s->addflash('You need to be an admin to view messages..','error');
-      $this->redirect('admin', 'index');
-    }
-
-    $pid = $parms[0];
-
-    // view data
-    $v = new ViewData($s);
-    $v->set('pageid', "viewMessage");
-    $v->data['contactMessages'] = array();
-
-    if ( ! empty($pid) && is_numeric($pid) ) {
-      $DB = new DB();
-      $msg = $DB->findone('contactForm', 'id', $pid);
-      $DB->close();
-      $v->set('msg', $msg);
-    } else {
-
-      $s->addflash("Message id not correct or no longer exists", 'error');
-      $this->redirect('contact', 'admin');
-
-    }
-
-    $v->set('adminbar', true);
-    $this->twig('view', $v->data, 'contact');
-
-  } // end view page
-
-  /**
-   * Deletes a message /contact/delete/[msgid]
-   */
-  public function delete($params) {
-
-		$s = new SessionManager();
-    
-    // redirects
-    if ( ! $s->loggedin('You need to login to edit messages.') )
-   		$this->redirect('login', 'index');
-
-    if ( ! $s->isAdmin() ) {
-      $s->addflash('You need to be an admin to view messages..','error');
-      $this->redirect('admin', 'index');
-    }
-
-		if ( !empty($params))
-			$msgid = $params[0];
-
-		if ( empty($msgid) || !is_numeric($msgid) ) {
-
-			$s->addFlash("Message id not correct", 'error');
-			$this->redirect('contact', 'admin');
-
-		}
-
-		// Check message exists
-    $DB = new DB();
-		$result = $DB->findone('contactForm','id',$msgid);
-
-		if ( empty($result ) ) {
-
-			$s->addFlash("Message does not exist", 'error');
-      $DB->close();
-			$this->redirect('contact', 'admin');
-
-		} else {
-
-			$DB->delete('contactForm',"id = $msgid");
-			$s->addFlash('Notice: user removed (deleted)', "notice");
-      $DB->close();
-			$this->redirect('contact', 'admin');
-		}
-
-	} // end delete msg
-
-  public function bademail($params) {
-
-    $s = new SessionManager();
-    
-    // redirects
-    if ( ! $s->loggedin('You need to login to edit messages.') )
-   		$this->redirect('login', 'index');
-
-    if ( ! $s->isAdmin() ) {
-      $s->addflash('You need to be an admin to view messages..','error');
-      $this->redirect('admin', 'index');
-    }
-
-    $v = new ViewData($s); // need for Request, TODO: shouldn't need this
-    $r = new RequestManager($s, $v);
-
-    if ( $r->submitted ) {
-
-      $DB = new DB();
-
-      $DB->create('badEmails', ['email' => $r->get('email') ] );
-      $where = '`email` = ' . $r->get('email');
-      $DB->delete('contactForm',$where);
-
-      $s->addFlash("Email Added, message removed", 'notice');
-      $this->redirect('contact','admin');
-
-    } else {
-
-      $s->addFlash("Post to save bad emails.", 'error');
-      $this->redirect('contact','admin');
-
-    }
-
-  }
-
-} // end class
+}
+//end class
