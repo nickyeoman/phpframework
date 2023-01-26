@@ -181,8 +181,7 @@ class userHelper {
       'confirmed'         => '0',
       'blocked'           => '0',
       'created'        => date("Y-m-d H:i:s"),
-      'updated'        => date("Y-m-d H:i:s"),
-      'admin'          => 0
+      'updated'        => date("Y-m-d H:i:s")
     );
 
     $id = $this->db->create("users", $user );
@@ -459,7 +458,6 @@ class userHelper {
       'username'  => $userdb['username'],
       'email'     => $userdb['email'],
       'loggedin'  => 1,
-      'admin'     => $userdb['admin']
       ];
 
     $this->userTraits['loggedin'] = true;

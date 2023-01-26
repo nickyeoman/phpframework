@@ -481,4 +481,37 @@ class userController extends \Nickyeoman\Framework\BaseController {
 
 	} // end save profile
 
+	// Manage your users
+	public function admin() {
+
+		$s = new SessionManager();
+		$v = new ViewData($s);
+		$r = new RequestManager($s, $v);
+
+		if ( ! $s->loggedin('You need to login to edit users.') )
+				$this->redirect('user', 'login');
+
+		if ( !$s->inGroup('admin', 'You need Admin permissions to edit users.') )
+				$this->redirect('user', 'login');
+
+		//Grab pages
+		$DB = new DB();
+		$result = $DB->findall('users','id,username,email,blocked');
+
+		if ( !empty( $result ) ) {
+
+			foreach ($result as $key => $value){
+
+				//$value['tags'] = explode(',',$value['tags']);
+					$v->data['users'][$key] = $value;
+
+			} //endforeach
+
+			} //endif
+
+		$v->data['page']['slug'] = "user-admin"; // instead of "admin" (for css pageid)
+		$this->twig('admin', $v->data,'user');
+
+	} //end admin
+
 } //End Class
