@@ -15,13 +15,24 @@ class pageController extends \Nickyeoman\Framework\BaseController {
 
     $s = new SessionManager();
 		$v = new ViewData($s);
-		$r = new RequestManager($s, $v);
 
     //TODO: 404 if empty
     $slug = $params[0];
 
     $DB = new DB();
-    $pagedata = $DB->findone('pages', 'slug', $slug);
+    $sql = <<<EOSQL
+        SELECT p.*, GROUP_CONCAT(t.title SEPARATOR ', ') as 'tags'
+        FROM pages p
+        LEFT JOIN tag_pages tp ON p.id = tp.pages_id
+        LEFT JOIN tags t ON t.id = tp.tag_id
+        WHERE p.slug = '$slug'
+        GROUP BY p.id
+EOSQL;
+    
+    $result = $DB->query($sql);
+    $pagedata = $result[0];
+    
+    //$pagedata = $DB->findone('pages', 'slug', $slug);
 
     if ( empty($pagedata)) {
       // TODO: test this
@@ -37,7 +48,8 @@ class pageController extends \Nickyeoman\Framework\BaseController {
         $pagedata[$key] = null;
     }
 
-    $taglinks = explode(',',$pagedata['tags']);
+    
+    $taglinks = array_map('trim', explode(',',$pagedata['tags']));
     $pagedata['taglinks'] = ''; //string
 
     foreach ( $taglinks as $value) {
@@ -52,16 +64,10 @@ class pageController extends \Nickyeoman\Framework\BaseController {
     $pageid = $pagedata['id']; // Used in multiple places
     $s->setKey('pageid', $pageid); //remember in session
     $SQL = <<<EOSQL
-SELECT
-	c.body, u.username, c.date
-FROM
-	`comments` as c
-LEFT JOIN
-	`users` as u
-ON
-	c.userid = u.id
-WHERE
-	c.pageid = $pageid
+SELECT c.body, u.username, c.date
+FROM comments c
+LEFT JOIN users u ON c.userid = u.id
+WHERE c.pageid = $pageid
 EOSQL;
 
     $v->data['comments'] = $DB->query($SQL);
@@ -96,13 +102,33 @@ EOSQL;
 
     //Grab pages
     $DB = new DB();
-    $result = $DB->findall('pages','id,title,slug,draft');
+    
+    // Join the tags
+    $sql = <<<EOSQL
+    SELECT p.id, p.title, p.slug, p.draft, GROUP_CONCAT(t.title SEPARATOR ', ') as 'tags'
+    FROM pages p
+    LEFT JOIN tag_pages tp ON p.id = tp.pages_id
+    LEFT JOIN tags t ON t.id = tp.tag_id
+    GROUP BY p.id
+EOSQL;
+
+    // Run the query
+    $result = $DB->query($sql);
+    
 
     if ( !empty( $result ) ) {
+
       foreach ($result as $key => $value){
-        $value['tags'] = explode(',',$value['tags']);
+        
+        // twig wants a tag array
+        if ( ! empty($value['tags']) )
+          $value['tags'] = array_map('trim', explode(',',$value['tags']));
+
+        // put the values into the view
         $v->data['pages'][$key] = $value;
+
       }
+
     }
 
     $v->set('pageid', "page-admin");
@@ -135,11 +161,13 @@ EOSQL;
 
       $page = new pageHelp($r->post);
       
-      
-      $id = $DB->update('pages', $page->page , 'id' );
+      $DB->update('pages', $page->page , 'id' );
+      $DB->modifyTags('pages', $page->page['id'], $page->tags );
+      $DB->close();
 
       $s->addflash('Saved Page.','notice');
       $s->writeSession();
+
       $this->redirect('page', 'admin');
 
     }
@@ -151,7 +179,21 @@ EOSQL;
       //TODO: clean it up, trim, lower
     }
 
-    $v->data['info'] = $DB->findone('pages', 'id', $pid);
+    
+    // Join the tags
+    $sql = <<<EOSQL
+        SELECT p.*, GROUP_CONCAT(t.title SEPARATOR ', ') as 'tags'
+        FROM pages p
+        LEFT JOIN tag_pages tp ON p.id = tp.pages_id
+        LEFT JOIN tags t ON t.id = tp.tag_id
+        WHERE p.id = $pid
+        GROUP BY p.id
+    EOSQL;
+
+    $results = $DB->query($sql);
+    $DB->close();
+    $v->data['info'] = $results[0];
+    
     $v->data['pageid'] = "page-edit";
     $this->twig('edit', $v->data, 'page');
 
@@ -177,7 +219,8 @@ EOSQL;
 
       if( empty($page->error) ) {
         $DB = new DB();
-        $DB->create('pages', $page->page);
+        $insertid = $DB->create('pages', $page->page);
+        $DB->modifyTags('pages', $insertid, $page->tags );
         $DB->close();
 
       } else {

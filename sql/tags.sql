@@ -1,0 +1,10 @@
+CREATE TABLE `tags` (
+  `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `title` varchar(191) DEFAULT NULL UNIQUE
+);
+
+CREATE TABLE `tag_pages` (
+  `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `pages_id` int(11) UNSIGNED DEFAULT NULL,
+  `tag_id` int(11) UNSIGNED DEFAULT NULL
+);

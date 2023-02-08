@@ -32,19 +32,18 @@ USE Nickyeoman\Framework\SessionManager;
        // do the search
        $sql = <<<EOSQL
        SELECT
-         title, slug, description
-      FROM `pages`
+         p.title as title, p.slug as slug, p.description as description, t.title as tagtitle
+      FROM pages as p
+      JOIN tag_pages tp ON p.id = tp.pages_id
+      JOIN tags t ON t.id = tp.tag_id
       WHERE
-        `draft` != 1
-        AND (`keywords` LIKE '%$searchRequest%' OR 'body' LIKE '$searchRequest' )
-        AND `tags` LIKE '%blog%' ;
+        p.draft != 1
+        AND (p.keywords LIKE '%$searchRequest%' OR 'p.body' LIKE '$searchRequest' )
+        AND t.title LIKE '%blog%'
+      GROUP BY p.id
 EOSQL;
-          $results = $DB->query($sql);
-          while( $fetched = $results->fetch_array(MYSQLI_ASSOC) ) {
-            $rows[] = $fetched;
-          }
-          
-          $v->data['searchResults'] = $rows;
+
+          $v->data['searchResults'] = $DB->query($sql);
           $v->data['searchTerm'] = $searchRequest;
 
           if (empty($v->data['searchResults']) )

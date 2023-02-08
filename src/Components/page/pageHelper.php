@@ -22,6 +22,7 @@ class pageHelper {
     'path' => '',
     'notes' => ''
   );
+  public $tags = '';
   public $error = array();
 
   /*
@@ -44,6 +45,7 @@ class pageHelper {
     $this->set_draft();
     $this->set_path();
     $this->set_notes();
+    $this->set_tags();
 
   }
   // End Construct
@@ -173,11 +175,11 @@ class pageHelper {
         $cleanArr[$key] = $value;
       }
 
-      $tags = implode(',',$cleanArr);
+      //$tags = implode(',',$cleanArr);
 
     }
 
-    $this->page['tags'] = $tags;
+    $this->tags = $cleanArr;
     return $tags;
 
   }
