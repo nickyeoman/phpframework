@@ -1,6 +1,8 @@
 ---
 version: "3.3"
 
+# sudo docker-compose --env-file env-stage -f docker-compose-stage.yml up -d
+
 volumes:
   db:
 
@@ -20,7 +22,7 @@ services:
     restart: always
     container_name: "${DBHOST}"
     environment:
-      MYSQL_ROOT_PASSWORD: ${SALT}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_PASSWORD: ${DBPASSWORD}
       MYSQL_DATABASE: ${DB}
       MYSQL_USER: ${DBUSER}
