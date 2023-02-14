@@ -1,26 +1,25 @@
 CREATE TABLE `acc_chartofaccounts` (
   `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `code` varchar(10),
-  `name` VARCHAR(255) NOT NULL,
-  `type` ENUM('Asset', 'Liability', 'Equity', 'Revenue', 'Expense') NOT NULL
+  `account_name` VARCHAR(255) NOT NULL,
+  `account_type` ENUM('asset', 'liability', 'equity', 'revenue', 'expense') NOT NULL,
+  `notes` text
 );
 
-CREATE TABLE transactions (
+CREATE TABLE `acc_receipts` (
   `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  transaction_date DATE NOT NULL,
-  transaction_description VARCHAR(255) NOT NULL,
-  transaction_total DECIMAL(10, 2) NOT NULL
-);
-
-CREATE TABLE receipts (
-  `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `internal_id` int(11) NOT NULL AUTO_INCREMENT UNIQUE,
+  `business_name` VARCHAR(155) NOT NULL,
   `external_id` int(11),
-  `receipt_date` datetime NOT NULL
+  `receipt_date` datetime NOT NULL,
+  `receipt_amount` DECIMAL(10, 2) NOT NULL,
+  `notes` text
 );
 
-CREATE TABLE `receipts_transactions` (
+CREATE TABLE `acc_receipt_breakdown` (
   `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `receipts_id` int(11) UNSIGNED DEFAULT NULL,
-  `transactions_id` int(11) UNSIGNED DEFAULT NULL
+  `receipt_id` int(11) NOT NULL,
+  `account_id` int(11) NOT NULL,
+  `item` VARCHAR(255) NOT NULL,
+  `amount` DECIMAL(10,2) NOT NULL,
+  `notes` text
 );
