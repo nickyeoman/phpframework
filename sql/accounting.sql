@@ -21,5 +21,6 @@ CREATE TABLE `acc_receipt_breakdown` (
   `account_id` int(11) NOT NULL,
   `item` VARCHAR(255) NOT NULL,
   `amount` DECIMAL(10,2) NOT NULL,
+  `reconciled` tinyint(1) NOT NULL DEFAULT 0,
   `notes` text
 );
