@@ -1,10 +1,9 @@
-FROM php:8.2.1-apache
+FROM php:8.2.3-apache
 LABEL maintainer="Nick Yeoman <c@nickyeoman.com>"
 # How to build: docker build -t ${DOCKERIMAGE}:${DOCKERVER} .
 # https://hub.docker.com/_/php
 
 WORKDIR /website
-
 ENV APACHE_DOCUMENT_ROOT /website/public/
 
 ########################################################################################################################################
@@ -16,12 +15,11 @@ RUN apt-get update
 # IMAP features #
 ########################################################################################################################################
 RUN apt-get install -y libc-client-dev libkrb5-dev libssl-dev;
-
-# https://stackoverflow.com/questions/49854767/docker-php7-2-fpm-cant-install-imap-module
-
 RUN docker-php-ext-configure imap --with-kerberos --with-imap-ssl
 RUN docker-php-ext-install imap
-# END IMAP #
+
+## References:
+# https://stackoverflow.com/questions/49854767/docker-php7-2-fpm-cant-install-imap-module
 
 ########################################################################################################################################
 # symfony intl requirement
@@ -48,5 +46,8 @@ RUN a2enmod expires headers rewrite socache_shmcb ssl
 RUN docker-php-ext-install mysqli pdo pdo_mysql
 RUN docker-php-ext-install opcache
 
+########################################################################################################################################
+# Docker config
+########################################################################################################################################
 EXPOSE 80
 CMD ["apache2-foreground"]
