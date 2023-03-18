@@ -4,6 +4,8 @@
 * v1.2
 **/
 
+session_start();
+
 class SessionManager {
 
   // Variables *****************************************************************
