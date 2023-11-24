@@ -30,7 +30,8 @@ class pageController extends \Nickyeoman\Framework\BaseController {
 EOSQL;
     
     $result = $DB->query($sql);
-    $pagedata = $result[0];
+    if ( $result !== null )
+      $pagedata = $result[0];
     
     //$pagedata = $DB->findone('pages', 'slug', $slug);
 

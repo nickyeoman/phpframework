@@ -4,10 +4,13 @@ namespace Nickyeoman\Framework;
 USE \Nickyeoman\Dbhelper\Dbhelp as DB;
 USE Nickyeoman\Framework\SessionManager;
 USE Nickyeoman\Framework\ViewData;
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
 
 class BaseController {
 
   public $db = null; //class
+  protected $twig;
 
   /*
   * Base controller
@@ -40,30 +43,27 @@ class BaseController {
   }
   // END redirect
 
-  //Call Twig as a view
-  public function twig($viewname = 'index', $vars = array(), $component = null ) {
-
-      //TWIG
-      $loader = new \Twig\Loader\FilesystemLoader($_ENV['BASEPATH'] . '/' . $_ENV['VIEWPATH']);
+  // Call Twig as a view
+  public function twig($viewname = 'index', $vars = array(), $component = null)
+  {
+      // TWIG
+      $loader = new FilesystemLoader($_ENV['BASEPATH'] . '/' . $_ENV['VIEWPATH']);
       $loader->addPath($_ENV['BASEPATH'] . '/vendor/nickyeoman/nytwig/src', 'nytwig');
 
-      //load component view
-      if ( $component != null ) {
-
-        $loader->prependPath($_ENV['BASEPATH'] . "/vendor/nickyeoman/phpframework/src/Components/$component/twig");
-        
+      // Load component view
+      if ($component != null) {
+          $loader->prependPath($_ENV['BASEPATH'] . "/vendor/nickyeoman/phpframework/src/Components/$component/twig");
       }
-      // end if load component view
+      // End if load component view
 
-      $this->twig = new \Twig\Environment($loader, [
-          'cache' => $_ENV['BASEPATH'] . '/' .$_ENV['TWIGCACHE'],
+      $this->twig = new Environment($loader, [
+          'cache' => $_ENV['BASEPATH'] . '/' . $_ENV['TWIGCACHE'],
           'debug' => true,
       ]);
 
       $this->twig->addExtension(new \Twig\Extension\DebugExtension());
 
       echo $this->twig->render("$viewname.html.twig", $vars);
-
   }
   // End twig
 
