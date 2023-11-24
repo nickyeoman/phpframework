@@ -19,7 +19,7 @@
         "php": ">=7.4 <8.3",
         "nette/mail": "^3.1.6",
         "vlucas/phpdotenv": "v5.4.1",
-        "tracy/tracy": "v2.9.0",
+        "tracy/tracy": "v2.10.5",
         "twig/twig": "3.3.7",
         "php-imap/php-imap": "^2.0",
         "nickyeoman/php-mysql-helper": "^2.0.3",
