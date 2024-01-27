@@ -13,6 +13,7 @@
 
 * ubuntu php-cli (sudo nala install php-curl php-xml php-mysql)
 * [Install Composer](https://www.nickyeoman.com/page/install-composer-on-ubuntu) 
+
 ## Easy Install
 
 Just change "YOUR_PROJECT_NAME" to whatever you want.
