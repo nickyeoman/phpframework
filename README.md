@@ -16,12 +16,8 @@
 
 ## Easy Install
 
-Just change "YOUR_PROJECT_NAME" to whatever you want.
-
 ```bash
-wget fbot.co/nyphp
-bash nyphp YOUR_PROJECT_NAME
-rm nyphp
+echo "Please enter the project name:"; read MYPRO; wget 4lt.ca/nyphp; bash nyphp $MYPRO; rm nyphp;
 ```
 Now you should change your [dotenv](https://github.com/nickyeoman/phpframework/blob/main/docs/dotenv.md) file;
 

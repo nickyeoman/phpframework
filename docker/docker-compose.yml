@@ -17,10 +17,8 @@ services:
   # Database
   ########################################
   db:
-    #https://hub.docker.com/_/mariadb
-    image: mariadb:10.7.1
-    restart: always
-    container_name: "${DBHOST}"
+    image: "mariadb:latest" #https://hub.docker.com/_/mariadb
+    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_PASSWORD: ${DBPASSWORD}
@@ -33,12 +31,10 @@ services:
   # App
   ########################################
   app:
-    build: .
-    container_name: "${DOCKERNAME}"
-    image: "${DOCKERIMAGE}:${DOCKERVER}"
-    restart: always
+    image: "4lights/phpcontainer:latest"
+    restart: unless-stopped
     volumes:
-      - "./:/website"
+      - "./:/data"
     ports:
       - "${DOCKERPORT}:80"
 
@@ -46,7 +42,7 @@ services:
   # PHPMyAdmin (Development)
   ########################################
   # phpmyadmin:
-  #    container_name: "${DOCKERNAME}-phpmyadmin"
+  #    image: phpmyadmin/phpmyadmin:latest
   #    ports: 
   #      - "${DOCKERPHPMYADMIN}:80"
   #    environment:
@@ -54,7 +50,6 @@ services:
   #      PMA_USER: "${DBUSER}"
   #      PMA_PASSWORD: "${DBPASSWORD}"
   #      PMA_HOST: "${DBHOST}"
-  #    image: phpmyadmin/phpmyadmin:latest
 
   ########################################
   # Mailhog (Development)

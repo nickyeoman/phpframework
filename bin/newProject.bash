@@ -2,8 +2,18 @@
 
 echo "*** Starting New Project Script ***"
 
-# TODO: check if script has already been run
-# TODO: check if $1 exits
+# Check if no directory argument is provided
+if [ -z "$1" ]; then
+    project_name="myproject"
+else
+    project_name="$1"
+fi
+
+# Check if the provided argument is a directory and exists
+if [ -d "$project_name" ]; then
+    echo "Error: '$project_name' directory already exists."
+    exit 1
+fi
 
 composer -v > /dev/null 2>&1
 COMPOSER=$?
@@ -13,18 +23,29 @@ if [[ $COMPOSER -ne 0 ]]; then
     echo 'Once installed, try running this script again'
     exit 1
 else
-  mkdir $1
-  cd $1
-  composer require nickyeoman/phpframework
-  echo "Composer has installed nickyeoman/phpframework to $1"
+    mkdir -p "$project_name"
+    cd "$project_name" || exit 1
+    composer require nickyeoman/phpframework
+    echo "Composer has installed nickyeoman/phpframework to $project_name"
+fi
+
+#Check if Sass is installed
+if command -v sass &> /dev/null; then
+    echo "Sass is installed."
+    sass --version
+else
+    echo "Sass is not installed."
+    exit 1
 fi
 
 ################################################################################
 # Create directories
 ################################################################################
 
-echo "Creating directories: controllers tmp public views scripts"
-mkdir -p controllers tmp sass scripts helpers views
+echo "Creating directories"
+
+mkdir -p tmp sass scripts 
+mkdir -p app/Controllers app/Helpers app/Views
 mkdir -p public/css public/js public/images
 
 ################################################################################
@@ -44,7 +65,6 @@ cp vendor/nickyeoman/phpframework/public/htaccess public/.htaccess
 echo "Creating SASS directory for css"
 cp vendor/nickyeoman/phpframework/sass/project.sass sass/.
 
-# TODO: Check that sass is installed (above)
 sass sass/project.sass public/css/main.css
 
 ################################################################################
@@ -59,7 +79,6 @@ cp vendor/nickyeoman/phpframework/env.sample .env
 ################################################################################
 
 echo "Creating docker files"
-cp vendor/nickyeoman/phpframework/docker/Dockerfile Dockerfile
 cp vendor/nickyeoman/phpframework/docker/docker-compose.yml docker-compose.yml
 
 ################################################################################
