@@ -1,27 +1,34 @@
 <?php
 namespace Nickyeoman\Framework\Components\contact;
 
-USE Nickyeoman\Framework\SessionManager;
-USE Nickyeoman\Framework\ViewData;
-USE Nickyeoman\Framework\RequestManager;
 USE \Nickyeoman\Dbhelper\Dbhelp as DB;
 USE Nickyeoman\Framework\Components\contact\contactHelper as contacthelp;
 
-class contactController extends \Nickyeoman\Framework\BaseController {
+class contactController {
+  private $sessionManager;
+  private $viewData;
+  private $requestManager;
+  private $twig;
+
+  public function __construct($container) {
+    $this->sessionManager = $container->getSessionManager();
+    $this->viewData = $container->getViewData();
+    $this->requestManager = $container->getRequestManager();
+    $this->twig = $container->getTwigRenderer();
+  }
 
   /**
    * Public Contact form
    **/
   public function index() {
 
-    $s = new SessionManager();
-		
-    $v = new ViewData($s);
+    $s = $this->sessionManager;
+    $v = $this->viewData;
     $v->set('menuActive', 'contact');
     $v->set('showform',true);
     $v->set('pageid', "contactform");
 
-    $r = new RequestManager($s, $v);
+    $r = $this->requestManager;
 
     if ( $r->submitted ) {
 
@@ -92,7 +99,7 @@ class contactController extends \Nickyeoman\Framework\BaseController {
 
     } //end if submitted
 
-    $this->twig('contact', $v->data, 'contact');   
+    $this->twig->render('contact', $v->data, 'contact');   
 
   }
 

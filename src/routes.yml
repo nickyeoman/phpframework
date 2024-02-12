@@ -1,0 +1,17 @@
+# Framework routes.yaml
+
+routes:
+  - path: /pages
+    controller: IndexController
+    action: index
+    namespace: Nickyeoman\Framework\Controllers
+
+  - path: /login
+    controller: loginController
+    action: index
+    namespace: Nickyeoman\Framework\Components\login
+
+  - path: /logout
+    controller: loginController
+    action: logout
+    namespace: Nickyeoman\Framework\Components\login

@@ -9,9 +9,9 @@ class ViewData {
   /*
   * Manages the data sent to the view
   */
-  public function __construct($session) {
+  public function __construct(SessionManager $sessionManager) {
 
-    $this->session = $session;
+    $this->session = $sessionManager;
     
     $this->populateData();
 

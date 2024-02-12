@@ -1,3 +1,4 @@
 <?php
 define('BASEPATH', dirname(__DIR__, 1));
-require_once BASEPATH . '/vendor/nickyeoman/phpframework/src/Bootstrap.php';
+define('FRAMEWORKPATH', BASEPATH . '/vendor/nickyeoman/phpframework/');
+require_once FRAMEWORKPATH . 'src/Bootstrap.php';

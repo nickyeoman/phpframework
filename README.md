@@ -46,3 +46,17 @@ I went with bash for the automation process for two reasons:
 
 1. I'm more familiar with bash.
 1. It seemed more appropriate when working with docker containers.
+
+
+
+
+# Notes
+
+add this to project composer:
+```
+    "autoload": {
+        "psr-4": {
+            "Nickyeoman\\Framework\\Controllers\\": "app/Controllers/"
+        }
+    }
+```
