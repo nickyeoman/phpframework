@@ -17,7 +17,7 @@ cat << EOF > app/Controllers/${ControllerName}.php
 EOF
 
 # Create view
-cat << EOF > views/${ControllerName}.html.twig
+cat << EOF > app/Views/${ControllerName}.html.twig
   {% set title = '${ControllerName} Page' %}
   {% extends "@nytwig/master.html.twig" %}
 

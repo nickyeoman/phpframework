@@ -26,7 +26,8 @@
         "nickyeoman/php-mysql-helper": "^2.0.3",
         "nickyeoman/php-validation-class": "^5.0",
 	    "nickyeoman/sasslibrary": "^2.0.0",
-        "nickyeoman/nytwig": "^1.0"
+        "nickyeoman/nytwig": "^1.0",
+        "php-di/php-di":"*"
     },
     "autoload": {
         "psr-4": { "Nickyeoman\\Framework\\": "src/" }

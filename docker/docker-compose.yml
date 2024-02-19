@@ -16,14 +16,14 @@ services:
   ########################################
   # Database
   ########################################
-  db:
-    image: "mariadb:latest" #https://hub.docker.com/_/mariadb
+  mariadb:
+    image: "mariadb:latest" # https://hub.docker.com/_/mariadb
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_PASSWORD: ${DBPASSWORD}
-      MYSQL_DATABASE: ${DB}
-      MYSQL_USER: ${DBUSER}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-ChangeThisPassword}
+      MYSQL_PASSWORD: ${DBPASSWORD:-ChangeToAnotherPassword}
+      MYSQL_DATABASE: ${DB:-dbname}
+      MYSQL_USER: ${DBUSER:-dbuser}
     volumes:
       - "db:/var/lib/mysql"
 
@@ -31,12 +31,12 @@ services:
   # App
   ########################################
   app:
-    image: "4lights/phpcontainer:latest"
+    image: "4lights/phpcontainer:latest" # https://hub.docker.com/r/4lights/phpcontainer
     restart: unless-stopped
     volumes:
       - "./:/data"
     ports:
-      - "${DOCKERPORT}:80"
+      - "${DOCKERPORT:-8000}:80"
 
   ########################################
   # PHPMyAdmin (Development)
@@ -44,12 +44,12 @@ services:
   # phpmyadmin:
   #    image: phpmyadmin/phpmyadmin:latest
   #    ports: 
-  #      - "${DOCKERPHPMYADMIN}:80"
+  #      - "${DOCKERPHPMYADMINPORT:-8001}:8001"
   #    environment:
   #      UPLOAD_LIMIT: '200M'
-  #      PMA_USER: "${DBUSER}"
-  #      PMA_PASSWORD: "${DBPASSWORD}"
-  #      PMA_HOST: "${DBHOST}"
+  #      PMA_USER: "${DBUSER:-dbuser}"
+  #      PMA_PASSWORD: "${DBPASSWORD:-ChangeToAnotherPassword}"
+  #      PMA_HOST: "mariadb"
 
   ########################################
   # Mailhog (Development)

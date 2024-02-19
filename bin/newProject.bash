@@ -4,7 +4,7 @@ echo "*** Starting New Project Script ***"
 
 # Check if no directory argument is provided
 if [ -z "$1" ]; then
-    project_name="myproject"
+    project_name="my_new_project"
 else
     project_name="$1"
 fi
