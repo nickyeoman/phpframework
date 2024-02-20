@@ -1,25 +1,21 @@
 <?php
 namespace Nickyeoman\Framework\Components\error;
 
-USE Nickyeoman\Framework\SessionManager;
-USE Nickyeoman\Framework\ViewData;
+use Nickyeoman\Framework\Classes\BaseController;
 
-class errorController {
+class errorController extends BaseController {
   
-  private $twig;
-
-  public function __construct($container) {
-    $this->twig = $container->getTwigRenderer();
-  }
-
   public function index() {
 
-    $s = new SessionManager();
-		$v = new ViewData($s);
+    //$s = new SessionManager();
+		//$v = new ViewData($s);
 
     //$this->log('error','404', '404 Controller - error.php', '404 page' );
     header('HTTP/1.1 404 Not Found');
-    $this->twig->render('404', $v->data, 'error');
+    
+    // Render the template
+    $this->view('@error/404.html.twig', ['one' => 'theone']);
+
 
   }
 

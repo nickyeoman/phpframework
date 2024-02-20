@@ -30,6 +30,9 @@
         "php-di/php-di":"*"
     },
     "autoload": {
-        "psr-4": { "Nickyeoman\\Framework\\": "src/" }
+        "psr-4": { 
+            "Nickyeoman\\Framework\\": "src/",
+            "Nickyeoman\\Framework\\Classes\\": "src/Classes/"
+        }
     }
 }

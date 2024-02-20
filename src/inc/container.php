@@ -5,5 +5,6 @@ use DI\ContainerBuilder;
 $containerBuilder = new ContainerBuilder();
 $container = $containerBuilder->build();
 
-// Set the container as the default one for static methods
-\DI\Container::set($container);
+// Register Twig as a service in the container
+$container->set(Environment::class, $twig);
+

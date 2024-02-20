@@ -24,7 +24,7 @@ try {
     $controllerClass = $controllerName;
 
     // Instantiate the controller class
-    $controllerInstance = new $controllerClass();
+    $controllerInstance = new $controllerClass($twig);
 
     // Call the action method on the controller instance
     $controllerInstance->$actionName();
