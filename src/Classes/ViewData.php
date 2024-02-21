@@ -1,5 +1,5 @@
 <?php
-namespace Nickyeoman\Framework;
+namespace Nickyeoman\Framework\Classes;
 
 class ViewData {
 
@@ -93,6 +93,17 @@ class ViewData {
     return( $count );
 
   }
+
+  /**
+  * Add an debug
+  **/
+  public function adddebug($string = "No Information Supplied") {
+
+    $this->data['debug'][] = $string;
+
+    return true;
+
+  } // End adddebug
 
   public function set($key, $value) {
     $this->data[$key] = $value;

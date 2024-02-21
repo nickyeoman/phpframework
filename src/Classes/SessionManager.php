@@ -1,10 +1,10 @@
-<?php namespace Nickyeoman\Framework;
+<?php namespace Nickyeoman\Framework\Classes;
 /**
 * Session Class
 * v1.2
 **/
 
-session_start();
+
 
 class SessionManager {
 

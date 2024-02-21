@@ -27,7 +27,8 @@
         "nickyeoman/php-validation-class": "^5.0",
 	    "nickyeoman/sasslibrary": "^2.0.0",
         "nickyeoman/nytwig": "^1.0",
-        "php-di/php-di":"*"
+        "php-di/php-di":"*",
+        "symfony/routing":"*"
     },
     "autoload": {
         "psr-4": { 
