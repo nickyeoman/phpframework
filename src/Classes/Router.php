@@ -6,14 +6,16 @@ use Symfony\Component\Yaml\Yaml; // Route files are Yaml
 // This class is responsible for routing requests to the appropriate controller and action based on defined routes.
 class Router {
     
+    public $controller = 'errorController';
+    public $action = 'index';
     public $params = [];
-    private $urlParts = []; // url into an array
+    private $urlSegments = []; // url into an array
     private $routes = []; // An array to store all routes
     private $route = [
         'controller' => 'errorController',
         'action' => 'index',
         'namespace' => 'Nickyeoman\Framework\Components\error'
-    ]; // (match)
+    ];
     private $routeFiles = [
         BASEPATH . '/app/routes.yml', 
         FRAMEWORKPATH . 'src/routes.yml'
@@ -24,11 +26,7 @@ class Router {
         // Load routes from all route files
         $this->getUrlParts();
         $this->loadRoutes();
-        $this->separateParameters();
-        if ( $this->findMatch() ) {
-
-        }
-
+        $this->findInstructions();
     }
 
     private function loadRoutes() {
@@ -41,92 +39,67 @@ class Router {
         
     }
 
-    private function separateParameters() {
-        // Loop through each route to check for parameters
-        foreach ($this->routes as &$route) {
-            // Check if the route path contains curly brackets {}
-            if (strpos($route['path'], '{') !== false && strpos($route['path'], '}') !== false) {
-                // Extract parameter names from the route path and store in $route['params']
-                preg_match_all('/{([^}]+)}/', $route['path'], $matches);
-                $route['params'] = $matches[1];
-                // Remove the entire parameter placeholder from the route path
-                $route['path'] = preg_replace('/\/?\{([^\/]+)\}/', '', $route['path']);
-            }
-        }
-        dump($this->routes);die();
-    }
-    
-
     public function getUrlParts() {
-
         // Remove query string from the URL, if present
         $urlParts = explode('?', $_SERVER['REQUEST_URI']);
         $path = $urlParts[0];
     
         // Split the path into segments separated by /
         $urlArray = explode('/', trim($path, '/'));
-        
+    
         // If the URL array is empty, set the first segment to 'index'
         if (empty($urlArray[0])) {
             $urlArray[0] = 'index';
         }
-        
-        $this->urlParts = $urlArray;
-        
+    
+        // Set all segments after the first two to the parameters array
+        $this->urlSegments = $urlArray;
+
     }
 
-    private function getRouterPathParts($router_path) {
-        $segary = explode('/', trim($router_path, '/'));
-    
-        if (empty($segary[0])) {
-            $segary[0] = 'index';
-        }
-    
-        $parameters = [];
-        foreach ($segary as $index => $part) {
-            // Check if the segment contains curly brackets {}
-            if (strpos($part, '{') !== false && strpos($part, '}') !== false) {
-                // Remove curly brackets from the segment
-                $parameterName = trim($part, '{}');
-                // Save the parameter name and its index
-                $parameters[$parameterName] = $index;
-                // Remove the parameter from the segment array
-                unset($segary[$index]);
-            }
-        }
-
-        $this->params = $parameters;
-         
-        // Return the segmented array and the parameters
-        return $segary;
-    }
-    
-    public function findMatch() {
-
-        // Loop through each route to find a match
-        foreach ($this->routes as $route) {
-            $routeSegments = $this->getRouterPathParts($route['path']);
-            $urlParts = $this->urlParts;
-    
-            $match = true;
-            foreach ($routeSegments as $index => $routeSegment) {
-                // Compare segments for non-parameter segments
-                if ($routeSegment !== $urlParts[$index]) {
-                    $match = false;
-                    break; // Exit loop if segments don't match
-                } else {
-                    dump($routeSegment);
-                    dump($index);
+    public function findInstructions() {
+        $matchedRouteIdentifier = null; // Initialize variable to store matched route identifier
+        
+        foreach ($this->routes as $identifier => $route) {
+            // Initialize variables
+            $checkCtrl = '';
+            $checkActn = '';
+            
+            // Extract controller and action from the route
+            if ($route['path'] === '/') {
+                $checkCtrl = 'index';
+            } else {
+                $split = explode('/', trim($route['path'], '/'));
+                $checkCtrl = strtolower($split[0]);
+                if (isset($split[1])) { // Check if action exists
+                    $checkActn = strtolower($split[1]);
                 }
             }
     
-            // If all segments match, return true
-            if ($match) {
-                return true;
+            // Match controller
+            if (strtolower($checkCtrl) === strtolower($this->urlSegments[0])) {
+                $this->controller = $route['namespace'] . '\\' . $route['controller'];
+                
+                // Match action if provided
+                if ($checkActn && $checkActn === strtolower($this->urlSegments[1])) {
+                    $this->action = $route['action'];
+                    $this->params = array_slice($this->urlSegments, 2);
+                } else {
+                    // If action doesn't match, continue searching for other routes
+                    $this->params = array_slice($this->urlSegments, 1);
+                    continue;
+                }
+    
+                // Save the matched route identifier before breaking out of the loop
+                $matchedRouteIdentifier = $identifier;
+                
+                // Break the loop if both controller and action match
+                break;
             }
         }
     
-        return false;
-    }
+        // Return controller
+        return $this->controller;
+    }    
     
 }
