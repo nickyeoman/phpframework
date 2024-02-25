@@ -6,16 +6,12 @@ use Symfony\Component\Yaml\Yaml; // Route files are Yaml
 // This class is responsible for routing requests to the appropriate controller and action based on defined routes.
 class Router {
     
-    public $controller = 'errorController';
+    public $controller = 'Nickyeoman\Framework\Components\error\errorController';
     public $action = 'index';
     public $params = [];
     private $urlSegments = []; // url into an array
     private $routes = []; // An array to store all routes
-    private $route = [
-        'controller' => 'errorController',
-        'action' => 'index',
-        'namespace' => 'Nickyeoman\Framework\Components\error'
-    ];
+    private $route = [];
     private $routeFiles = [
         BASEPATH . '/app/routes.yml', 
         FRAMEWORKPATH . 'src/routes.yml'
@@ -51,6 +47,9 @@ class Router {
         if (empty($urlArray[0])) {
             $urlArray[0] = 'index';
         }
+        if (empty($urlArray[1])) {
+            $urlArray[1] = 'index';
+        }
     
         // Set all segments after the first two to the parameters array
         $this->urlSegments = $urlArray;
@@ -81,7 +80,7 @@ class Router {
                 $this->controller = $route['namespace'] . '\\' . $route['controller'];
                 
                 // Match action if provided
-                if ($checkActn && $checkActn === strtolower($this->urlSegments[1])) {
+                if ($checkActn === strtolower($this->urlSegments[1])) {
                     $this->action = $route['action'];
                     $this->params = array_slice($this->urlSegments, 2);
                 } else {
