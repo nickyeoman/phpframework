@@ -10,7 +10,7 @@ $session = new SessionManager();
 // Create view Object
 $view = new ViewData($session);
 
-// Debugging Starts Now
-if ($_ENV['DEBUG'] === 'display') {
-    $view->adddebug('Debugging is Enabled, Session and View loaded.');
-} 
+// Debugging
+$view->debugDump('framework.php', 'Session Data', $session);
+$view->debugDump('framework.php', 'View Data', $view);
+

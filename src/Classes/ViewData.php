@@ -95,15 +95,45 @@ class ViewData {
   }
 
   /**
-  * Add an debug
-  **/
-  public function adddebug($string = "No Information Supplied") {
+   * Add a debug message with support for nested sections
+   *
+   * @param string $section Section name
+   * @param string $title Title of the debug message
+   * @param string $string Content of the debug message
+   * @return bool Returns true if the debug message is added successfully
+   */
+  public function debugMsg($section = 'General', $title = 'Expand', $string = "No Information Supplied") {
 
-    $this->data['debug'][] = $string;
+    if ($_ENV['DEBUG'] != 'display') {
+      return false;
+    }
+
+    if (!isset($this->data['debug'][$section])) {
+        $this->data['debug'][$section] = [];
+    }
+
+    $this->data['debug'][$section][] = ['title' => $title, 'string' => $string];
 
     return true;
+  }
 
-  } // End adddebug
+  public function debugDump($section = 'General', $title = 'Dump', $var = null) {
+    if ($_ENV['DEBUG'] != 'display') {
+      return false;
+    }
+
+    if (!isset($this->data['debug'][$section])) {
+      $this->data['debug'][$section] = [];
+    }
+
+    ob_start();
+    dump($var);
+    $mydump = ob_get_clean();
+    
+    $this->data['debug'][$section][] = ['title' => $title, 'string' => $mydump];
+    return true;
+
+  }
 
   public function set($key, $value) {
     $this->data[$key] = $value;
