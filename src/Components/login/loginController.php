@@ -2,25 +2,29 @@
 namespace Nickyeoman\Framework\Components\login;
 
 use Nickyeoman\Framework\Classes\BaseController;
+use Nickyeoman\Framework\Components\login\loginHelper;
 use Nickyeoman\Dbhelper\Dbhelp as DB;
 USE \Nickyeoman\Validation\Validate;
 
 class LoginController extends BaseController {
 
     public function index() {
+        
+        
         // Your existing code goes here
-        $s = $this->sessionManager;
-        $v = $this->viewData;
-        $r = $this->requestManager; // Assuming you also need RequestManager
+        $s = $this->session;
+        $v = $this->viewClass;
+        $r = $this->request; // Assuming you also need RequestManager
 		$validate = new Validate;
 
         // If the user is logged in we don't need to proceed
         if ($s->loggedin()) {
-            $this->redirect('user', 'index');
+            redirect('user', 'index');
         }
 
         // Check if form Submitted
         if ($r->submitted) {
+
             $dirty = false;
 
             // Check Username or email is not null
@@ -75,21 +79,22 @@ class LoginController extends BaseController {
 
                 $s->setUserGroups($ugroups);
                 $s->authorize($userSession);
+                $s->writeSession();
 
-                $this->redirect('admin', 'index');
+                redirect('admin', 'index');
             }
         } // end if submitted
 
-        $this->twig->render('login', $v->data, 'login');
+        $this->view('@login/login');
         $s->writeSession();
     }
 
     public function logout(){
 
-		$s = $this->sessionManager;
+		$s = $this->session;
 		$s->destroySession();
 		$s->addflash("You have been logged out.",'notice');
-		$this->redirect('index', 'index');
+		redirect('index', 'index');
 
 	}
 }

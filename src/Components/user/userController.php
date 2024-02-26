@@ -1,9 +1,6 @@
 <?php
 namespace Nickyeoman\Framework\Components\user;
 
-USE Nickyeoman\Framework\SessionManager;
-USE Nickyeoman\Framework\ViewData;
-USE Nickyeoman\Framework\RequestManager;
 USE \Nickyeoman\Validation\Validate;
 USE \Nickyeoman\Dbhelper\Dbhelp as DB;
 
@@ -23,18 +20,16 @@ class userController extends \Nickyeoman\Framework\BaseController {
 	**/
 	public function registration() {
 
-		$s = new SessionManager();
-		$v = new ViewData($s);
-		$r = new RequestManager($s, $v);
+		$s = $this->session;
+        $v = $this->viewClass;
+        $r = $this->request; // Assuming you also need RequestManager
 
 		// If the user is logged in we don't need to proceed
 		if ( $s->loggedin() )
-		$this->redirect('admin', 'index');
+			redirect('admin', 'index');
 
 		//check Form Was submitted is enabled
 		if ( ! empty( $r->get('formkey') ) ){
-
-		
 
 		//check session matches
     	if ( $r->submitted ) {
@@ -96,7 +91,7 @@ class userController extends \Nickyeoman\Framework\BaseController {
     }
 
     //Display view
-    $this->twig('registration', $v->data,'user');
+	$this->view('@user/registration');
 	$s->writeSession();
 
 	}
@@ -104,9 +99,9 @@ class userController extends \Nickyeoman\Framework\BaseController {
 
 	public function validate(){
 
-		$s = new SessionManager();
-		$v = new ViewData($s);
-		$r = new RequestManager($s, $v);
+		$s = $this->session;
+        $v = $this->viewClass;
+        $r = $this->request;
 
 		if ( $r->get('valid') ) { //TODO: change this to param
 
@@ -130,7 +125,7 @@ class userController extends \Nickyeoman\Framework\BaseController {
 		//end check key
 
 		// display view
-		$this->twig('validate', $v->data, 'user');
+		$this->view('@user/validate');
 
 	}
 	// End validate action (page)
@@ -140,13 +135,13 @@ class userController extends \Nickyeoman\Framework\BaseController {
      */
 	public function forgot() {
 
-		$s = new SessionManager();
-		$v = new ViewData($s);
-		$r = new RequestManager($s, $v);
+		$s = $this->session;
+        $v = $this->viewClass;
+        $r = $this->request;
 
 		// If the user is logged in we don't need to proceed
 		if ( $s->loggedin() )
-		    $this->redirect('user', 'index');
+		    redirect('user', 'index');
 
 		$user = new Nickyeoman\helpers\userHelper();
 
@@ -180,15 +175,15 @@ class userController extends \Nickyeoman\Framework\BaseController {
 		}
 
 		//Display view
-		$this->twig('login', $v->data);
+		$this->view('@user/login');
 		$s->writeSession();
 	}
 
 	public function reset() {
 
-		$s = new SessionManager();
-		$v = new ViewData($s);
-		$r = new RequestManager($s, $v);
+		$s = $this->session;
+        $v = $this->viewClass;
+        $r = $this->request;
 
         if ( isset( $_GET['valid'] ) ) {
 
@@ -262,7 +257,7 @@ class userController extends \Nickyeoman\Framework\BaseController {
                         $s->setFlash('notice', "Password Change Successful, please login.");
                         $s->writeSession();
 
-                        $this->redirect('admin', 'index');  //redirect to login page
+                        redirect('admin', 'index');  //redirect to login page
 
                     }
                     // If all was good, data was written to database
@@ -283,22 +278,21 @@ class userController extends \Nickyeoman\Framework\BaseController {
 
         }
 
-        $this->twig('reset', $v->data); // display view
-
+		$this->view('@user/reset');
     }
 		//End Function reset
 
 	public function block($params) {
 
-		$s = new SessionManager();
-		$v = new ViewData($s);
-		$r = new RequestManager($s, $v);
+		$s = $this->session;
+        $v = $this->viewClass;
+        $r = $this->request;
 
 		if ( ! $s->loggedin('You need to login to edit users.') )
-      		$this->redirect('admin', 'index');
+      		redirect('admin', 'index');
 
     	if ( !$s->inGroup('admin', 'You need Admin permissions to edit users.') )
-      		$this->redirect('admin', 'index');
+      		redirect('admin', 'index');
 
 		if ( !empty($params))
 			$userid = $params[0];
@@ -306,7 +300,7 @@ class userController extends \Nickyeoman\Framework\BaseController {
 		if ( empty($userid) || !is_numeric($userid) ) {
 
 			$s->addFlash('error', "User id not correct");
-			$this->redirect('user', 'admin');
+			redirect('user', 'admin');
 
 		}
 
@@ -317,7 +311,7 @@ class userController extends \Nickyeoman\Framework\BaseController {
 		if ( empty($result ) ) {
 
 			$s->addFlash('error', "User does not exist");
-			$this->redirect('user', 'admin');
+			redirect('user', 'admin');
 
 		} else {
 
@@ -339,7 +333,7 @@ class userController extends \Nickyeoman\Framework\BaseController {
 			$DB->update('users',$update,'id');
 			$DB->close();
 
-			$this->redirect('user', 'admin');
+			redirect('user', 'admin');
 		}
 
 	} // end block user
@@ -349,15 +343,15 @@ class userController extends \Nickyeoman\Framework\BaseController {
 	 */
 	public function delete($params) {
 
-		$s = new SessionManager();
-		$v = new ViewData($s);
-		$r = new RequestManager($s, $v);
+		$s = $this->session;
+        $v = $this->viewClass;
+        $r = $this->request;
 
 		if ( ! $s->loggedin('You need to login to edit users.') )
-      		$this->redirect('admin', 'index');
+      		redirect('admin', 'index');
 
     	if ( !$s->inGroup('admin', 'You need Admin permissions to edit users.') )
-      		$this->redirect('admin', 'index');
+      		redirect('admin', 'index');
 
 		if ( !empty($params))
 			$userid = $params[0];
@@ -365,7 +359,7 @@ class userController extends \Nickyeoman\Framework\BaseController {
 		if ( empty($userid) || !is_numeric($userid) ) {
 
 			$s->addFlash("User id not correct", 'error');
-			$this->redirect('user', 'admin');
+			redirect('user', 'admin');
 
 		}
 
@@ -377,14 +371,14 @@ class userController extends \Nickyeoman\Framework\BaseController {
 		if ( empty($result ) ) {
 
 			$s->addFlash("User does not exist", 'error');
-			$this->redirect('user', 'admin');
+			redirect('user', 'admin');
 
 		} else {
 
 			$DB->delete('users',"id = $userid");
 			$s->addFlash('Notice: user removed (deleted)', "notice");
 
-			$this->redirect('user', 'admin');
+			redirect('user', 'admin');
 		}
 
 	} // end delete user
@@ -394,7 +388,7 @@ class userController extends \Nickyeoman\Framework\BaseController {
 
 			$s->addflash("You need to login to edit your profile.",'error');
 	    	$s->writeSession();
-	    	$this->redirect('admin', 'index');
+	    	redirect('admin', 'index');
 
 		}
 
@@ -415,9 +409,9 @@ class userController extends \Nickyeoman\Framework\BaseController {
 
 	public function saveprofile() {
 
-		$s = new SessionManager();
-		$v = new ViewData($s);
-		$r = new RequestManager($s, $v);
+		$s = $this->session;
+        $v = $this->viewClass;
+        $r = $this->request;
 
 		$userdb = array();
 
@@ -476,7 +470,7 @@ class userController extends \Nickyeoman\Framework\BaseController {
 
 		//dump($this->post);dump($s->);dump($this->data);dump($userdb);
 		//die();
-		$this->redirect('user', 'myprofile');
+		redirect('user', 'myprofile');
 
 
 	} // end save profile
@@ -484,15 +478,15 @@ class userController extends \Nickyeoman\Framework\BaseController {
 	// Manage your users
 	public function admin() {
 
-		$s = new SessionManager();
-		$v = new ViewData($s);
-		$r = new RequestManager($s, $v);
+		$s = $this->session;
+        $v = $this->viewClass;
+        $r = $this->request;
 
 		if ( ! $s->loggedin('You need to login to edit users.') )
-				$this->redirect('user', 'login');
+				redirect('user', 'login');
 
 		if ( !$s->inGroup('admin', 'You need Admin permissions to edit users.') )
-				$this->redirect('user', 'login');
+				redirect('user', 'login');
 
 		//Grab pages
 		$DB = new DB();
@@ -510,7 +504,7 @@ class userController extends \Nickyeoman\Framework\BaseController {
 			} //endif
 
 		$v->data['page']['slug'] = "user-admin"; // instead of "admin" (for css pageid)
-		$this->twig('admin', $v->data,'user');
+		$this->view('@user/admin');
 
 	} //end admin
 

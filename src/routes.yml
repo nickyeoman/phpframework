@@ -1,17 +1,33 @@
 # Framework routes.yaml
 
 routes:
-  - path: /pages
-    controller: IndexController
+
+  - path: /contact
+    controller: contactController
     action: index
-    namespace: Nickyeoman\Framework\Controllers
+    namespace: Nickyeoman\Framework\Components\contact
+
+  - path: /contact/admin
+    controller: contactController
+    action: admin
+    namespace: Nickyeoman\Framework\Components\contact
 
   - path: /login
     controller: loginController
     action: index
     namespace: Nickyeoman\Framework\Components\login
 
+  - path: /user
+    controller: userController
+    action: index
+    namespace: Nickyeoman\Framework\Components\user
+
   - path: /logout
     controller: loginController
     action: logout
     namespace: Nickyeoman\Framework\Components\login
+
+  - path: /pages
+    controller: IndexController
+    action: index
+    namespace: Nickyeoman\Framework\Controllers

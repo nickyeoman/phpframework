@@ -12,7 +12,7 @@ $view->debugDump('Routing', 'Router Class', $router); //Debug
 // Check if the controller class exists
 if (class_exists($controller)) {
     // Create an instance of the controller class
-    $controllerInstance = new $controller($twig, $view);
+    $controllerInstance = new $controller($twig, $view, $session, $request);
 
     // Check if the action method exists in the controller class
     if (method_exists($controllerInstance, $action)) {

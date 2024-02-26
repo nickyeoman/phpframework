@@ -1,18 +1,13 @@
 <?php
 
-namespace Nickyeoman\Framework;
+namespace Nickyeoman\Framework\Classes;
 
 use Nickyeoman\Dbhelper\Dbhelp as DB;
 
 class Logger {
-    private $sessionManager;
-    private $viewData;
-    private $requestManager;
-
-    public function __construct($container) {
-        $this->sessionManager = $container->getSessionManager();
-        $this->viewData = $container->getViewData();
-        $this->requestManager = $container->getRequestManager();
+    
+    public function __construct() {
+        // Needs session I think
     }
 
     public function log($level = 'DEBUG', $title = 'Called log', $location = 'Base Controller', $content = "NULL") {

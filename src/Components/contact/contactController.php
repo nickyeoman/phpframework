@@ -1,35 +1,30 @@
 <?php
 namespace Nickyeoman\Framework\Components\contact;
 
-USE \Nickyeoman\Dbhelper\Dbhelp as DB;
-USE Nickyeoman\Framework\Components\contact\contactHelper as contacthelp;
+use Nickyeoman\Framework\Classes\BaseController;
+use \Nickyeoman\Dbhelper\Dbhelp as DB;
+use Nickyeoman\Framework\Components\contact\contactHelper as contacthelp;
 
-class contactController {
-  private $sessionManager;
-  private $viewData;
-  private $requestManager;
-  private $twig;
-
-  public function __construct($container) {
-    $this->sessionManager = $container->getSessionManager();
-    $this->viewData = $container->getViewData();
-    $this->requestManager = $container->getRequestManager();
-    $this->twig = $container->getTwigRenderer();
-  }
+class contactController extends BaseController {
 
   /**
    * Public Contact form
    **/
   public function index() {
 
-    $s = $this->sessionManager;
-    $v = $this->viewData;
+    // Grab 
+    $s = $this->session;
+    $v = $this->viewClass;
+    $r = $this->requestManager;
+
     $v->set('menuActive', 'contact');
     $v->set('showform',true);
     $v->set('pageid', "contactform");
 
-    $r = $this->requestManager;
+    $v->debugDump('Contact Controller', 'Session Data', $s->data); //Debug
+    $v->debugDump('Contact Controller', 'View Data Start', $v->data); //Debug
 
+    // Did we get anything?
     if ( $r->submitted ) {
 
       // sendEmail clarifies if we are going to save to the db and send and email
@@ -99,21 +94,22 @@ class contactController {
 
     } //end if submitted
 
-    $this->twig->render('contact', $v->data, 'contact');   
+    $v->debugDump('Contact Controller', 'View Data End', $v->data); //Debug
+    $this->view('@contact/contact');   
 
   }
 
   public function admin() {
 
-    $s = new SessionManager();
+    $s = $this->session;
     
     // redirects
     if ( ! $s->loggedin('You need to login to edit messages.') )
-   		$this->redirect('login', 'index');
+   		redirect('login', 'index');
 
     if ( ! $s->isAdmin() ) {
       $s->addflash('You need to be an admin to view messages..','error');
-      $this->redirect('admin', 'index');
+      redirect('admin', 'index');
     }
 
     // view data
@@ -134,21 +130,21 @@ class contactController {
     }
     
     $v->set('adminbar', true);
-    $this->twig('admin', $v->data, 'contact');
+    $this->view('@contact/admin');   
 
   }
 
-  public function view($parms = null) {
+  public function contactView($parms = null) {
 
-    $s = new SessionManager();
+    $s = $this->session;
     
     // redirects
     if ( ! $s->loggedin('You need to login to edit messages.') )
-   		$this->redirect('login', 'index');
+   		redirect('login', 'index');
 
     if ( ! $s->isAdmin() ) {
       $s->addflash('You need to be an admin to view messages..','error');
-      $this->redirect('admin', 'index');
+      redirect('admin', 'index');
     }
 
     $pid = $parms[0];
@@ -166,12 +162,12 @@ class contactController {
     } else {
 
       $s->addflash("Message id not correct or no longer exists", 'error');
-      $this->redirect('contact', 'admin');
+      redirect('contact', 'admin');
 
     }
 
     $v->set('adminbar', true);
-    $this->twig('view', $v->data, 'contact');
+    $this->view('@contact/view');   
 
   } // end view page
 
@@ -180,15 +176,15 @@ class contactController {
    */
   public function delete($params) {
 
-		$s = new SessionManager();
+		$s = $this->session;
     
     // redirects
     if ( ! $s->loggedin('You need to login to edit messages.') )
-   		$this->redirect('login', 'index');
+   		redirect('login', 'index');
 
     if ( ! $s->isAdmin() ) {
       $s->addflash('You need to be an admin to view messages..','error');
-      $this->redirect('admin', 'index');
+      redirect('admin', 'index');
     }
 
 		if ( !empty($params))
@@ -197,7 +193,7 @@ class contactController {
 		if ( empty($msgid) || !is_numeric($msgid) ) {
 
 			$s->addFlash("Message id not correct", 'error');
-			$this->redirect('contact', 'admin');
+			redirect('contact', 'admin');
 
 		}
 
@@ -209,21 +205,21 @@ class contactController {
 
 			$s->addFlash("Message does not exist", 'error');
       $DB->close();
-			$this->redirect('contact', 'admin');
+			redirect('contact', 'admin');
 
 		} else {
 
 			$DB->delete('contactForm',"id = $msgid");
 			$s->addFlash('Notice: user removed (deleted)', "notice");
       $DB->close();
-			$this->redirect('contact', 'admin');
+			redirect('contact', 'admin');
 		}
 
 	} // end delete msg
 
   public function bademail($params) {
 
-    $s = new SessionManager();
+    $s = $this->session;
     
     // redirects
     if ( ! $s->loggedin('You need to login to edit messages.') )
@@ -231,11 +227,11 @@ class contactController {
 
     if ( ! $s->isAdmin() ) {
       $s->addflash('You need to be an admin to view messages..','error');
-      $this->redirect('admin', 'index');
+      redirect('admin', 'index');
     }
 
-    $v = new ViewData($s); // need for Request, TODO: shouldn't need this
-    $r = new RequestManager($s, $v);
+    $v = $this->viewClass;
+    $r = $this->requestManager;
 
     if ( $r->submitted ) {
 
@@ -246,12 +242,12 @@ class contactController {
       $DB->delete('contactForm',$where);
 
       $s->addFlash("Email Added, message removed", 'notice');
-      $this->redirect('contact','admin');
+      redirect('contact','admin');
 
     } else {
 
       $s->addFlash("Post to save bad emails.", 'error');
-      $this->redirect('contact','admin');
+      redirect('contact','admin');
 
     }
 

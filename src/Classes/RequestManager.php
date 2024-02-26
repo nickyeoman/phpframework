@@ -1,5 +1,4 @@
-<?php
-namespace Nickyeoman\Framework;
+<?php namespace Nickyeoman\Framework\Classes;
 /**
 * Request Class
 * v1.0

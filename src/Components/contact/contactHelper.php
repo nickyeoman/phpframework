@@ -4,9 +4,9 @@ USE \Nickyeoman\Validation;
 
 class contactHelper {
 
-  public $error = array();
+  public $error  = array();
   public $notice = array();
-  public $post = array();
+  public $post   = array();
   public $valid;
 
   /*

@@ -13,6 +13,9 @@ $loader = new FilesystemLoader([
 // Add namespaces for the template directories
 $loader->addPath(BASEPATH . '/vendor/nickyeoman/nytwig/src', 'nytwig');
 $loader->addPath(BASEPATH . '/vendor/nickyeoman/phpframework/src/Components/error/twig/', 'error');
+$loader->addPath(BASEPATH . '/vendor/nickyeoman/phpframework/src/Components/contact/twig/', 'contact');
+$loader->addPath(BASEPATH . '/vendor/nickyeoman/phpframework/src/Components/login/twig/', 'login');
+$loader->addPath(BASEPATH . '/vendor/nickyeoman/phpframework/src/Components/user/twig/', 'user');
 
 // Create Twig environment
 $twig = new Environment($loader, [
