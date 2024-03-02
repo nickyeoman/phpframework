@@ -1,9 +1,10 @@
 <?php
 namespace Nickyeoman\Framework\Components\sitemap;
 
+use Nickyeoman\Framework\Classes\BaseController;
 USE \Nickyeoman\Dbhelper\Dbhelp as DB;
 
-class sitemapController extends \Nickyeoman\Framework\BaseController {
+class sitemapController extends BaseController {
 
   public function index() {
 

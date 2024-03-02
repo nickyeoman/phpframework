@@ -1,7 +1,7 @@
 <?php
 use Nickyeoman\Framework\Classes\Router;
 
-$router = new Router();
+$router = new Router($_SERVER['REQUEST_URI']);
 
 // Get the controller and action from the router
 $controller = $router->controller;

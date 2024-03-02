@@ -4,7 +4,7 @@ namespace Nickyeoman\Framework\Components\login;
 use Nickyeoman\Framework\Classes\BaseController;
 use Nickyeoman\Framework\Components\login\loginHelper;
 use Nickyeoman\Dbhelper\Dbhelp as DB;
-USE \Nickyeoman\Validation\Validate;
+USE Nickyeoman\Validation\Validate;
 
 class LoginController extends BaseController {
 

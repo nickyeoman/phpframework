@@ -1,17 +1,15 @@
 <?php namespace Nickyeoman\Framework\Components\search;
 
+use Nickyeoman\Framework\Classes\BaseController;
 USE Nickyeoman\Dbhelper\Dbhelp as DB;
-USE Nickyeoman\Framework\ViewData;
-USE Nickyeoman\Framework\RequestManager;
-USE Nickyeoman\Framework\SessionManager;
 
- class searchController extends \Nickyeoman\Framework\BaseController {
+ class searchController extends BaseController {
 
    function index($params = null) {
 
-    $s = new SessionManager();
-		$v = new ViewData($s);
-		$r = new RequestManager($s, $v);
+    $s = $this->session;
+    $v = $this->viewClass;
+    $r = $this->request;
 
      $searchRequest = null;
      $v->data['searchCount'] = null;
@@ -54,7 +52,7 @@ EOSQL;
      }
 
      $v->data['menuActive'] = 'search';
-     $this->twig('search', $v->data, 'search');
+     $this->view('@search/search');
 
    }
  }

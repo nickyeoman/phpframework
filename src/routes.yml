@@ -12,14 +12,34 @@ routes:
     action: admin
     namespace: Nickyeoman\Framework\Components\contact
 
+  - path: /contact/view/{msgid}
+    controller: contactController
+    action: contactView
+    namespace: Nickyeoman\Framework\Components\contact
+
+  - path: /contact/delete/{msgid}
+    controller: contactController
+    action: delete
+    namespace: Nickyeoman\Framework\Components\contact
+
   - path: /login
     controller: loginController
     action: index
     namespace: Nickyeoman\Framework\Components\login
 
+  - path: /admin
+    controller: userController
+    action: admin
+    namespace: Nickyeoman\Framework\Components\user
+
   - path: /user
     controller: userController
     action: index
+    namespace: Nickyeoman\Framework\Components\user
+
+  - path: /user/registration
+    controller: userController
+    action: registration
     namespace: Nickyeoman\Framework\Components\user
 
   - path: /logout
@@ -27,7 +47,38 @@ routes:
     action: logout
     namespace: Nickyeoman\Framework\Components\login
 
-  - path: /pages
-    controller: IndexController
+  - path: /page/admin
+    controller: pageController
+    action: admin
+    namespace: Nickyeoman\Framework\Components\page
+
+  - path: /page/edit/{id}
+    controller: pageController
+    action: edit
+    namespace: Nickyeoman\Framework\Components\page
+
+  - path: /page/edit
+    controller: pageController
+    action: edit
+    namespace: Nickyeoman\Framework\Components\page
+  
+  - path: /page/new
+    controller: pageController
+    action: new
+    namespace: Nickyeoman\Framework\Components\page
+
+  - path: /page/{slug}
+    controller: pageController
+    action: page
+    namespace: Nickyeoman\Framework\Components\page
+
+  - path: /search
+    controller: searchController
     action: index
-    namespace: Nickyeoman\Framework\Controllers
+    namespace: Nickyeoman\Framework\Components\search
+
+  - path: /sitemap.xml
+    controller: sitemapController
+    action: sitemap
+    namespace: Nickyeoman\Framework\Components\sitemap
+

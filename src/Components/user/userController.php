@@ -1,17 +1,18 @@
 <?php
 namespace Nickyeoman\Framework\Components\user;
 
-USE \Nickyeoman\Validation\Validate;
-USE \Nickyeoman\Dbhelper\Dbhelp as DB;
+use Nickyeoman\Framework\Classes\BaseController;
+USE Nickyeoman\Validation\Validate;
+USE Nickyeoman\Dbhelper\Dbhelp as DB;
 
-class userController extends \Nickyeoman\Framework\BaseController {
+class userController extends BaseController {
 
 	public bool $error = false;
 
 	// This is the dashboard
 	public function index(){
 
-		$this->redirect('admin', 'index');
+		redirect('admin', 'index');
 
 	} // end function index
 
@@ -483,10 +484,10 @@ class userController extends \Nickyeoman\Framework\BaseController {
         $r = $this->request;
 
 		if ( ! $s->loggedin('You need to login to edit users.') )
-				redirect('user', 'login');
+			redirect('user', 'login');
 
 		if ( !$s->inGroup('admin', 'You need Admin permissions to edit users.') )
-				redirect('user', 'login');
+			redirect('user', 'login');
 
 		//Grab pages
 		$DB = new DB();

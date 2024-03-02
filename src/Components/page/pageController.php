@@ -1,23 +1,19 @@
 <?php
 namespace Nickyeoman\Framework\Components\page;
 
-USE Nickyeoman\Framework\SessionManager;
-USE Nickyeoman\Framework\ViewData;
-USE Nickyeoman\Framework\RequestManager;
-USE \Nickyeoman\Dbhelper\Dbhelp as DB;
+use Nickyeoman\Framework\Classes\BaseController;
+USE Nickyeoman\Dbhelper\Dbhelp as DB;
 USE Nickyeoman\Framework\Components\page\pageHelper as pageHelp;
 
+class pageController extends BaseController {
 
-class pageController extends \Nickyeoman\Framework\BaseController {
+  function page( $params = array() ) {
 
-  // There is no index page, this will catch
-  function override( $params = array() ) {
-
-    $s = new SessionManager();
-		$v = new ViewData($s);
+    $s = $this->session;
+		$v = $this->viewClass;
 
     //TODO: 404 if empty
-    $slug = $params[0];
+    $slug = $params['slug'];
 
     $DB = new DB();
     $sql = <<<EOSQL
@@ -38,7 +34,7 @@ EOSQL;
     if ( empty($pagedata)) {
       // TODO: test this
       header('HTTP/1.1 404 Not Found');
-      $this->twig('404', $v->data, 'error');
+      $this->view('@error/404');
       die();
     }
 
@@ -76,28 +72,28 @@ EOSQL;
     $v->data['page'] = $pagedata;
 
     $s->writeSession();
-    $this->twig('page', $v->data, 'page');
+    $this->view('@page/page');
 
   }
-  // end override
+  // end page
 
   // List pages to edit
   function admin() {
 
-    $s = new SessionManager();
-		$v = new ViewData($s);
+    $s = $this->session;
+		$v = $this->viewClass;
 
     if ( ! $s->loggedin() ) {
 
       $s->addflash("You need to login to edit pages.",'notice');
       $s->writeSession();
-      $this->redirect('admin', 'index');
+      redirect('admin', 'index');
 
     } elseif ( !$s->isAdmin() ) {
 
       $s->addflash("You need Admin permissions to edit pages.",'notice');
       $s->writeSession(); 
-      $this->redirect('user', 'login');
+      redirect('user', 'login');
 
     }
 
@@ -135,7 +131,8 @@ EOSQL;
     $v->set('pageid', "page-admin");
     $v->set('adminbar', true);
     $s->writeSession();
-    $this->twig('admin', $v->data, 'page');
+    //$this->twig('admin', $v->data, 'page');
+    $this->view('@page/admin');
 
   }
   //end admin
@@ -145,17 +142,17 @@ EOSQL;
    **/
   function edit($params = null) {
 
-    $s = new SessionManager();
-		$v = new ViewData($s);
-		$r = new RequestManager($s, $v);
+    $s = $this->session;
+		$v = $this->viewClass;
+		$r = $this->request;
     $DB = new DB();
     
     if ( ! $s->loggedin('You need to login to edit pages.') )
-      $this->redirect('admin', 'index');
+      redirect('admin', 'index');
 
     if ( !$s->isAdmin() ) {
       $s->addflash('You need to be an admin to view messages..','error');
-      $this->redirect('user', 'login');
+      redirect('user', 'login');
     }
 
     if ( $r->submitted ) {
@@ -169,11 +166,11 @@ EOSQL;
       $s->addflash('Saved Page.','notice');
       $s->writeSession();
 
-      $this->redirect('page', 'admin');
+      redirect('page', 'admin');
 
     }
 
-    $pid = $params[0];
+    $pid = $params['id'];
 
     if ( empty($pid) ) {
       //TODO: error, page not given
@@ -196,21 +193,22 @@ EOSQL;
     $v->data['info'] = $results[0];
     
     $v->data['pageid'] = "page-edit";
-    $this->twig('edit', $v->data, 'page');
+    
+    $this->view('@page/edit');
 
   }
   // end function edit
 
   public function new(){
 
-    $s = new SessionManager();
-		$v = new ViewData($s);
-		$r = new RequestManager($s, $v);
+    $s = $this->session;
+		$v = $this->viewClass;
+		$r = $this->request;
 
     if ( ! $s->loggedin() ) {
 
       $s->addflash('You need to login to edit pages.','notice');
-      $this->redirect('login', 'index');
+      redirect('login', 'index');
 
     }
 
@@ -243,26 +241,26 @@ EOSQL;
     $v->data['mode'] = 'new';
     $v->data['pageid'] = "page-edit";
     $s->writeSession();
-    $this->twig('edit', $v->data, 'page');
+    $this->view('@page/edit');
 
   }
   //end new
 
   public function tagadmin($params = null) {
 
-    $s = new SessionManager();
-		$v = new ViewData($s);
-		$r = new RequestManager($s, $v);
+    $s = $this->session;
+		$v = $this->viewClass;
+		$r = $this->request;
 
     if ( ! $s->loggedin() ) {
 
       $s->addflash("You need to login to edit tags.",'notice');
-      $this->redirect('user', 'login');
+      redirect('user', 'login');
 
     } elseif ( !$s->inGroup('admin') ) {
 
       $s->addflash("You need Admin permissions to edit tags.",'notice');
-      $this->redirect('user', 'login');
+      redirect('user', 'login');
 
     }
 
@@ -280,18 +278,18 @@ EOSQL;
 
     $v->set('adminbar', true);
     $v->set('pageid', "page-admin");
-    $this->twig('admin', $this->data, 'page');
+    $view('@page/admin');
   }
 
   public function createcomment() {
 
-    $s = new SessionManager();
-		$v = new ViewData($s);
-		$r = new RequestManager($s, $v);
+    $s = $this->session;
+		$v = $this->viewClass;
+		$r = $this->request;
 
     // Check if logged in
     if ( ! $s->loggedin('You need to login to leave a comment.') )
-      $this->redirect('user', 'login');
+      redirect('user', 'login');
 
     if ( empty( $s->getKey('pageid') ))
       $s->addflash("Error: missing pageid.",'error');
@@ -329,15 +327,15 @@ EOSQL;
 
     }
 
-    $this->redirect('page', $this->post['slug']);
+    redirect('page', $this->post['slug']);
 
   }
 
   public function admincomment($params = null) {
 
-    $s = new SessionManager();
-		$v = new ViewData($s);
-		$r = new RequestManager($s, $v);
+    $s = $this->session;
+		$v = $this->viewClass;
+		$r = $this->request;
     $DB = new DB();
 
     if ( ! $s->loggedin('You need to login to admin comments.') )
@@ -371,7 +369,7 @@ EOSQL;
 
     $v->data['pageid'] = "comments-admin";
     $v->set('adminbar', true);
-    $this->twig('adminComments', $v->data, 'page');
+    $this->view('@page/adminComments');
   }
 
 } //end class

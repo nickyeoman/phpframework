@@ -16,6 +16,8 @@ $loader->addPath(BASEPATH . '/vendor/nickyeoman/phpframework/src/Components/erro
 $loader->addPath(BASEPATH . '/vendor/nickyeoman/phpframework/src/Components/contact/twig/', 'contact');
 $loader->addPath(BASEPATH . '/vendor/nickyeoman/phpframework/src/Components/login/twig/', 'login');
 $loader->addPath(BASEPATH . '/vendor/nickyeoman/phpframework/src/Components/user/twig/', 'user');
+$loader->addPath(BASEPATH . '/vendor/nickyeoman/phpframework/src/Components/page/twig/', 'page');
+$loader->addPath(BASEPATH . '/vendor/nickyeoman/phpframework/src/Components/search/twig/', 'search');
 
 // Create Twig environment
 $twig = new Environment($loader, [

@@ -6,99 +6,126 @@ use Symfony\Component\Yaml\Yaml; // Route files are Yaml
 // This class is responsible for routing requests to the appropriate controller and action based on defined routes.
 class Router {
     
-    public $controller = 'Nickyeoman\Framework\Components\error\errorController';
-    public $action = 'index';
+    private $requestURI; // REQUEST_URI
+    private $uriSegments = []; // Request uri but an array
+    private $routeFiles = []; // Array of Files to find the routes
+    private $routes = []; // Routes as an array 
+
     public $params = [];
-    private $urlSegments = []; // url into an array
-    private $routes = []; // An array to store all routes
-    private $route = [];
-    private $routeFiles = [
-        BASEPATH . '/app/routes.yml', 
-        FRAMEWORKPATH . 'src/routes.yml'
-    ];
+    public $controller = null; // Controller to Call
+    public $action = 'index'; // Method to call
 
-    public function __construct() {
+    public function __construct($uri = null) {
 
-        // Load routes from all route files
-        $this->getUrlParts();
-        $this->loadRoutes();
-        $this->findInstructions();
+        if (empty($uri))
+            $uri = $_SERVER['REQUEST_URI'];
+
+        $this->requestURI = $uri; // Set uri
+        $this->uriSegments = $this->uri2array($uri);  // create uri array
+        $this->routeFiles = $this->createRouteFilesArray(); // Load file paths to array
+        $this->routes = $this->loadRoutes(); // Read the filepaths and store routes to array
+        $this->setCAP();
+        
     }
 
+    /**
+     * Takes the uri provided and turns it into an array
+     * Returns the array
+     */
+    private function uri2array($uri) {
+
+        // Split the path into segments separated by /
+        $urlArray = explode('/', trim($uri, '/'));
+    
+        // Set all segments after the first two to the parameters array
+        return $urlArray;
+
+    }
+
+    /**
+     * Creates the default paths for route files
+     */
+    private function createRouteFilesArray() {
+
+        $a = array(
+        BASEPATH . '/App/routes.yml', 
+        FRAMEWORKPATH . 'src/routes.yml'
+        );
+        
+        return $a;
+
+    }
+
+    /**
+     * Adds a route path
+     * Remember to loadRoutes() again if you use this
+     */
+    public function addRouteFile($filePath) {
+
+        // Add the file to the begining of the array
+        array_unshift($this->routeFiles, $filePath);
+        return $this->routeFiles;
+    }
+
+    /**
+     * Loops through the files and returns a routes array
+     */
     private function loadRoutes() {
+
+        $routeElements = [];
+
         foreach ($this->routeFiles as $file) {
             if (file_exists($file)) {
                 $routes = Yaml::parseFile($file)['routes'];
-                $this->routes = array_merge_recursive($this->routes, $routes);
+                $routeElements = array_merge_recursive($routeElements, $routes);
             }
         }
-        
-    }
 
-    public function getUrlParts() {
-        // Remove query string from the URL, if present
-        $urlParts = explode('?', $_SERVER['REQUEST_URI']);
-        $path = $urlParts[0];
-    
-        // Split the path into segments separated by /
-        $urlArray = explode('/', trim($path, '/'));
-    
-        // If the URL array is empty, set the first segment to 'index'
-        if (empty($urlArray[0])) {
-            $urlArray[0] = 'index';
-        }
-        if (empty($urlArray[1])) {
-            $urlArray[1] = 'index';
-        }
-    
-        // Set all segments after the first two to the parameters array
-        $this->urlSegments = $urlArray;
+        return $routeElements;
 
     }
 
-    public function findInstructions() {
-        $matchedRouteIdentifier = null; // Initialize variable to store matched route identifier
-        
-        foreach ($this->routes as $identifier => $route) {
-            // Initialize variables
-            $checkCtrl = '';
-            $checkActn = '';
-            
-            // Extract controller and action from the route
-            if ($route['path'] === '/') {
-                $checkCtrl = 'index';
-            } else {
-                $split = explode('/', trim($route['path'], '/'));
-                $checkCtrl = strtolower($split[0]);
-                if (isset($split[1])) { // Check if action exists
-                    $checkActn = strtolower($split[1]);
-                }
-            }
-    
-            // Match controller
-            if (strtolower($checkCtrl) === strtolower($this->urlSegments[0])) {
-                $this->controller = $route['namespace'] . '\\' . $route['controller'];
-                
-                // Match action if provided
-                if ($checkActn === strtolower($this->urlSegments[1])) {
-                    $this->action = $route['action'];
-                    $this->params = array_slice($this->urlSegments, 2);
-                } else {
-                    // If action doesn't match, continue searching for other routes
-                    $this->params = array_slice($this->urlSegments, 1);
-                    continue;
-                }
-    
-                // Save the matched route identifier before breaking out of the loop
-                $matchedRouteIdentifier = $identifier;
-                
-                // Break the loop if both controller and action match
+    /**
+     * Set Controller Action Params
+     */
+    private function setCAP() {
+
+        $rs = $this->routes;
+        $seg = $this->uriSegments;
+        $ctl = 'Nickyeoman\Framework\Components\error\errorController';
+        $found = false;
+
+        foreach ( $rs as $key => $route) {
+
+            $matchedRouteIdentifier = $key;
+            $rpath = $route['path'];
+
+            // Convert route path to a regular expression pattern
+            $pattern = preg_replace('/\{([^\/]+)\}/', '(?<$1>[^\/]+)', $rpath);
+            $pattern = '#^' . $pattern . '$#';
+
+            // Check if the request URI matches the pattern
+            if (preg_match($pattern, $this->requestURI, $matches)) {
+                $found = true;
                 break;
             }
+            
         }
-    
-        // Return controller
-        return $this->controller;
-    }    
+
+        if ($found) {
+            $this->controller = $rs[$matchedRouteIdentifier]['namespace'] . '\\' . $rs[$matchedRouteIdentifier]['controller'];
+            $this->action = $rs[$matchedRouteIdentifier]['action'];
+            
+            $this->params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
+
+            return true;
+        } else {
+            $this->controller = $ctl;
+            $this->action = 'index';
+            return false;
+        }
+
+    }
+
     
 }

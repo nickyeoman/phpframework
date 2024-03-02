@@ -15,7 +15,7 @@ class contactController extends BaseController {
     // Grab 
     $s = $this->session;
     $v = $this->viewClass;
-    $r = $this->requestManager;
+    $r = $this->request;
 
     $v->set('menuActive', 'contact');
     $v->set('showform',true);
@@ -84,18 +84,18 @@ class contactController extends BaseController {
 
       // Send am email
       // TODO: this shouldn't be public
-      $this->sendEmail(
-        $_ENV['MAIL_FROM_ADDRESS']
-        ,'New Message on ' . $_ENV['MAIL_FROM_NAME']
-        ,"Here is your message: " . $r->get('message')
-      );
+      // $this->sendEmail(
+      //   $_ENV['MAIL_FROM_ADDRESS']
+      //   ,'New Message on ' . $_ENV['MAIL_FROM_NAME']
+      //   ,"Here is your message: " . $r->get('message')
+      // );
 
       } // end if errors
 
     } //end if submitted
 
     $v->debugDump('Contact Controller', 'View Data End', $v->data); //Debug
-    $this->view('@contact/contact');   
+    $this->view('@contact/contact');
 
   }
 
@@ -113,7 +113,7 @@ class contactController extends BaseController {
     }
 
     // view data
-    $v = new ViewData($s);
+    $v = $this->viewClass;
     $v->set('pageid', "contact-admin");
     $v->data['contactMessages'] = array();
       
@@ -147,10 +147,10 @@ class contactController extends BaseController {
       redirect('admin', 'index');
     }
 
-    $pid = $parms[0];
+    $pid = $parms['msgid'];
 
     // view data
-    $v = new ViewData($s);
+    $v = $this->viewClass;
     $v->set('pageid', "viewMessage");
     $v->data['contactMessages'] = array();
 
@@ -188,7 +188,7 @@ class contactController extends BaseController {
     }
 
 		if ( !empty($params))
-			$msgid = $params[0];
+			$msgid = $params['msgid'];
 
 		if ( empty($msgid) || !is_numeric($msgid) ) {
 
