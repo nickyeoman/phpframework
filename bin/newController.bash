@@ -1,27 +1,36 @@
 #!/bin/bash
 
-ControllerName=$1;
+ControllerName="$1";
+
+# Check if ControllerName is provided
+if [ -z "$ControllerName" ]; then
+  echo "Usage: $0 <ControllerName>"
+  exit 1
+fi
 
 # Create child controller
-cat << EOF > app/Controllers/${ControllerName}.php
+cat << EOF > App/Controllers/${ControllerName}.php
 <?php
-   namespace Nickyeoman\Framework\Controller;
-   class ${ControllerName}Controller extends \Nickyeoman\Framework\BaseController {
+namespace App\Controllers;
 
-     function index() {
+use Nickyeoman\Framework\Classes\BaseController;
+use Nickyeoman\Framework\Attributes\Route;
 
-       \$this->twig('${ControllerName}', \$this->data);
+class ${ControllerName} extends BaseController {
 
-     }
-   }
+    #[Route('/${ControllerName}')]
+    public function index() {
+        \$this->view('index');
+    }
+}
 EOF
 
 # Create view
-cat << EOF > app/Views/${ControllerName}.html.twig
-  {% set title = '${ControllerName} Page' %}
-  {% extends "@nytwig/master.html.twig" %}
+cat << EOF > App/Views/${ControllerName}.html.twig
+{% set title = '${ControllerName} Page' %}
+{% extends "@nytwig/master.html.twig" %}
 
-  {% block content %}
-  <p>Sample ${ControllerName} Page Content.</p>
-  {% endblock %}
+{% block content %}
+<p>Sample ${ControllerName} Page Content.</p>
+{% endblock %}
 EOF
