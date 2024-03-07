@@ -1,131 +1,118 @@
 <?php
+
 namespace Nickyeoman\Framework\Classes;
 
-use Symfony\Component\Yaml\Yaml; // Route files are Yaml
+use Twig\Environment;
 
-// This class is responsible for routing requests to the appropriate controller and action based on defined routes.
 class Router {
-    
-    private $requestURI; // REQUEST_URI
-    private $uriSegments = []; // Request uri but an array
-    private $routeFiles = []; // Array of Files to find the routes
-    private $routes = []; // Routes as an array 
+    private array $controllerFiles;
+    private array $cachedRoutes = [];
+    private Environment $twig;
+    private $view;
+    private $session;
+    private $request;
 
-    public $params = [];
-    public $controller = null; // Controller to Call
-    public $action = 'index'; // Method to call
-
-    public function __construct($uri = null) {
-
-        if (empty($uri))
-            $uri = $_SERVER['REQUEST_URI'];
-
-        $this->requestURI = $uri; // Set uri
-        $this->uriSegments = $this->uri2array($uri);  // create uri array
-        $this->routeFiles = $this->createRouteFilesArray(); // Load file paths to array
-        $this->routes = $this->loadRoutes(); // Read the filepaths and store routes to array
-        $this->setCAP();
-        
+    public function __construct(array $controllerFiles, Environment $twig, $view, $session, $request) {
+        $this->controllerFiles = $controllerFiles;
+        $this->twig = $twig;
+        $this->view = $view;
+        $this->session = $session;
+        $this->request = $request;
     }
 
-    /**
-     * Takes the uri provided and turns it into an array
-     * Returns the array
-     */
-    private function uri2array($uri) {
+    public function handleRequest(string $url) {
+        $routes = $this->getRoutes();
 
-        // Split the path into segments separated by /
-        $urlArray = explode('/', trim($uri, '/'));
-    
-        // Set all segments after the first two to the parameters array
-        return $urlArray;
+        $requestMethod = $_SERVER['REQUEST_METHOD'];
 
-    }
+        foreach ($routes as $route) {
+            [$methodInfo, $path] = $route;
+            [$controllerClassName, $method_name] = $methodInfo;
 
-    /**
-     * Creates the default paths for route files
-     */
-    private function createRouteFilesArray() {
+            $reflectionMethod = new \ReflectionMethod($controllerClassName, $method_name);
 
-        $a = array(
-        BASEPATH . '/App/routes.yml', 
-        FRAMEWORKPATH . 'src/routes.yml'
-        );
-        
-        return $a;
+            $attributes = $reflectionMethod->getAttributes(\Nickyeoman\Framework\Attributes\Route::class);
 
-    }
+            if (empty($attributes)) {
+                continue;
+            }
 
-    /**
-     * Adds a route path
-     * Remember to loadRoutes() again if you use this
-     */
-    public function addRouteFile($filePath) {
+            $routeAttribute = $attributes[0]->newInstance();
 
-        // Add the file to the begining of the array
-        array_unshift($this->routeFiles, $filePath);
-        return $this->routeFiles;
-    }
+            $allowedMethods = $routeAttribute->methods ?? ['GET'];
 
-    /**
-     * Loops through the files and returns a routes array
-     */
-    private function loadRoutes() {
+            if (!in_array($requestMethod, $allowedMethods)) {
+                continue;
+            }
 
-        $routeElements = [];
+            if ($this->matchPath($url, $path)) {
+                $controller = new $controllerClassName($this->twig, $this->view, $this->session, $this->request);
 
-        foreach ($this->routeFiles as $file) {
-            if (file_exists($file)) {
-                $routes = Yaml::parseFile($file)['routes'];
-                $routeElements = array_merge_recursive($routeElements, $routes);
+                $parameters = $this->getRouteParameters($url, $path);
+                $controller->$method_name(...$parameters);
+                return;
             }
         }
 
-        return $routeElements;
-
+        $errorController = new \Nickyeoman\Framework\Controllers\error($this->twig, $this->view, $this->session, $this->request);
+        $errorController->index();
     }
 
-    /**
-     * Set Controller Action Params
-     */
-    private function setCAP() {
+    private function matchPath(string $url, string $path): bool {
+        // Replace parameters with regex patterns
+        $pattern = preg_replace('/{([^}]+)}/', '([^/]+)', $path); // Using # as delimiter
+        $pattern = '#^' . $pattern . '$#'; // Using # as delimiter
+    
+        return (bool) preg_match($pattern, $url);
+    }
 
-        $rs = $this->routes;
-        $seg = $this->uriSegments;
-        $ctl = 'Nickyeoman\Framework\Components\error\errorController';
-        $found = false;
+    private function getRouteParameters(string $url, string $path): array {
+        preg_match_all('/{([^}]+)}/', $path, $matches);
+        $parameterNames = $matches[1];
+        $pattern = preg_replace('/{([^}]+)}/', '([^\/]+)', $path);
+        $pattern = str_replace('/', '\/', $pattern);
+        $pattern = '/^' . $pattern . '$/';
 
-        foreach ( $rs as $key => $route) {
+        preg_match($pattern, $url, $matches);
+        array_shift($matches);
 
-            $matchedRouteIdentifier = $key;
-            $rpath = $route['path'];
+        return array_combine($parameterNames, $matches);
+    }
 
-            // Convert route path to a regular expression pattern
-            $pattern = preg_replace('/\{([^\/]+)\}/', '(?<$1>[^\/]+)', $rpath);
-            $pattern = '#^' . $pattern . '$#';
+    private function getRoutes(): array {
+        if (!empty($this->cachedRoutes)) {
+            return $this->cachedRoutes;
+        }
 
-            // Check if the request URI matches the pattern
-            if (preg_match($pattern, $this->requestURI, $matches)) {
-                $found = true;
-                break;
+        $routes = [];
+
+        foreach ($this->controllerFiles as $controllerFile) {
+            $namespace = $this->getNamespaceFromFile($controllerFile);
+            $className = basename($controllerFile, '.php');
+            $controllerClassName = $namespace . '\\' . $className;
+            $reflectionClass = new \ReflectionClass($controllerClassName);
+            foreach ($reflectionClass->getMethods() as $method) {
+                $attributes = $method->getAttributes(\Nickyeoman\Framework\Attributes\Route::class);
+                foreach ($attributes as $attribute) {
+                    $routes[] = [[$controllerClassName, $method->getName()], $attribute->newInstance()->path];
+                }
             }
-            
         }
 
-        if ($found) {
-            $this->controller = $rs[$matchedRouteIdentifier]['namespace'] . '\\' . $rs[$matchedRouteIdentifier]['controller'];
-            $this->action = $rs[$matchedRouteIdentifier]['action'];
-            
-            $this->params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
-
-            return true;
-        } else {
-            $this->controller = $ctl;
-            $this->action = 'index';
-            return false;
-        }
-
+        $this->cachedRoutes = $routes;
+        return $routes;
     }
 
+    private function getNamespaceFromFile(string $file): string {
+        $contents = file_get_contents($file);
+        $namespacePattern = '/\bnamespace\s+([a-zA-Z0-9\\\\_]+);/m';
+    
+        if (preg_match($namespacePattern, $contents, $matches)) {
+            return $matches[1];
+        }
+    
+        return '';
+    }
+    
     
 }

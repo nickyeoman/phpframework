@@ -1,28 +1,15 @@
 <?php
 use Nickyeoman\Framework\Classes\Router;
 
-$router = new Router($_SERVER['REQUEST_URI']);
+// Usage
+$controllerDirectories = [
+    BASEPATH . '/App/Controllers',
+    FRAMEWORKPATH . '/src/Controllers',
+    // Add additional controller directories here as needed
+];
 
-// Get the controller and action from the router
-$controller = $router->controller;
-$action = $router->action;
+$controllerScanner = new \Nickyeoman\Framework\Classes\ControllerScanner($controllerDirectories);
+$controllerFiles = $controllerScanner->getControllerFiles();
 
-$view->debugDump('Routing', 'Router Class', $router); //Debug
-
-// Check if the controller class exists
-if (class_exists($controller)) {
-    // Create an instance of the controller class
-    $controllerInstance = new $controller($twig, $view, $session, $request);
-
-    // Check if the action method exists in the controller class
-    if (method_exists($controllerInstance, $action)) {
-        // Call the action method on the controller instance
-        $controllerInstance->$action($router->params);
-    } else {
-        // Handle case where action method doesn't exist
-        echo "Error: Action method '$action' not found in controller '$controller'.";
-    }
-} else {
-    // Handle case where controller class doesn't exist
-    echo "Error: Controller class '$controller' not found.";
-}
+$router = new Router($controllerFiles, $twig, $view, $session, $request);
+$router->handleRequest($_SERVER['REQUEST_URI']);

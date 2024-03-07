@@ -1,15 +1,17 @@
 <?php
-namespace Nickyeoman\Framework\Components\contact;
+namespace Nickyeoman\Framework\Controllers;
 
 use Nickyeoman\Framework\Classes\BaseController;
-use \Nickyeoman\Dbhelper\Dbhelp as DB;
+use Nickyeoman\Dbhelper\Dbhelp as DB;
 use Nickyeoman\Framework\Components\contact\contactHelper as contacthelp;
+use Nickyeoman\Framework\Attributes\Route;
 
-class contactController extends BaseController {
+class contact extends BaseController {
 
   /**
    * Public Contact form
    **/
+  #[Route('/contact', methods: ['GET','POST'])]
   public function index() {
 
     // Grab 
@@ -95,10 +97,11 @@ class contactController extends BaseController {
     } //end if submitted
 
     $v->debugDump('Contact Controller', 'View Data End', $v->data); //Debug
-    $this->view('@contact/contact');
+    $this->view('@cms/contact/contact');
 
   }
 
+  #[Route('/admin/contact', methods: ['GET'])]
   public function admin() {
 
     $s = $this->session;
@@ -129,11 +132,12 @@ class contactController extends BaseController {
       }
     }
     
-    $v->set('adminbar', true);
-    $this->view('@contact/admin');   
+    $v->set('adminbar', true);  
+    $this->view('@cms/contact/admin');
 
   }
 
+  #[Route('/admin/contact/view', methods: ['GET'])]
   public function contactView($parms = null) {
 
     $s = $this->session;
@@ -167,13 +171,14 @@ class contactController extends BaseController {
     }
 
     $v->set('adminbar', true);
-    $this->view('@contact/view');   
+    $this->view('@cms/contact/view');
 
   } // end view page
 
   /**
    * Deletes a message /contact/delete/[msgid]
    */
+  #[Route('/admin/contact/delete/{msgid}', methods: ['GET'])]
   public function delete($params) {
 
 		$s = $this->session;
@@ -217,6 +222,7 @@ class contactController extends BaseController {
 
 	} // end delete msg
 
+  #[Route('/admin/contact/bademail/{msgid}', methods: ['GET'])]
   public function bademail($params) {
 
     $s = $this->session;

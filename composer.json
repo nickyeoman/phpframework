@@ -16,7 +16,7 @@
     "prefer-stable" : true,
     "require": {
 	    "erusev/parsedown": "^1.7",
-        "php": ">=7.4 <8.3",
+        "php": "^8.0",
         "nette/mail": "^3.1.6",
         "vlucas/phpdotenv": "v5.4.1",
         "tracy/tracy": "v2.10.5",
@@ -29,8 +29,7 @@
     },
     "autoload": {
         "psr-4": { 
-            "Nickyeoman\\Framework\\": "src/",
-            "Nickyeoman\\Framework\\Classes\\": "src/Classes/"
+            "Nickyeoman\\Framework\\": "src/"
         }
     }
 }
