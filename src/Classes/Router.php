@@ -49,6 +49,7 @@ class Router {
                 $controller = new $controllerClassName($this->twig, $this->view, $this->session, $this->request);
 
                 $parameters = $this->getRouteParameters($url, $path);
+                
                 $controller->$method_name(...$parameters);
                 return;
             }
@@ -67,17 +68,35 @@ class Router {
     }
 
     private function getRouteParameters(string $url, string $path): array {
-        preg_match_all('/{([^}]+)}/', $path, $matches);
-        $parameterNames = $matches[1];
-        $pattern = preg_replace('/{([^}]+)}/', '([^\/]+)', $path);
-        $pattern = str_replace('/', '\/', $pattern);
-        $pattern = '/^' . $pattern . '$/';
-
-        preg_match($pattern, $url, $matches);
-        array_shift($matches);
-
-        return array_combine($parameterNames, $matches);
+        // Split the URL into segments
+        $urlSegments = explode('/', trim($url, '/'));
+        
+        // Split the path into segments
+        $pathSegments = explode('/', trim($path, '/'));
+    
+        // Check if the number of segments in URL matches the number of segments in path
+        if (count($urlSegments) !== count($pathSegments)) {
+            return []; // Return empty array if the lengths don't match
+        }
+    
+        $parms = [];
+    
+        // Loop through the segments of the path
+        foreach ($pathSegments as $index => $segment) {
+            // Check if the segment is a parameter (enclosed in curly brackets)
+            if (preg_match('/^{([^}]+)}$/', $segment, $matches)) {
+                // Get the parameter name from the matches
+                $parameterName = $matches[1];
+                
+                // Set the parameter value from the URL segments
+                $parms[$parameterName] = $urlSegments[$index];
+            }
+        }
+    
+        return $parms;
     }
+    
+    
 
     private function getRoutes(): array {
         if (!empty($this->cachedRoutes)) {

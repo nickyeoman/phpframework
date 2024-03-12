@@ -1,10 +1,12 @@
-<?php namespace Nickyeoman\Framework\Components\search;
+<?php namespace Nickyeoman\Framework\Controllers;
 
-use Nickyeoman\Framework\Classes\BaseController;
+USE Nickyeoman\Framework\Classes\BaseController;
 USE Nickyeoman\Dbhelper\Dbhelp as DB;
+USE Nickyeoman\Framework\Attributes\Route;
 
  class searchController extends BaseController {
 
+  #[Route('/search', methods: ['GET','POST'])]
    function index($params = null) {
 
     $s = $this->session;
@@ -52,7 +54,7 @@ EOSQL;
      }
 
      $v->data['menuActive'] = 'search';
-     $this->view('@search/search');
+     $this->view('@cms/search/search');
 
    }
  }

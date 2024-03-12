@@ -31,7 +31,7 @@ class RequestManager {
             } else {
 
                 //error no form key.
-                $ViewData->adderror( 'There was a problem with the session, try again', 'error' );
+                $Session->addFlash( 'There was a problem with the session, try again', 'error' );
 
             }
 

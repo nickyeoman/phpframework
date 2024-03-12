@@ -56,6 +56,7 @@ class SessionManager {
       ,'user'     => array()
       ,'ugroups'  => array()
       ,'flash'    => array()
+      ,'post'     => array()
       ,'page'     => strtok($_SERVER['REQUEST_URI'], '?')
       ,'pageid'   => null //this is the last pageid set, if you visit other pages that don't have an id, the one with an id will remain
     );
@@ -68,6 +69,16 @@ class SessionManager {
       array_push($this->debug_log,$this->data);
     }
 
+  }
+
+  public function addPost($arr) {
+    $this->data['post'] = $arr;
+    return true;
+  }
+
+  public function clearPost() {
+    unset($this->data['post']);
+    return true;
   }
 
   public function existingSession() {
@@ -104,19 +115,24 @@ class SessionManager {
   /**
    * Flash is an array in sessions that gets read and cleared after each page load.
    */
-  public function addflash($string = "Error, no message",$name = null) {
+  public function addFlash($message = "Error, no message", $name = null) {
+    // Validate the message
+    if (empty($message)) {
+        return false;
+    }
 
-    if ( empty($string) )
-      return false;
+    // Initialize the flash data if it doesn't exist
+    if (!isset($this->data['flash'])) {
+        $this->data['flash'] = [];
+    }
 
-    if ( array_key_exists($name, $this->data['flash'] ) )
-      array_push($this->data['flash'][$name], $string);
-    else
-      $this->data['flash'][$name] = array($string);
+    // Add the message to the specified flash array or to a default one
+    $flashArray = isset($this->data['flash'][$name]) ? $this->data['flash'][$name] : [];
+    $flashArray[] = $message;
+    $this->data['flash'][$name] = $flashArray;
 
     return true;
-
-  }
+}
 
   public function clearflash(){
 

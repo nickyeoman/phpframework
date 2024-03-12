@@ -6,23 +6,16 @@
 /**
  * Redirect to the correct controller and action (page)
 **/
-function redirect($controller = 'index', $action = 'index') {
+function redirect($relativeUrl, $statusCode = 303) {
+    // Get the base URL of the website
+    $baseUrl = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
 
-    // set controller
-    if ($controller == 'index' || empty($controller) )
-        $controller = '/';
-    else
-        $controller = "/$controller";
+    // Construct the absolute URL
+    $absoluteUrl = $baseUrl . '/' . ltrim($relativeUrl, '/');
 
-    // set method/action
-    if ($action == 'index' || empty($action) )
-        $action = '';
-    else
-        $action = "/$action";
-
-    // php redirect
-    exit(header("Location: $controller$action"));
-
+    // Perform the redirect
+    header('Location: ' . $absoluteUrl, true, (int) $statusCode);
+    exit();
 }
 // END redirect
 

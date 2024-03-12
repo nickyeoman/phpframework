@@ -1,8 +1,9 @@
 <?php
-namespace Nickyeoman\Framework\Components\sitemap;
+namespace Nickyeoman\Framework\Controllers;
 
 use Nickyeoman\Framework\Classes\BaseController;
 USE \Nickyeoman\Dbhelper\Dbhelp as DB;
+use Nickyeoman\Framework\Attributes\Route;
 
 class sitemapController extends BaseController {
 
@@ -11,7 +12,8 @@ class sitemapController extends BaseController {
     echo 'HTML sitemap goes here (TODO) <a href="/sitemap.xml">sitemap.xml</a>';
 
   }
-
+  
+  #[Route('/sitemap.xml')]
   public function sitemap() {
 
     // xml for the sitemap

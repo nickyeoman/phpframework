@@ -1,5 +1,5 @@
 <?php
-namespace Nickyeoman\Framework\Components\page;
+namespace Nickyeoman\Framework\Helpers;
 
 USE \Nickyeoman\Validation;
 

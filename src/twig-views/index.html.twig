@@ -5,5 +5,30 @@
 
 <h1>{{ title }}</h1>
 
-<p>Nothing Here yet</p>
+<h2>Route tour</h2>
+
+<h3>/ (index)</h3>
+<p>A temporary index page, that you are seeing right now.  Create your own by running the following:</p>
+<pre>
+bash vendor/nickyeoman/phpframework/bin/newController.bash index
+</pre>
+
+<h3><a href="/login">/login</a></h3>
+<p>Where you login to the website.</p>
+
+<h3><a href="/logout">/logout</a></h3>
+<p>Where you login to the website.</p>
+
+<h3><a href="/admin">/admin</a></h3>
+<p>Saves a message to the database.</p>
+
+<h3><a href="/contact">/contact</a></h3>
+<p>Saves a message to the database.</p>
+
+<h3><a href="/pages">/pages/{slug}</a></h3>
+<p>Displays a db page.</p>
+
+<h3><a href="/sitemap.xml">/sitemap.xml</a></h3>
+<p>Generates a sitemap based on the Pages component.</p>
+
 {% endblock %}
