@@ -18,11 +18,11 @@
 {% for msg in contactMessages %}
 
   <tr>
-    <td><a href="/contact/view/{{ msg.id}}">View Message {{ msg.id }}</a></td>
+    <td><a href="/admin/contact/view/{{ msg.id}}">View Message {{ msg.id }}</a></td>
     <td>{{ msg.email }}</td>
     <td>{{ msg.created}}</td>
     <td>{{ msg.unread}}</td>
-    <td><a href="/contact/delete/{{ msg.id }}">Delete this message</a></td>
+    <td><a href="/admin/contact/delete/{{ msg.id }}">Delete this message</a></td>
   </tr>
 
 {% endfor %}

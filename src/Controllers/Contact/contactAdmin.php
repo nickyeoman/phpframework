@@ -43,8 +43,8 @@ class contactAdmin extends BaseController {
 
   }
 
-  #[Route('/admin/contact/view', methods: ['GET'])]
-  public function contactView($parms = null) {
+  #[Route('/admin/contact/view/{msgid}', methods: ['GET'])]
+  public function contactView($msgid) {
 
     $s = $this->session;
     
@@ -57,7 +57,7 @@ class contactAdmin extends BaseController {
       redirect('admin', 'index');
     }
 
-    $pid = $parms['msgid'];
+    $pid = $msgid;
 
     // view data
     $v = $this->viewClass;
@@ -71,7 +71,7 @@ class contactAdmin extends BaseController {
       $v->set('msg', $msg);
     } else {
 
-      $s->addflash("Message id not correct or no longer exists", 'error');
+      $s->addFlash("Message id not correct or no longer exists", 'error');
       redirect('contact', 'admin');
 
     }
@@ -85,7 +85,7 @@ class contactAdmin extends BaseController {
    * Deletes a message /contact/delete/[msgid]
    */
   #[Route('/admin/contact/delete/{msgid}', methods: ['GET'])]
-  public function delete($params) {
+  public function delete($msgid) {
 
 		$s = $this->session;
     
@@ -94,17 +94,14 @@ class contactAdmin extends BaseController {
    		redirect('login', 'index');
 
     if ( ! $s->isAdmin() ) {
-      $s->addflash('You need to be an admin to view messages..','error');
+      $s->addFlash('You need to be an admin to view messages..','error');
       redirect('admin', 'index');
     }
-
-		if ( !empty($params))
-			$msgid = $params['msgid'];
 
 		if ( empty($msgid) || !is_numeric($msgid) ) {
 
 			$s->addFlash("Message id not correct", 'error');
-			redirect('contact', 'admin');
+			redirect('/admin/contact');
 
 		}
 
@@ -116,33 +113,32 @@ class contactAdmin extends BaseController {
 
 			$s->addFlash("Message does not exist", 'error');
       $DB->close();
-			redirect('contact', 'admin');
+			redirect('/admin/contact');
 
 		} else {
 
 			$DB->delete('contactForm',"id = $msgid");
 			$s->addFlash('Notice: user removed (deleted)', "notice");
       $DB->close();
-			redirect('contact', 'admin');
+			redirect('/admin/contact');
 		}
 
 	} // end delete msg
 
   #[Route('/admin/contact/bademail/{msgid}', methods: ['GET'])]
-  public function bademail($params) {
+  public function bademail($msgid) {
 
     $s = $this->session;
     
     // redirects
     if ( ! $s->loggedin('You need to login to edit messages.') )
-   		$this->redirect('login', 'index');
+   		redirect('/login');
 
     if ( ! $s->isAdmin() ) {
-      $s->addflash('You need to be an admin to view messages..','error');
-      redirect('admin', 'index');
+      $s->addFlash('You need to be an admin to view messages..','error');
+      redirect('/admin');
     }
 
-    $v = $this->viewClass;
     $r = $this->requestManager;
 
     if ( $r->submitted ) {
@@ -154,12 +150,12 @@ class contactAdmin extends BaseController {
       $DB->delete('contactForm',$where);
 
       $s->addFlash("Email Added, message removed", 'notice');
-      redirect('contact','admin');
+      redirect('/admin/contact');
 
     } else {
 
       $s->addFlash("Post to save bad emails.", 'error');
-      redirect('contact','admin');
+      redirect('/admin/contact');
 
     }
 

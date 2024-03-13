@@ -10,16 +10,16 @@
 <div class="formContainer">
 
 {% if mode != 'new' %}
-  <form action="/page/edit" method="post">
+  <form action="/admin/pages/edit" method="post">
   <input type="hidden" name="id" value="{{ info.id }}" />
 {% else %}
-  <form action="/page/new" method="post">
+  <form action="/admin/pages/new" method="post">
 {%endif%}
 
 <input type="hidden" name="formkey" value="{{ formkey }}" />
 
 <input type="submit" value="Save Page" name="submit" class="button save" />
-<a href="/page/admin" class="button">Back/cancel</a>
+<a href="/admin/pages" class="button">Back/cancel</a>
 
 {# Title #}
 <div class="row">

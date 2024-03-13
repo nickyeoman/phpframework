@@ -5,14 +5,14 @@
 <h1>{{ title }}</h1>
 
 <div id="tools">
-    <a href="/contact/admin" class="btn">back to admin</a>
-    <a href="/contact/delete/{{ msg.id }}" class="btn">Delete this message</a>
+    <a href="/admin/contact" class="btn">back to admin</a>
+    <a href="/admin/contact/delete/{{ msg.id }}" class="btn">Delete this message</a>
     {% if msg.unread == 0 %}
         <a href="#" class="btn">Mark as unread</a>
     {% else %}
         <a href="#" class="btn">Mark as read</a>
     {% endif %}
-    <form action="/contact/bademail" method="post">
+    <form action="/admin/contact/bademail" method="post">
       <input type="hidden" name="formkey" value="{{ formkey }}" />
       <input type="hidden" name="email" value="{{ msg.email }}" />
       <input type="hidden" name="message" value="{{ msg.id }}" />

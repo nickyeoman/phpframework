@@ -20,6 +20,7 @@ class dashboard extends BaseController {
             redirect('login');
         }
 
+        $v->set('adminbar', true);
         $this->view('@cms/admin/dashboard');
     }
 }

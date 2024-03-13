@@ -19,7 +19,7 @@
 {% for log in logs %}
 
   <tr>
-    <td><a href="/logs/delete/{{ log.id }}">Row</a> - <a href="/logs/deletegroup/{{ log.url }}">Group</a> -</td>
+    <td><a href="/admin/logs/delete/{{ log.id }}">Row</a> - <a href="/admin/logs/deletegroup/{{ log.url }}">Group</a> -</td>
     <td><a href="/{{ log.url }}" target="_new">/{{ log.url }}</a></td>
     <td>{{ log.ip }}</td>
     <td>{{ log.time }}</td>

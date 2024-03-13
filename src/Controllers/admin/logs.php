@@ -1,28 +1,30 @@
 <?php
-namespace Nickyeoman\Framework\Components\logs;
+namespace Nickyeoman\Framework\Controllers\admin;
 
-USE Nickyeoman\Framework\SessionManager;
-USE Nickyeoman\Framework\ViewData;
+USE Nickyeoman\Framework\Attributes\Route;
+use Nickyeoman\Framework\Classes\BaseController;
 USE \Nickyeoman\Dbhelper\Dbhelp as DB;
 
 //TODO: the syntax on this page is a mess
-class logsController extends \Nickyeoman\Framework\BaseController {
+//TODO: need pagination
+class logs extends BaseController {
 
+  #[Route('/admin/logs')]
   public function index() {
 
-    $s = new SessionManager();
+    $s = $this->session;
     
     // redirects
     if ( ! $s->loggedin('You need to login to view logs.') )
-   		$this->redirect('login', 'index');
+   		redirect('/login');
 
     if ( ! $s->isAdmin() ) {
-      $s->addflash('You need Admin permissions to edit pages.','error');
-      $this->redirect('admin', 'index');
+      $s->addFlash('You need Admin permissions to edit pages.','error');
+      redirect('/admin');
     }
 
     // view data
-    $v = new ViewData($s);
+    $v = $this->viewClass;
     $v->set('pageid', "logs-admin");
 
     //Grab pages
@@ -46,43 +48,45 @@ EOSQL;
 
     $v->set('adminbar', true);
     $v->set('pageid',"page-admin");
-    $this->twig('logs', $v->data, 'logs');
+    $this->view('@cms/admin/logs');
 
   }
 
-   public function delete($parms){
+   #[Route('/admin/logs/delete/{logid}')]
+   public function delete($logid){
 
-    $s = new SessionManager();
+    $s = $this->session;
     
     // redirects
     if ( ! $s->loggedin('You need to login to delete logs.') )
-   		$this->redirect('login', 'index');
+   		redirect('/login');
 
     if ( ! $s->isAdmin() ) {
-      $s->addflash('You need Admin permissions to delete logs.','error');
-      $this->redirect('admin', 'index');
+      $s->addFlash('You need Admin permissions to delete logs.','error');
+      redirect('/admin');
     }
 
     $DB = new DB();
-    $deleteid = mysqli_real_escape_string($DB->con, $parms[0]);
+    $deleteid = mysqli_real_escape_string($DB->con, $logid);
     $DB->delete('logs', "id = $deleteid");
     $DB->close();
-    $s->addflash("Removed Log entry $deleteid.",'notice');
+    $s->addFlash("Removed Log entry $deleteid.",'notice');
     $s->writeSession();
-    $this->redirect('logs', 'index');
+    redirect('/admin/logs');
 
    }
-
+   
+   // TODO: slug system isn't good
    public function deletegroup($parms){
 
-      $s = new SessionManager();
+    $s = $this->session;
 
       // redirects
       if ( ! $s->loggedin('You need to login to delete logs.') )
-        $this->redirect('login', 'index');
+        redirect('/login');
 
       if ( ! $s->isAdmin() ) {
-        $s->addflash('You need Admin permissions to delete logs.','error');
+        $s->addFlash('You need Admin permissions to delete logs.','error');
         $this->redirect('admin', 'index');
       }
 
@@ -91,48 +95,49 @@ EOSQL;
       $deleteid = mysqli_real_escape_string($DB->con, $deleteid);
       $DB->delete('logs', "`url` = '$deleteid'");
       $DB->close();
-      $s->addflash("Removed Log entries for $deleteid.",'notice');
-      $this->redirect('logs', 'index');
+      $s->addFlash("Removed Log entries for $deleteid.",'notice');
+      redirect('/logs');
    }
 
    public function deleteall(){
 
-    $s = new SessionManager();
+    $s = $this->session;
 
       // redirects
       if ( ! $s->loggedin('You need to login to delete logs.') )
-        $this->redirect('login', 'index');
+        redirect('/login');
 
       if ( ! $s->isAdmin() ) {
-        $s->addflash('You need Admin permissions to delete logs.','error');
-        $this->redirect('admin', 'index');
+        $s->addFlash('You need Admin permissions to delete logs.','error');
+        redirect('/admin');
       }
 
       $DB = new DB();
       $DB->delete('logs', "`id` > 1 AND `title` LIKE '%404%'");
       $DB->close();
-      $s->addflash("Removed All 404 Log entries.",'notice');
-      $this->redirect('logs', 'index');
+      $s->addFlash("Removed All 404 Log entries.",'notice');
+      redirect('/logs');
    }
 
+   #[Route('/admin/logs/deletequerystrings')]
    public function deletequerystrings(){
 
-    $s = new SessionManager();
+      $s = $this->session;
 
-    // redirects
-    if ( ! $s->loggedin('You need to login to delete logs.') )
-      $this->redirect('login', 'index');
+      // redirects
+      if ( ! $s->loggedin('You need to login to delete logs.') )
+        redirect('/login');
 
-    if ( ! $s->isAdmin() ) {
-      $s->addflash('You need Admin permissions to delete logs.','error');
-      $this->redirect('admin', 'index');
-    }
+      if ( ! $s->isAdmin() ) {
+        $s->addFlash('You need Admin permissions to delete logs.','error');
+        redirect('/admin');
+      }
 
       $DB = new DB();
       $DB->delete('logs', "url LIKE '%?%' AND `title` LIKE '%404%'");
       $DB->close();
-      $s->addflash("Removed Log entries for entries containing query strings.",'notice');
-      $this->redirect('logs', 'index');
+      $s->addFlash("Removed Log entries for entries containing query strings.",'notice');
+      redirect('/admin/logs');
    }
 
 

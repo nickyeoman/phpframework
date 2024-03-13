@@ -4,26 +4,30 @@ namespace Nickyeoman\Framework\Controllers\Pages;
 use Nickyeoman\Framework\Classes\BaseController;
 USE Nickyeoman\Dbhelper\Dbhelp as DB;
 USE Nickyeoman\Framework\Components\page\pageHelper as pageHelp;
+use Nickyeoman\Framework\Attributes\Route;
 
 class pagesAdmin extends BaseController {
 
   // List pages to edit
+  #[Route('/admin/pages')]
   function admin() {
+
+    // TODO: Needs pagination
 
     $s = $this->session;
 		$v = $this->viewClass;
 
     if ( ! $s->loggedin() ) {
 
-      $s->addflash("You need to login to edit pages.",'notice');
+      $s->addFlash("You need to login to edit pages.",'notice');
       $s->writeSession();
-      redirect('admin', 'index');
+      redirect('/admin');
 
     } elseif ( !$s->isAdmin() ) {
 
-      $s->addflash("You need Admin permissions to edit pages.",'notice');
+      $s->addFlash("You need Admin permissions to edit pages.",'notice');
       $s->writeSession(); 
-      redirect('user', 'login');
+      redirect('/login');
 
     }
 
@@ -41,7 +45,6 @@ EOSQL;
 
     // Run the query
     $result = $DB->query($sql);
-    
 
     if ( !empty( $result ) ) {
 
@@ -62,7 +65,7 @@ EOSQL;
     $v->set('adminbar', true);
     $s->writeSession();
     //$this->twig('admin', $v->data, 'page');
-    $this->view('@page/admin');
+    $this->view('@cms/pages/admin');
 
   }
   //end admin
@@ -70,7 +73,8 @@ EOSQL;
   /** 
    * Edit a page
    **/
-  function edit($params = null) {
+  #[Route('/admin/pages/edit/{pageid}')]
+  function edit($pageid) {
 
     $s = $this->session;
 		$v = $this->viewClass;
@@ -100,13 +104,12 @@ EOSQL;
 
     }
 
-    $pid = $params['id'];
+    $pid = $pageid;
 
     if ( empty($pid) ) {
       //TODO: error, page not given
       //TODO: clean it up, trim, lower
     }
-
     
     // Join the tags
     $sql = <<<EOSQL
@@ -124,7 +127,7 @@ EOSQL;
     
     $v->data['pageid'] = "page-edit";
     
-    $this->view('@page/edit');
+    $this->view('@cms/pages/edit');
 
   }
   // end function edit
@@ -137,8 +140,8 @@ EOSQL;
 
     if ( ! $s->loggedin() ) {
 
-      $s->addflash('You need to login to edit pages.','notice');
-      redirect('login', 'index');
+      $s->addFlash('You need to login to edit pages.','notice');
+      redirect('/login');
 
     }
 
@@ -156,8 +159,8 @@ EOSQL;
         dump($page->error);die("there are page errors");
       }
 
-      $s->addflash('Saved Page.','notice');
-      $this->redirect('page', 'admin');
+      $s->addFlash('Saved Page.','notice');
+      redirect('/admin/pages');
 
     }
     //end submitted
@@ -171,7 +174,7 @@ EOSQL;
     $v->data['mode'] = 'new';
     $v->data['pageid'] = "page-edit";
     $s->writeSession();
-    $this->view('@page/edit');
+    $this->view('@cms/pages/edit');
 
   }
   //end new
