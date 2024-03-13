@@ -10,7 +10,7 @@
 <div class="formContainer">
 
 {% if mode != 'new' %}
-  <form action="/admin/pages/edit" method="post">
+  <form action="/admin/pages/edit/{{ info.id }}" method="post">
   <input type="hidden" name="id" value="{{ info.id }}" />
 {% else %}
   <form action="/admin/pages/new" method="post">

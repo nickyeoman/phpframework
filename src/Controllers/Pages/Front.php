@@ -4,8 +4,10 @@ namespace Nickyeoman\Framework\Controllers\Pages;
 use Nickyeoman\Framework\Classes\BaseController;
 USE Nickyeoman\Dbhelper\Dbhelp as DB;
 use Nickyeoman\Framework\Attributes\Route;
+USE Nickyeoman\Validation\Validate as Validate;
 
-class pageController extends BaseController {
+// Front End Pages Controller
+class Front extends BaseController {
 
   #[Route('/page/{slug}')]  
   function page( $slug ) {
@@ -75,6 +77,8 @@ EOSQL;
   }
   // end page
 
+  // TODO: Store Username
+  #[Route('/page/createcomment', methods: ['POST'])]
   public function createcomment() {
 
     $s = $this->session;
@@ -96,13 +100,14 @@ EOSQL;
 
       // The comment
       // load validation
-      $this->valid = new \Nickyeoman\Validation\Validate();
+      $valid = new Validate();
       // Check the comment against spammy words using the validate class
       $badwords = '';
-      $badwords = $this->valid->checkSpam($this->post['comment'], $_ENV['SPAMWORDS']);
+      $spamwords = ''; // TODO: grab from database
+      $badwords = $valid->checkSpam($r->post['comment'], $spamwords);
 
       if ( !empty($badwords) )
-        $s->addflash("You can't use these words: $badwords",'error');
+        $s->addFlash("You can't use these words: $badwords",'error');
 
     }
 
@@ -115,13 +120,13 @@ EOSQL;
       );
 
       $DB = new DB();
-      $id = $this->db->create('comments', $comment);
+      $id = $DB->create('comments', $comment);
       $DB->close();
-      $s->addflash("Saved Comment.",'notice');
+      $s->addFlash("Saved Comment.",'notice');
 
     }
 
-    redirect('page', $this->post['slug']);
+    redirect('/page/' . $r->post['slug']);
 
   }
 
