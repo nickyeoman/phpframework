@@ -5,6 +5,7 @@ namespace Nickyeoman\Framework\Classes;
 class ControllerPaths {
     
     private array $cachedRoutes = [];
+    private $controllerFiles;
 
     public function __construct($controllerFiles) {
         $this->controllerFiles = $controllerFiles;
