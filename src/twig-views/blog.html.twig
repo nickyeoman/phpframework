@@ -1,0 +1,22 @@
+{% set title = 'Nick Yeoman\'s Blog' %}
+{% extends "@nytwig/master.html.twig" %}
+
+{% block content %}
+  {% include 'modules/blogmenu.html.twig' %}
+
+  {% include 'modules/pagination.html.twig' %}
+
+  <div class="items">
+    {% for page in pages %}
+      <div class="article">
+        <h2><a href="/page/{{ page.slug}}">{{ page.title | raw }}</a></h2>
+        <div class="updated">Updated: {{ page.updated|date("M\\. jS Y \\a\\t g:ia") }}</div>
+        <p>{{ page.intro|raw }}</p>
+        <a href="/page/{{ page.slug}}">Read the article: {{ page.title | raw }}</a>
+      </div>
+    {% endfor %}
+  </div>
+
+  {% include 'modules/pagination.html.twig' %}
+
+{% endblock %}
