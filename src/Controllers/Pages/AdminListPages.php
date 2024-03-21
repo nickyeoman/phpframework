@@ -5,13 +5,15 @@ use Nickyeoman\Framework\Classes\BaseController;
 USE Nickyeoman\Dbhelper\Dbhelp as DB;
 USE Nickyeoman\Framework\Components\page\pageHelper as pageHelp;
 use Nickyeoman\Framework\Attributes\Route;
-use Nickyeoman\Framework\Classes\paginationHelper; // TODO: Needs pagination
+use Nickyeoman\Framework\Classes\paginationHelper;
 
 class AdminListPages extends BaseController {
 
+  private $DB;
+
   // List pages to edit
-  #[Route('/admin/pages')]
-  function admin() {
+  #[Route('/admin/pages/{pagenum}')]
+  function admin($pagenum = 1) {
 
     $s = $this->session;
 		$v = $this->viewClass;
@@ -30,8 +32,15 @@ class AdminListPages extends BaseController {
 
     }
 
-    //Grab pages
-    $DB = new DB();
+    $current_page = isset($pagenum) && is_numeric($pagenum) && $pagenum >= 1 ? $pagenum : 1;
+    $whereCondition = "";
+    $limit = 20;
+    $this->DB = new DB();
+    $pagination = $this->getPagination($current_page, $limit);
+    
+    $this->viewClass->data['menuActive'] = 'admin-pages';
+    $this->viewClass->data['pagination'] = $pagination->data;
+    $this->viewClass->data['pageid'] = 'admin-pages';
     
     // Join the tags
     $sql = <<<EOSQL
@@ -40,10 +49,11 @@ class AdminListPages extends BaseController {
     LEFT JOIN tag_pages tp ON p.id = tp.pages_id
     LEFT JOIN tags t ON t.id = tp.tag_id
     GROUP BY p.id
+    LIMIT $pagination->sql_limit
 EOSQL;
 
     // Run the query
-    $result = $DB->query($sql);
+    $result = $this->DB->query($sql);
 
     if ( !empty( $result ) ) {
 
@@ -68,5 +78,12 @@ EOSQL;
 
   }
   //end admin
+
+  private function getPagination($current_page, $limit) {
+    $sql = "SELECT COUNT(*) as i FROM pages p ";
+    $result = $this->DB->query($sql);
+    $num_articles = $result[0]['i'];
+    return new paginationHelper($limit, $current_page, $num_articles);
+  }
 
 } //end class
