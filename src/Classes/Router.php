@@ -27,8 +27,12 @@ class Router {
     public function handleRequest(string $url): void {
         $requestMethod = $_SERVER['REQUEST_METHOD'];
     
+        // Parse the URL to extract the path without the query string
+        $parsedUrl = parse_url($url);
+        $path = $parsedUrl['path'] ?? '/'; // Default to root path if path is not provided
+    
         foreach ($this->cachedRoutes as $route) {
-            [$methodInfo, $path] = $route;
+            [$methodInfo, $routePath] = $route;
             [$controllerClassName, $method_name] = $methodInfo;
     
             $reflectionMethod = new \ReflectionMethod($controllerClassName, $method_name);
@@ -47,10 +51,10 @@ class Router {
                 continue;
             }
     
-            if ($this->matchPath($url, $path)) {
+            if ($this->matchPath($path, $routePath)) {
                 $controller = new $controllerClassName($this->twig, $this->view, $this->session, $this->request);
     
-                $parameters = $this->getRouteParameters($url, $path);
+                $parameters = $this->getRouteParameters($path, $routePath);
                     
                 $controller->$method_name(...$parameters);
                 return;
