@@ -1,107 +1,178 @@
-# dotenv
+# .env File Documentation
 
-There is a sample dotenv (.env) file in the root directory of this project (env.sample).
-
-You can always search the code to find where these variables are used:
-```bash
-grep -iIrn "DOTENVNAME" *
-```
+Below is a guide to understanding and configuring the `.env` file for this project. This file contains various environment variables used throughout the application.
 
 ## Global Variables
+
 ### DEBUG
 
-*DEFAULT:* DEBUG="production" (not active)
+- **production(Default):** DEBUG="production" (inactive)
+- **display:** DEBUG="display" (activates the [Tracy debugger](https://tracy.nette.org/en/))
 
-Default means all debug data is not displayed. 
+Controls the debug mode of the application. When set to "display", debug data will be shown.
 
-*display:* DEBUG="display" activates the [Tracy debugger](https://tracy.nette.org/en/).
-
-### CONTROLLERPATH
-
-DEFAULT: CONTROLLERPATH="controllers"
-
-This is the default directory to look for app controllers.
-
-The path is relative from the root of the project directory (The root directory is where the dotenv file is located).
-
-Do not add pre or post slashes.
+Found in:
+* inc/tracy.php:6
+* inc/utility.php:37
+* src/Classes/ViewData.php:107
+* src/Classes/ViewData.php:121
 
 ### VIEWPATH
 
-DEFAULT: VIEWPATH="views"
+- **Default:** VIEWPATH="App/Views"
 
-Same as CONTROLLERPATH but for views.
-define the path from the root directory of the project.
-do not add pre or post slashes.
+Specifies the default directory for application views. The path is relative to the project's root directory.
 
-### TWIGCACHE
-
-DEFAULT: TWIGCACHE="tmp"
-The path twig uses to cache.
-From the root project directory.
-do not add pre or post slashes.
-
-### LOADERTMPDIR
-
-This is the tmp directory.
-LOADERTMPDIR="tmp"
+Found in:
+* inc/twig.php:8
 
 ### SALT
 
-I generate my SALT with pwgen -cnsB1v 32
+Generates a unique salt used for encryption purposes. You can generate a salt using tools like `pwgen -cnsB1v 32`.
+
+Found in:
+* src/Components/user/userHelper.php
 
 ### BASEURL
-Requires last slash.
-If left blank? (how do we allow for anything?)
----
+
+Specifies the base URL of the application. Ensure it ends with a slash.
+
+Found in:
+* src/Controllers/sitemapController.php:41
+* src/Controllers/sitemapController.php:43
+* src/Components/user/userHelper.php:208
+* src/Components/user/userHelper.php:251
+
 
 ### LOGGING
 
-DEFAULT=off
-tells the cms where to log.
-mysql is currently the only option
-function log in BaseController.
+- **Default:** LOGGING="off"
 
-### USECMS
+Controls where the application logs its data. Currently, only MySQL is supported.
 
-The framework has a build in CMS components. If this is false the router will not load them.
+Found in:
+* src/Classes/Logger.php
 
-## Docker
+## Docker Configuration
 
-USEDOCKER="docker"
-DOCKERVOL="local"
-DOCKERNAME="YOURNAME"
-DOCKERIMAGE="ORG/PROJECT"
-DOCKERVER="latest"
-DOCKERPORT="8000"
-DOCKERNET="DOCKER_NETWORK_NAME_FOR_PROXY"
-DOCKERDB="none"
-DOCKERPHPMYADMIN=8002
+These variables are used when running the application within Docker containers.
 
-## Database
-DBHOST="127.0.0.1"
-DBPORT="3301"
-DBUSER=""
-DBPASSWORD=""
-DB=""
+### DOCKERIMAGE
 
-If you are not using a database, make sure that the DBUSER is null or empty.
+- **Default:** DOCKERIMAGE="4lights/phpcontainer"
 
-## SMTP
-MAIL_MAILER="smtp"
-MAIL_HOST=""
-MAIL_PORT="587"
-MAIL_USERNAME=""
-MAIL_PASSWORD=""
-MAIL_ENCRYPTION="tls"
-MAIL_FROM_ADDRESS=""
-MAIL_FROM_NAME=""
+Specifies the Docker image to be used.
 
-## IMAP
-IMAP_SERVER=imap.gmail.com:993/imap/ssl}INBOX
-IMAP_USER=example@gmail.com
-IMAP_PASSWORD=examplePasswordToAccount
+### DOCKERVER
 
-# Debugging dotenv
+- **Default:** DOCKERVER="latest"
 
-Framework environment variables are pulled in using [phpdotenv]( https://github.com/vlucas/phpdotenv)
+Specifies the version of the Docker image.
+
+### DOCKERPORT
+
+- **Default:** DOCKERPORT="8000"
+
+Specifies the port used by Docker.
+
+### DOCKERNET
+
+- **Default:** DOCKERNET="DOCKER_NETWORK_NAME_FOR_PROXY"
+
+Specifies the Docker network name for proxy.
+
+### DOCKERPHPMYADMINPORT
+
+- **Default:** DOCKERPHPMYADMINPORT="8001"
+
+Specifies the port used by PhpMyAdmin when running with Docker.
+
+## Database Configuration
+
+These variables are used for configuring the database connection.
+
+### MYSQL_ROOT_PASSWORD
+
+Specifies the root password for MySQL.
+
+### DBHOST
+
+- **Default:** DBHOST="phpframework-db"
+
+Specifies the host for the database.
+
+### DBPORT
+
+- **Default:** DBPORT="3306"
+
+Specifies the port for the database connection.
+
+### DBUSER
+
+Specifies the username for the database connection.
+
+### DBPASSWORD
+
+Specifies the password for the database connection.
+
+### DB
+
+Specifies the name of the database.
+
+## SMTP Configuration
+
+These variables are used for configuring SMTP settings.
+
+### MAIL_MAILER
+
+- **Default:** MAIL_MAILER="smtp"
+
+Specifies the mailer to be used.
+
+### MAIL_HOST
+
+Specifies the SMTP host.
+
+### MAIL_PORT
+
+Specifies the port for SMTP connection.
+
+### MAIL_USERNAME
+
+Specifies the username for SMTP authentication.
+
+### MAIL_PASSWORD
+
+Specifies the password for SMTP authentication.
+
+### MAIL_ENCRYPTION
+
+Specifies the encryption method for SMTP.
+
+### MAIL_FROM_ADDRESS
+
+Specifies the sender's email address.
+
+### MAIL_FROM_NAME
+
+Specifies the sender's name.
+
+## IMAP Configuration
+
+These variables are used for configuring IMAP settings.
+
+### IMAP_SERVER
+
+Specifies the IMAP server details.
+
+### IMAP_USER
+
+Specifies the IMAP username.
+
+### IMAP_PASSWORD
+
+Specifies the IMAP password.
+
+# Debugging .env
+
+Framework environment variables are loaded using [phpdotenv](https://github.com/vlucas/phpdotenv).

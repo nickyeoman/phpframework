@@ -31,7 +31,7 @@ services:
   # App
   ########################################
   app:
-    image: "4lights/phpcontainer:latest" # https://hub.docker.com/r/4lights/phpcontainer
+    image: "${DOCKERIMAGE}:${DOCKERVER}" # https://hub.docker.com/r/4lights/phpcontainer
     restart: unless-stopped
     volumes:
       - "./:/data"

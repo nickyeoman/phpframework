@@ -45,7 +45,7 @@ fi
 echo "Creating directories"
 
 mkdir -p tmp sass scripts 
-mkdir -p app/Controllers app/Helpers app/Views
+mkdir -p App/Controllers App/Helpers App/Views
 mkdir -p public/css public/js public/images
 
 ################################################################################
