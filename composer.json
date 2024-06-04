@@ -16,16 +16,16 @@
     "prefer-stable" : true,
     "require": {
 	    "erusev/parsedown": "^1.7",
-        "php": "^8.0",
+        "php": "~8.0",
         "nette/mail": "^3.1.6",
         "vlucas/phpdotenv": "v5.4.1",
         "tracy/tracy": "v2.10.5",
         "twig/twig": "*",
         "symfony/yaml": "*",
-        "nickyeoman/php-mysql-helper": "^2.0.3",
-        "nickyeoman/php-validation-class": "^5.0",
-	    "nickyeoman/sasslibrary": "^2.0.0",
-        "nickyeoman/nytwig": "^1.0"
+        "nickyeoman/php-mysql-helper": "~2.0",
+        "nickyeoman/php-validation-class": "~5.0",
+	    "nickyeoman/sasslibrary": "~2.0",
+        "nickyeoman/nytwig": "~1.0"
     },
     "autoload": {
         "psr-4": { 
