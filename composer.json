@@ -15,7 +15,7 @@
     "minimum-stability": "dev",
     "prefer-stable" : true,
     "require": {
-	    "erusev/parsedown": "^1.7",
+        "erusev/parsedown": "^1.7",
         "php": "~8.0",
         "nette/mail": "^3.1.6",
         "vlucas/phpdotenv": "v5.4.1",
@@ -24,12 +24,35 @@
         "symfony/yaml": "*",
         "nickyeoman/php-mysql-helper": "~2.0",
         "nickyeoman/php-validation-class": "~5.0",
-	    "nickyeoman/sasslibrary": "~2.0",
+        "nickyeoman/sasslibrary": "~2.0",
         "nickyeoman/nytwig": "~1.0"
     },
     "autoload": {
         "psr-4": { 
-            "Nickyeoman\\Framework\\": "src/"
+            "Nickyeoman\\\\Framework\\\\": "src/"
         }
-    }
+    },
+    "extra": {
+        "versioning": {
+            "strategy": "semantic-versioning"
+        }
+    },
+    "scripts": {
+        "lint": "phpcs src --standard=PSR2",
+        "test": "phpunit"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git://github.com/nickyeoman/php-validation-class.git"
+        },
+        {
+            "type": "vcs",
+            "url": "git://github.com/nickyeoman/sasslibrary.git"
+        },
+        {
+            "type": "vcs",
+            "url": "git://github.com/nickyeoman/nytwig.git"
+        }
+    ]
 }

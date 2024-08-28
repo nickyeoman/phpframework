@@ -28,17 +28,14 @@ class ControllerPaths {
         foreach ($this->controllerFiles as $controllerFile) {
             $namespace = $this->getNamespaceFromFile($controllerFile);
             $className = basename($controllerFile, '.php');
-            $controllerClassName = $namespace . '\\\\' . $className;
-    
+            $controllerClassName = $namespace . '\\' . $className; // Single backslash here
             if (class_exists($controllerClassName)) {
-                $reflectionClass = new \\ReflectionClass($controllerClassName);
+                $reflectionClass = new \ReflectionClass($controllerClassName); // Single backslash here
             } else {
                 continue;
             }
-    
             foreach ($reflectionClass->getMethods() as $method) {
-                $attributes = $method->getAttributes(\\Nickyeoman\\Framework\\Attributes\\Route::class);
-    
+                $attributes = $method->getAttributes(\Nickyeoman\Framework\Attributes\Route::class); // Single backslash here
                 foreach ($attributes as $attribute) {
                     $routes[] = [[$controllerClassName, $method->getName()], $attribute->newInstance()->path];
                 }
@@ -46,6 +43,7 @@ class ControllerPaths {
         }
     
         $this->cachedRoutes = $routes;
+        dump($routes);
         return $routes;
     }
 

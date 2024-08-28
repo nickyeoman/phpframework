@@ -11,7 +11,7 @@
 
 ## Requirements
 
-* ubuntu php-cli (sudo nala install php-curl php-xml php-mysql)
+* For ubuntu you need php-cli (sudo nala install php-curl php-xml php-mysql)
 * [Install Composer](https://www.nickyeoman.com/page/install-composer-on-ubuntu) 
 
 ## Easy Install
