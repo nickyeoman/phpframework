@@ -7,4 +7,3 @@ require FRAMEWORKPATH . '/inc/framework.php';
 require FRAMEWORKPATH . '/inc/utility.php'; 
 require FRAMEWORKPATH . '/inc/twig.php';
 require FRAMEWORKPATH . '/inc/routing.php'; 
-

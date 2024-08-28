@@ -22,22 +22,29 @@ class ControllerPaths {
         if (!empty($this->cachedRoutes)) {
             return $this->cachedRoutes;
         }
-
+    
         $routes = [];
-
+    
         foreach ($this->controllerFiles as $controllerFile) {
             $namespace = $this->getNamespaceFromFile($controllerFile);
             $className = basename($controllerFile, '.php');
-            $controllerClassName = $namespace . '\\' . $className;
-            $reflectionClass = new \ReflectionClass($controllerClassName);
+            $controllerClassName = $namespace . '\\\\' . $className;
+    
+            if (class_exists($controllerClassName)) {
+                $reflectionClass = new \\ReflectionClass($controllerClassName);
+            } else {
+                continue;
+            }
+    
             foreach ($reflectionClass->getMethods() as $method) {
-                $attributes = $method->getAttributes(\Nickyeoman\Framework\Attributes\Route::class);
+                $attributes = $method->getAttributes(\\Nickyeoman\\Framework\\Attributes\\Route::class);
+    
                 foreach ($attributes as $attribute) {
                     $routes[] = [[$controllerClassName, $method->getName()], $attribute->newInstance()->path];
                 }
             }
         }
-
+    
         $this->cachedRoutes = $routes;
         return $routes;
     }
